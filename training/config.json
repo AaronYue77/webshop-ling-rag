@@ -1,0 +1,19 @@
+{
+  "model_id": "inclusionAI/Ling-3.0-tiny",
+  "model_revision": "main",
+  "seed": 42,
+  "max_length": 1152,
+  "max_new_tokens": 340,
+  "lora_rank": 8,
+  "lora_alpha": 16,
+  "lora_dropout": 0.05,
+  "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "q_a_proj", "q_b_proj", "kv_a_proj_with_mqa", "kv_b_proj"],
+  "learning_rate": 0.00015,
+  "epochs": 1,
+  "gradient_accumulation_steps": 16,
+  "logging_steps": 1,
+  "save_steps": 20,
+  "eval_steps": 20,
+  "validation_loss_examples": 24,
+  "warmup_ratio": 0.05
+}
