@@ -1,0 +1,127 @@
+{
+  "model_revision": "9a98e35fe1c9ee255f78dd64771c7ae15a799481",
+  "split": "test",
+  "data_sha256": "21b98a834d64bed299cb737509d2ae4b4023d918ed42a0c6ee08f53846414fa8",
+  "adapter_sha256": "a12308ed323e764e3a14fb3437a9371e8d839394cfa27f134e9db65c2e86b8c9",
+  "limit": null,
+  "smoke_adapter": false,
+  "base": {
+    "samples": 156,
+    "valid_json": 0.557692,
+    "action_accuracy": 0.166667,
+    "refs_accuracy": 0.429487,
+    "category_accuracy": 0.557692,
+    "limit_accuracy": 0.557692,
+    "compatibility_target_accuracy": 0.487179,
+    "constraints_exact": 0.551282,
+    "task_macro_f1": 0.295757,
+    "plan_exact": 0.0,
+    "family_plan_exact": {
+      "active": {
+        "n": 11,
+        "score": 0.0
+      },
+      "budget": {
+        "n": 37,
+        "score": 0.0
+      },
+      "compare": {
+        "n": 11,
+        "score": 0.0
+      },
+      "current": {
+        "n": 11,
+        "score": 0.0
+      },
+      "detail": {
+        "n": 12,
+        "score": 0.0
+      },
+      "fit": {
+        "n": 11,
+        "score": 0.0
+      },
+      "lookup": {
+        "n": 39,
+        "score": 0.0
+      },
+      "reason": {
+        "n": 11,
+        "score": 0.0
+      },
+      "shoe": {
+        "n": 2,
+        "score": 0.0
+      },
+      "variant": {
+        "n": 11,
+        "score": 0.0
+      }
+    }
+  },
+  "adapter": {
+    "samples": 156,
+    "valid_json": 0.987179,
+    "action_accuracy": 0.967949,
+    "refs_accuracy": 0.967949,
+    "category_accuracy": 0.987179,
+    "limit_accuracy": 0.987179,
+    "compatibility_target_accuracy": 0.987179,
+    "constraints_exact": 0.961538,
+    "task_macro_f1": 0.900427,
+    "plan_exact": 0.769231,
+    "family_plan_exact": {
+      "active": {
+        "n": 11,
+        "score": 1.0
+      },
+      "budget": {
+        "n": 37,
+        "score": 0.918919
+      },
+      "compare": {
+        "n": 11,
+        "score": 0.0
+      },
+      "current": {
+        "n": 11,
+        "score": 1.0
+      },
+      "detail": {
+        "n": 12,
+        "score": 1.0
+      },
+      "fit": {
+        "n": 11,
+        "score": 1.0
+      },
+      "lookup": {
+        "n": 39,
+        "score": 1.0
+      },
+      "reason": {
+        "n": 11,
+        "score": 0.090909
+      },
+      "shoe": {
+        "n": 2,
+        "score": 0.0
+      },
+      "variant": {
+        "n": 11,
+        "score": 0.090909
+      }
+    }
+  },
+  "delta": {
+    "valid_json": 0.429487,
+    "action_accuracy": 0.801282,
+    "refs_accuracy": 0.538462,
+    "category_accuracy": 0.429487,
+    "limit_accuracy": 0.429487,
+    "compatibility_target_accuracy": 0.5,
+    "constraints_exact": 0.410256,
+    "task_macro_f1": 0.60467,
+    "plan_exact": 0.769231
+  }
+}
