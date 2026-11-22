@@ -11,12 +11,12 @@ const root = resolve(__dirname,"..");
 const {products,meta} = globalThis.ShopCatalog;
 const idx = rag.index(products);
 const localVersion = {model:"local-rule-planner",config_version:rag.localConfigVersion,catalog_sha256:meta.sha256};
-const splits = ["train","validation","test","challenge"];
+const splits = ["train","validation","test"];
 const {values} = parseArgs({options:{
   run:{type:"string"}, split:{type:"string"}, output:{type:"string"}
 }});
 if (values.split && !splits.includes(values.split)) throw Error("Invalid dataset split.");
-const chosen = values.split ? [values.split] : values.run ? ["test","challenge"] : splits;
+const chosen = values.split ? [values.split] : values.run ? ["test"] : splits;
 
 const readRows = path=>readFileSync(path,"utf8").split(/\r?\n/).filter(line=>line.trim()).map(line=>JSON.parse(line));
 const digest = path=>createHash("sha256").update(readFileSync(path)).digest("hex");

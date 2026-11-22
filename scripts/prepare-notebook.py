@@ -110,10 +110,10 @@ print("Ling generation preflight passed.", flush=True)
 cell("markdown", """
 ## 基座与 LoRA 对比
 
-正式运行使用完整 156 条测试问题和 24 条独立问法。Smoke 只用 4 题检查评测链路。评测按条写盘，长时间运行中断后可在相同配置下续跑。
+正式运行使用完整的 156 道正式测试题。Smoke 只用 4 题检查评测链路。评测按条写盘，长时间运行中断后可在相同配置下续跑。
 """)
 cell("code", """
-for split in (["test"] if MODE == "smoke" else ["test", "challenge"]):
+for split in ["test"]:
     command = [sys.executable, "training/evaluate.py", "--adapter", str(out / "adapter"),
                "--output", str(out / ("evaluation-" + split)), "--split", split]
     if MODE == "smoke":

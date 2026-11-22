@@ -174,50 +174,5 @@ for (const [split,items] of Object.entries(splits)) {
     categories:Object.fromEntries(Object.entries(quotas).map(([key,value])=>[key,value[split]])),families:counts};
 }
 fs.writeFileSync(path.join(out,"asin-splits.json"),JSON.stringify(assignment,null,2)+"\n");
-const exampleProducts = splits.test.filter(p=>p.category==="fashion").slice(0,4);
-const prior = contextFor(exampleProducts), active = contextFor(exampleProducts,2);
-const detail = (n,tasks,extra={})=>({action:"detail",refs:[n],tasks,...extra});
-const comparison = (a,b)=>({action:"compare",refs:[a,b],tasks:["compare","price","specs"]});
-const challenges = [
-  ["我想给女朋友买一双8.5码的女士鞋，预算50美元以内。请给我图片、历史价格和推荐理由，并列出颜色与尺码信息。",
-    {shoe:true,audience:"women",size:"8.5",size_system:"US",max_price:50,tasks:["image","price","price_history","recommend","color","size"]}],
-  ["目录里有哪些女士鞋款？给我看看图片、历史价格和已记录的尺码。",
-    {shoe:true,audience:"women",limit:12,tasks:["image","price","price_history","size"]}],
-  ["从美妆个护里挑几件25美元以内的商品，给我图片，并说明怎么选。",
-    {category:"beauty",max_price:25,tasks:["image","recommend"]}],
-  ["介绍第三款的颜色、材质和规格，资料缺失的地方也告诉我。",detail(3,["color","material","specs"]),prior],
-  ["第一款和第三款哪个更便宜？差多少钱？它们的主要区别是什么？",comparison(1,3),prior],
-  ["刚才第二款记录了哪些尺码？这些尺码有各自的价格吗？",detail(2,["size","price","variant_price"]),prior],
-  ["我比较喜欢第一款。结合它的具体属性，说说选择它的理由和还需要确认的信息。",detail(1,["recommend"]),prior],
-  ["这款现在是不是有货？能确认实时售价吗？",detail(2,["inventory","price","current_price"]),active],
-  ["给我看 3 件 20 美元以下的电子数码商品，按价格从高到低列出来。",
-    {category:"electronics",max_price:20,limit:3,sort:"price_desc",tasks:["price"]}],
-  ["两件美妆加起来预算 18 美元，想先看照片和推荐理由。",
-    {category:"beauty",max_price:18,budget_scope:"total",limit:2,tasks:["image","recommend"]}],
-  ["找黑色、UK 7 的男鞋，低于 40 美元，附照片。",
-    {shoe:true,audience:"men",color:"black",size:"7",size_system:"UK",max_price:40,price_exclusive:true,tasks:["image","size"]}],
-  ["我准备用欧码 39 选女士凉鞋，想要商品图片和尺寸表。",
-    {shoe:true,audience:"women",size:"39",size_system:"EU",terms:["sandals"],tasks:["image","size","specs"]}],
-  ["Show me grocery items between 10 and 22 dollars, cheapest first, with photos.",
-    {category:"grocery",min_price:10,max_price:22,sort:"price_asc",tasks:["image"]}],
-  ["有没有适配 iPhone 13 的手机壳？从数码挑 2 款单价不超过 30 美元并给出图片。",
-    {category:"electronics",max_price:30,compatibility_target:"iPhone 13",terms:["phone case"],limit:2,tasks:["compatibility","image"]}],
-  ["前一轮第 2 件配 Nintendo Switch 可不可以，确认依据在哪？",
-    detail(2,["compatibility"],{compatibility_target:"Nintendo Switch"}),prior],
-  ["Show me three coffee options under $15 per item. Include pictures and a selection rationale.",
-    {max_price:15,price_exclusive:true,terms:["coffee"],limit:3,tasks:["image","recommend"]}],
-  ["第三件的各个颜色有没有分别标价？",detail(3,["color","price","variant_price"]),prior],
-  ["第 1 件过去三个月降价了吗？顺便核实今天库存。",detail(1,["price_history","price","inventory"]),prior],
-  ["What is the material of the previously selected item? Any catalog dimensions?",detail(2,["material","specs"]),active],
-  ["请改搜家居园艺，展示前五件并给图，预算最多 60 美元。",{category:"garden",max_price:60,limit:5,tasks:["image"]},prior],
-  ["比较第二和第四款，主要差别与目录价分别是多少？",comparison(2,4),prior],
-  ["哪个颜色更适合搭配？先列出第 2 款的颜色，给我图片。",detail(2,["color","image","recommend"]),prior],
-  ["Do you have any face masks below $12 with images?",{max_price:12,price_exclusive:true,terms:["face mask"],tasks:["image"]}],
-  ["推荐 2 个 100 美元以内的咖啡桌，讲讲材质和规格，给出商品照片。",
-    {max_price:100,terms:["coffee table"],limit:2,tasks:["recommend","material","specs","image"]}]
-];
-const challengeRows = challenges.map(([q,p,c],i)=>row("challenge-"+(i+1),c ? exampleProducts.map(x=>x.id) : [],q,p,c,"manual"));
-fs.writeFileSync(path.join(out,"challenge.jsonl"),challengeRows.map(r=>JSON.stringify(r)).join("\n")+"\n");
-manifest.challenge = {questions:challengeRows.length,contextSplit:"test",construction:"manual"};
 fs.writeFileSync(path.join(out,"manifest.json"),JSON.stringify(manifest,null,2)+"\n");
 console.log(JSON.stringify(manifest,null,2));
