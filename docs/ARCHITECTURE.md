@@ -33,7 +33,7 @@ flowchart TD
 flowchart TD
   C["WebShop 目录"] --> G["ASIN 家族分组"]
   G --> S["训练与验证样本"]
-  G --> H["留出测试与挑战题"]
+  G --> H["留出测试"]
   S --> T["Ling 4-bit QLoRA"]
   T --> W["LoRA 适配器"]
   W --> E["底座与适配器对照评测"]
