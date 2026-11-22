@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
+  <title>WebShop 商品档案 · 问答台</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="policy.js"></script>
+  <script defer src="catalog.js"></script>
+  <script defer src="rag.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="bar-inner">
+      <button id="home" class="brand" type="button" aria-label="WebShop 商品档案首页">
+        <span class="brand-mark" aria-hidden="true">W</span><b>WebShop 商品档案</b>
+      </button>
+      <div class="header-actions">
+        <span id="status" class="status" role="status"><span class="dot"></span><span id="status-text">Kaggle 待连接</span></span>
+        <button id="settings" class="button primary" type="button">连接 Kaggle <span aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+  </header>
+  <main class="workspace">
+    <aside id="workspace-tools" class="workspace-tools" aria-label="问答台功能">
+      <div class="workspace-actions">
+        <button id="new-thread" class="button primary" type="button"><span aria-hidden="true">＋</span> 新对话</button>
+      </div>
+      <section class="recent-threads" aria-labelledby="recent-threads-title">
+        <h2 id="recent-threads-title">最近对话</h2>
+        <div id="recent-thread-list" class="recent-thread-list"></div>
+      </section>
+      <p id="archive-status" role="status"></p>
+      <p id="history-action-status" class="sr-only" role="status"></p>
+    </aside>
+    <div id="workspace-resizer" class="workspace-resizer" role="separator" tabindex="0"
+         aria-label="调整功能区宽度" aria-controls="workspace-tools" aria-orientation="vertical"
+         aria-valuemin="148" aria-valuemax="360" aria-valuenow="218"></div>
+    <div class="workspace-main">
+      <div class="workspace-head">
+        <div id="breadcrumbs" class="breadcrumbs" aria-label="当前位置"></div>
+        <button id="toggle-workspace-tools" class="button" type="button" aria-controls="workspace-tools" aria-expanded="false">功能区</button>
+      </div>
+      <div id="scroll" class="scroll" tabindex="0" aria-label="商品与对话区域">
+        <section id="catalog" aria-label="商品档案"></section>
+        <section id="messages" class="messages" aria-label="对话" aria-live="polite" hidden></section>
+      </div>
+      <div class="compose">
+        <form id="composer">
+          <label class="sr-only" for="question">输入商品问题</label>
+          <textarea id="question" rows="2" maxlength="1500" placeholder="问问商品的颜色、尺码和价格，或找几个候选…" required></textarea>
+          <div class="compose-actions">
+            <span><kbd>Enter</kbd> 发送 <span class="divider">·</span> <kbd>Shift + Enter</kbd> 换行</span>
+            <button id="send" class="button primary" type="submit" disabled>发送 <span aria-hidden="true">↑</span></button>
+          </div>
+        </form>
+        <p id="feedback" role="status">目录仅提供历史快照。实时价格、库存和可购买情况需要另行核对。</p>
+      </div>
+    </div>
+  </main>
+  <dialog id="connection" aria-labelledby="connection-title">
+    <form id="connection-form">
+      <div class="dialog-title"><h2 id="connection-title">连接 Kaggle GPU</h2><button id="close-settings" class="icon-button" type="button" aria-label="关闭">×</button></div>
+      <p><a href="https://www.kaggle.com/code/aaronyue77/webshop-ling-inference" target="_blank" rel="noopener noreferrer">打开一键推理 Notebook ↗</a>，点 <strong>Run All</strong>。模型就绪后，粘贴 <strong>VSCode Compatible URL</strong>。</p>
+      <details id="connection-guide" class="connection-guide">
+        <summary>点击查看详细图文说明</summary>
+        <ol class="guide-steps">
+          <li>
+            <h3>复制推理 Notebook</h3>
+            <p>打开 <a href="https://www.kaggle.com/code/aaronyue77/webshop-ling-inference" target="_blank" rel="noopener noreferrer">WebShop Ling-3.0-tiny 一键推理 Notebook ↗</a>，点 <strong>Copy &amp; Edit</strong>。如果右上角显示 <strong>Edit</strong>，从旁边的 <strong>⋮</strong> 选择 <strong>Copy &amp; edit notebook</strong>。</p>
+            <div class="guide-images"><img src="kaggle-guide/01-copy.png" alt="Kaggle 更多菜单中的 Copy &amp; edit notebook" loading="lazy"></div>
+          </li>
+          <li>
+            <h3>启用 GPU 和 Internet</h3>
+            <p>在自己的副本中打开 <strong>Settings</strong>。确认 Internet 已开启，并在 <strong>Accelerator</strong> 选一个可用的 GPU，例如 <strong>GPU T4 x2</strong>。</p>
+            <div class="guide-images"><img src="kaggle-guide/02-gpu.png" alt="Kaggle Settings 菜单中的 Internet 和 GPU 选项" loading="lazy"></div>
+          </li>
+          <li>
+            <h3>点击 Run All</h3>
+            <p>直接点工具栏上的 <strong>Run All</strong>。Notebook 会自动读取正式 LoRA 权重并启动推理。等待输出 <strong>WebShop LoRA 已就绪</strong>。</p>
+            <div class="guide-images"><img src="kaggle-guide/06-run-all.png" alt="Kaggle 工具栏中的 Run All 按钮" loading="lazy"></div>
+          </li>
+          <li>
+            <h3>复制会话地址并连接</h3>
+            <p>保持 Kaggle 会话运行，打开 <strong>Run → Kaggle Jupyter Server</strong>。在 <strong>Manually Connect</strong> 找到 <strong>VSCode Compatible URL</strong> 并复制。回到问答台，粘贴到 <strong>Kaggle 会话地址</strong>，点击 <strong>连接</strong>。</p>
+            <div class="guide-images"><img src="kaggle-guide/07-server-menu.png" alt="Run 菜单中的 Kaggle Jupyter Server" loading="lazy"><img src="kaggle-guide/07-vscode.png" alt="Kaggle Jupyter Server 面板中的 VSCode Compatible URL" loading="lazy"></div>
+          </li>
+        </ol>
+        <button id="back-to-kaggle-address" class="button" type="button">返回粘贴 Kaggle 地址</button>
+      </details>
+      <label for="endpoint">Kaggle 会话地址</label>
+      <input id="endpoint" type="password" placeholder="https://…" autocomplete="off" spellcheck="false" inputmode="url" required>
+      <p id="connect-result" class="notice" role="status"></p>
+      <div class="dialog-actions">
+        <button id="disconnect" class="button" type="button" hidden>断开连接</button>
+        <button id="connect" class="button primary" type="submit">连接</button>
+      </div>
+    </form>
+  </dialog>
+  <div id="thread-actions" class="thread-actions" role="group" aria-label="对话操作" hidden>
+    <button id="delete-thread" type="button">删除</button>
+    <button id="export-thread" type="button">导出对话记录</button>
+  </div>
+  <dialog id="delete-thread-dialog" aria-labelledby="delete-thread-title" aria-describedby="delete-thread-name">
+    <div class="dialog-title"><h2 id="delete-thread-title">删除这条对话？</h2></div>
+    <p id="delete-thread-name"></p>
+    <div class="dialog-actions">
+      <button id="cancel-delete-thread" class="button" type="button" autofocus>取消</button>
+      <button id="confirm-delete-thread" class="button primary" type="button">确认删除</button>
+    </div>
+  </dialog>
+</body>
+</html>
