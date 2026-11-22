@@ -76,10 +76,5 @@
         "shoe": 2
       }
     }
-  },
-  "challenge": {
-    "questions": 24,
-    "contextSplit": "test",
-    "construction": "manual"
   }
 }
