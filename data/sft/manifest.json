@@ -1,0 +1,85 @@
+{
+  "seed": "webshop-v1",
+  "catalogSHA256": "9cd22585dc15a240ba2d554627b1d72a15c81f435376225341274550176fa62f",
+  "groupCount": 777,
+  "variantGroups": 1,
+  "split": {
+    "train": {
+      "products": 623,
+      "questions": 1246,
+      "uniqueInputs": 1246,
+      "categories": {
+        "beauty": 177,
+        "electronics": 163,
+        "fashion": 50,
+        "garden": 156,
+        "grocery": 77
+      },
+      "families": {
+        "lookup": 310,
+        "detail": 89,
+        "budget": 310,
+        "compare": 89,
+        "variant": 89,
+        "current": 89,
+        "reason": 89,
+        "fit": 89,
+        "active": 89,
+        "shoe": 3
+      }
+    },
+    "validation": {
+      "products": 78,
+      "questions": 156,
+      "uniqueInputs": 156,
+      "categories": {
+        "beauty": 22,
+        "electronics": 20,
+        "fashion": 6,
+        "garden": 20,
+        "grocery": 10
+      },
+      "families": {
+        "lookup": 38,
+        "detail": 12,
+        "budget": 38,
+        "compare": 11,
+        "variant": 11,
+        "current": 11,
+        "reason": 11,
+        "fit": 11,
+        "active": 11,
+        "shoe": 2
+      }
+    },
+    "test": {
+      "products": 78,
+      "questions": 156,
+      "uniqueInputs": 156,
+      "categories": {
+        "beauty": 22,
+        "electronics": 20,
+        "fashion": 7,
+        "garden": 20,
+        "grocery": 9
+      },
+      "families": {
+        "lookup": 39,
+        "detail": 12,
+        "budget": 37,
+        "compare": 11,
+        "variant": 11,
+        "current": 11,
+        "reason": 11,
+        "fit": 11,
+        "active": 11,
+        "shoe": 2
+      }
+    }
+  },
+  "challenge": {
+    "questions": 24,
+    "contextSplit": "test",
+    "construction": "manual"
+  }
+}

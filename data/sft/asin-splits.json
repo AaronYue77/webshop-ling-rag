@@ -1,0 +1,3118 @@
+{
+  "B08276Q6PZ": {
+    "split": "train",
+    "group": "B08276Q6PZ"
+  },
+  "B08X4YD5WH": {
+    "split": "train",
+    "group": "B08X4YD5WH"
+  },
+  "B00GMQ4WRI": {
+    "split": "train",
+    "group": "B00GMQ4WRI"
+  },
+  "B085VFMXMZ": {
+    "split": "train",
+    "group": "B085VFMXMZ"
+  },
+  "B07234S5G1": {
+    "split": "train",
+    "group": "B07234S5G1"
+  },
+  "B09LLRSWF4": {
+    "split": "train",
+    "group": "B09LLRSWF4"
+  },
+  "B01LR85M1U": {
+    "split": "train",
+    "group": "B01LR85M1U"
+  },
+  "B09P71WY8C": {
+    "split": "train",
+    "group": "B09P71WY8C"
+  },
+  "B07963ZMK6": {
+    "split": "train",
+    "group": "B07963ZMK6"
+  },
+  "B09DBYG4XD": {
+    "split": "train",
+    "group": "B09DBYG4XD"
+  },
+  "B083TZ4JSR": {
+    "split": "train",
+    "group": "B083TZ4JSR"
+  },
+  "B077KY1X93": {
+    "split": "train",
+    "group": "B077KY1X93"
+  },
+  "B09RVF4JP1": {
+    "split": "train",
+    "group": "B09RVF4JP1"
+  },
+  "B08M5BYQN9": {
+    "split": "train",
+    "group": "B08M5BYQN9"
+  },
+  "B07QL67W9Y": {
+    "split": "train",
+    "group": "B07QL67W9Y"
+  },
+  "B08WKMHTGH": {
+    "split": "train",
+    "group": "B08WKMHTGH"
+  },
+  "B09D842QY4": {
+    "split": "train",
+    "group": "B09D842QY4"
+  },
+  "B0073AC440": {
+    "split": "train",
+    "group": "B0073AC440"
+  },
+  "B001C6JXJU": {
+    "split": "train",
+    "group": "B001C6JXJU"
+  },
+  "B009LHWYO8": {
+    "split": "train",
+    "group": "B009LHWYO8"
+  },
+  "B01MSXI9M5": {
+    "split": "train",
+    "group": "B01MSXI9M5"
+  },
+  "B09M7M1YB3": {
+    "split": "train",
+    "group": "B09M7M1YB3"
+  },
+  "B08NPQT5TW": {
+    "split": "train",
+    "group": "B08NPQT5TW"
+  },
+  "B09Q55JLCS": {
+    "split": "train",
+    "group": "B09Q55JLCS"
+  },
+  "B08GY1VWPH": {
+    "split": "train",
+    "group": "B08GY1VWPH"
+  },
+  "B0912H5LHP": {
+    "split": "train",
+    "group": "B0912H5LHP"
+  },
+  "B09PYR413Y": {
+    "split": "train",
+    "group": "B09PYR413Y"
+  },
+  "B06XFZXXTC": {
+    "split": "train",
+    "group": "B06XFZXXTC"
+  },
+  "B08LQZ5BRC": {
+    "split": "train",
+    "group": "B08LQZ5BRC"
+  },
+  "B09KRLGSC5": {
+    "split": "train",
+    "group": "B09KRLGSC5"
+  },
+  "B074PBDJG9": {
+    "split": "train",
+    "group": "B074PBDJG9"
+  },
+  "B094RBNS2K": {
+    "split": "train",
+    "group": "B094RBNS2K"
+  },
+  "B07K23XNQN": {
+    "split": "train",
+    "group": "B07K23XNQN"
+  },
+  "B07FYPSNH8": {
+    "split": "train",
+    "group": "B07FYPSNH8"
+  },
+  "B09F9DZFKL": {
+    "split": "train",
+    "group": "B09F9DZFKL"
+  },
+  "B07F2G93BJ": {
+    "split": "train",
+    "group": "B07F2G93BJ"
+  },
+  "B09T5M3KKG": {
+    "split": "train",
+    "group": "B09T5M3KKG"
+  },
+  "B084VWH12H": {
+    "split": "train",
+    "group": "B084VWH12H"
+  },
+  "B09DZVSFJL": {
+    "split": "train",
+    "group": "B09DZVSFJL"
+  },
+  "B09JC84P1M": {
+    "split": "train",
+    "group": "B09JC84P1M"
+  },
+  "B08DK9WBQL": {
+    "split": "train",
+    "group": "B08DK9WBQL"
+  },
+  "B004L4D6FW": {
+    "split": "train",
+    "group": "B004L4D6FW"
+  },
+  "B089B1K9LJ": {
+    "split": "train",
+    "group": "B089B1K9LJ"
+  },
+  "B00T9U3NA6": {
+    "split": "train",
+    "group": "B00T9U3NA6"
+  },
+  "B01IA9BY1G": {
+    "split": "train",
+    "group": "B01IA9BY1G"
+  },
+  "B0854JTZMT": {
+    "split": "train",
+    "group": "B0854JTZMT"
+  },
+  "B095Z2SDB9": {
+    "split": "train",
+    "group": "B095Z2SDB9"
+  },
+  "B082HFQM2B": {
+    "split": "train",
+    "group": "B082HFQM2B"
+  },
+  "B08DQWNJPQ": {
+    "split": "train",
+    "group": "B08DQWNJPQ"
+  },
+  "B09Q53YH1W": {
+    "split": "train",
+    "group": "B09Q53YH1W"
+  },
+  "B07PVZPS58": {
+    "split": "train",
+    "group": "B07PVZPS58"
+  },
+  "B079PH6955": {
+    "split": "train",
+    "group": "B079PH6955"
+  },
+  "B08DNGCK67": {
+    "split": "train",
+    "group": "B08DNGCK67"
+  },
+  "B09NDGV4PL": {
+    "split": "train",
+    "group": "B09NDGV4PL"
+  },
+  "B08NFLLK8P": {
+    "split": "train",
+    "group": "B08NFLLK8P"
+  },
+  "B01F3JGOWA": {
+    "split": "train",
+    "group": "B01F3JGOWA"
+  },
+  "B095TRCDXW": {
+    "split": "train",
+    "group": "B095TRCDXW"
+  },
+  "B09B7G7P58": {
+    "split": "train",
+    "group": "B09B7G7P58"
+  },
+  "B09B265D1J": {
+    "split": "train",
+    "group": "B09B265D1J"
+  },
+  "B08HV9D6P3": {
+    "split": "train",
+    "group": "B08HV9D6P3"
+  },
+  "B01LA37T1S": {
+    "split": "train",
+    "group": "B01LA37T1S"
+  },
+  "B08YNRQSBL": {
+    "split": "train",
+    "group": "B08YNRQSBL"
+  },
+  "B00272NBN2": {
+    "split": "train",
+    "group": "B00272NBN2"
+  },
+  "B01N4QB5WP": {
+    "split": "train",
+    "group": "B01N4QB5WP"
+  },
+  "B08G14B779": {
+    "split": "train",
+    "group": "B08G14B779"
+  },
+  "B01NB94BQO": {
+    "split": "train",
+    "group": "B01NB94BQO"
+  },
+  "B07LGBVH6L": {
+    "split": "train",
+    "group": "B07LGBVH6L"
+  },
+  "B078T46X81": {
+    "split": "train",
+    "group": "B078T46X81"
+  },
+  "B07G2SC9HW": {
+    "split": "train",
+    "group": "B07G2SC9HW"
+  },
+  "B00FBPHZKC": {
+    "split": "train",
+    "group": "B00FBPHZKC"
+  },
+  "B09J89KFHQ": {
+    "split": "train",
+    "group": "B09J89KFHQ"
+  },
+  "B084ZPN17C": {
+    "split": "train",
+    "group": "B084ZPN17C"
+  },
+  "B09N3CDKGV": {
+    "split": "train",
+    "group": "B09N3CDKGV"
+  },
+  "B08MQF4FV1": {
+    "split": "train",
+    "group": "B08MQF4FV1"
+  },
+  "B07HDK7TPT": {
+    "split": "train",
+    "group": "B07HDK7TPT"
+  },
+  "B07WGHWNSB": {
+    "split": "train",
+    "group": "B07WGHWNSB"
+  },
+  "B086DK24K2": {
+    "split": "train",
+    "group": "B086DK24K2"
+  },
+  "B08NWDG4N4": {
+    "split": "train",
+    "group": "B08NWDG4N4"
+  },
+  "B085W9G2QY": {
+    "split": "train",
+    "group": "B085W9G2QY"
+  },
+  "B000EMWBV0": {
+    "split": "train",
+    "group": "B000EMWBV0"
+  },
+  "B01A0VZQHK": {
+    "split": "train",
+    "group": "B01A0VZQHK"
+  },
+  "B09B4YH4RG": {
+    "split": "train",
+    "group": "B09B4YH4RG"
+  },
+  "B09RQ22QJY": {
+    "split": "train",
+    "group": "B09RQ22QJY"
+  },
+  "B09P147DN2": {
+    "split": "train",
+    "group": "B09P147DN2"
+  },
+  "B07S2Z9KGP": {
+    "split": "train",
+    "group": "B07S2Z9KGP"
+  },
+  "B09GVJBPRR": {
+    "split": "train",
+    "group": "B09GVJBPRR"
+  },
+  "B08YNND3LN": {
+    "split": "train",
+    "group": "B08YNND3LN"
+  },
+  "B08ZHP2QQG": {
+    "split": "train",
+    "group": "B08ZHP2QQG"
+  },
+  "B08DZ2593Y": {
+    "split": "train",
+    "group": "B08DZ2593Y"
+  },
+  "B09QYYN4S4": {
+    "split": "train",
+    "group": "B09QYYN4S4"
+  },
+  "B00IG0RDNI": {
+    "split": "train",
+    "group": "B00IG0RDNI"
+  },
+  "B08X31TV2P": {
+    "split": "train",
+    "group": "B08X31TV2P"
+  },
+  "B088WFD1XQ": {
+    "split": "train",
+    "group": "B088WFD1XQ"
+  },
+  "B099Z6YWL1": {
+    "split": "train",
+    "group": "B099Z6YWL1"
+  },
+  "B09QCVCYVY": {
+    "split": "train",
+    "group": "B09QCVCYVY"
+  },
+  "B01DNNKHBC": {
+    "split": "train",
+    "group": "B01DNNKHBC"
+  },
+  "B01A0L5FXA": {
+    "split": "train",
+    "group": "B01A0L5FXA"
+  },
+  "B07N864Q64": {
+    "split": "train",
+    "group": "B07N864Q64"
+  },
+  "B07VJ8R4HY": {
+    "split": "train",
+    "group": "B07VJ8R4HY"
+  },
+  "B0928LGTVF": {
+    "split": "train",
+    "group": "B0928LGTVF"
+  },
+  "B08GXD5MDG": {
+    "split": "train",
+    "group": "B08GXD5MDG"
+  },
+  "B07SXRVKZ2": {
+    "split": "train",
+    "group": "B07SXRVKZ2"
+  },
+  "B09DXD6LLB": {
+    "split": "train",
+    "group": "B09DXD6LLB"
+  },
+  "B09RLQR5NP": {
+    "split": "train",
+    "group": "B09RLQR5NP"
+  },
+  "B00CHSKYKE": {
+    "split": "train",
+    "group": "B00CHSKYKE"
+  },
+  "B09DPDGYRK": {
+    "split": "train",
+    "group": "B09DPDGYRK"
+  },
+  "B00JISMSG4": {
+    "split": "train",
+    "group": "B00JISMSG4"
+  },
+  "B09BNCFGLY": {
+    "split": "train",
+    "group": "B09BNCFGLY"
+  },
+  "B000J3HZXS": {
+    "split": "train",
+    "group": "B000J3HZXS"
+  },
+  "B014C9KQLM": {
+    "split": "train",
+    "group": "B014C9KQLM"
+  },
+  "B08H22ZV67": {
+    "split": "train",
+    "group": "B08H22ZV67"
+  },
+  "B07FDJYBVW": {
+    "split": "train",
+    "group": "B07FDJYBVW"
+  },
+  "B001GCVA0U": {
+    "split": "train",
+    "group": "B001GCVA0U"
+  },
+  "B087Y28XLM": {
+    "split": "train",
+    "group": "B087Y28XLM"
+  },
+  "B09LHM4WQS": {
+    "split": "train",
+    "group": "B09LHM4WQS"
+  },
+  "B09JNRTFGQ": {
+    "split": "train",
+    "group": "B09JNRTFGQ"
+  },
+  "B00DGDBYQC": {
+    "split": "train",
+    "group": "B00DGDBYQC"
+  },
+  "B00ECNSAXU": {
+    "split": "train",
+    "group": "B00ECNSAXU"
+  },
+  "B08TGV7SP2": {
+    "split": "train",
+    "group": "B08TGV7SP2"
+  },
+  "B00R249C5G": {
+    "split": "train",
+    "group": "B00R249C5G"
+  },
+  "B09F6SCW47": {
+    "split": "train",
+    "group": "B09F6SCW47"
+  },
+  "B09B7551X2": {
+    "split": "train",
+    "group": "B09B7551X2"
+  },
+  "B09H2NB41N": {
+    "split": "train",
+    "group": "B09H2NB41N"
+  },
+  "B09BWQZ68V": {
+    "split": "train",
+    "group": "B09BWQZ68V"
+  },
+  "B08QVDNJC7": {
+    "split": "train",
+    "group": "B08QVDNJC7"
+  },
+  "B09PTQFBNT": {
+    "split": "train",
+    "group": "B09PTQFBNT"
+  },
+  "B09CTMLF8X": {
+    "split": "train",
+    "group": "B09CTMLF8X"
+  },
+  "B08X2PKKB2": {
+    "split": "train",
+    "group": "B08X2PKKB2"
+  },
+  "B07S8JZJ6Y": {
+    "split": "train",
+    "group": "B07S8JZJ6Y"
+  },
+  "B09CV5GPJ2": {
+    "split": "train",
+    "group": "B09CV5GPJ2"
+  },
+  "B019IHR5LW": {
+    "split": "train",
+    "group": "B019IHR5LW"
+  },
+  "B09Q3PZ8JK": {
+    "split": "train",
+    "group": "B09Q3PZ8JK"
+  },
+  "B01E9OPWUU": {
+    "split": "train",
+    "group": "B01E9OPWUU"
+  },
+  "B07PGQKDFD": {
+    "split": "train",
+    "group": "B07PGQKDFD"
+  },
+  "B0932C11QQ": {
+    "split": "train",
+    "group": "B0932C11QQ"
+  },
+  "B09QQP3356": {
+    "split": "train",
+    "group": "B09QQP3356"
+  },
+  "B09S2ZQ49B": {
+    "split": "train",
+    "group": "B09S2ZQ49B"
+  },
+  "B08SKT2TCH": {
+    "split": "train",
+    "group": "B08SKT2TCH"
+  },
+  "B09HMN26HY": {
+    "split": "train",
+    "group": "B09HMN26HY"
+  },
+  "B09FXPRZN5": {
+    "split": "train",
+    "group": "B09FXPRZN5"
+  },
+  "B09QMGX7V3": {
+    "split": "train",
+    "group": "B09QMGX7V3"
+  },
+  "B00O19GGSG": {
+    "split": "train",
+    "group": "B00O19GGSG"
+  },
+  "B07B6DVG41": {
+    "split": "train",
+    "group": "B07B6DVG41"
+  },
+  "B09NMZS7HK": {
+    "split": "train",
+    "group": "B09NMZS7HK"
+  },
+  "B09RX1PLP4": {
+    "split": "train",
+    "group": "B09RX1PLP4"
+  },
+  "B099F89JTZ": {
+    "split": "train",
+    "group": "B099F89JTZ"
+  },
+  "B09B321GS4": {
+    "split": "train",
+    "group": "B09B321GS4"
+  },
+  "B01GGCZA7I": {
+    "split": "train",
+    "group": "B01GGCZA7I"
+  },
+  "B09CQ45ZRB": {
+    "split": "train",
+    "group": "B09CQ45ZRB"
+  },
+  "B08QCL5SX5": {
+    "split": "train",
+    "group": "B08QCL5SX5"
+  },
+  "B08SH37R9Z": {
+    "split": "train",
+    "group": "B08SH37R9Z"
+  },
+  "B09B7ZKMVY": {
+    "split": "train",
+    "group": "B09B7ZKMVY"
+  },
+  "B07JHNMLN9": {
+    "split": "train",
+    "group": "B07JHNMLN9"
+  },
+  "B09BVYK2WL": {
+    "split": "train",
+    "group": "B09BVYK2WL"
+  },
+  "B085FQ4YL5": {
+    "split": "train",
+    "group": "B085FQ4YL5"
+  },
+  "B003I567W4": {
+    "split": "train",
+    "group": "B003I567W4"
+  },
+  "B001EHF3KK": {
+    "split": "train",
+    "group": "B001EHF3KK"
+  },
+  "B00VC425OM": {
+    "split": "train",
+    "group": "B00VC425OM"
+  },
+  "B09GY58GDH": {
+    "split": "train",
+    "group": "B09GY58GDH"
+  },
+  "B078FL4788": {
+    "split": "train",
+    "group": "B078FL4788"
+  },
+  "B004TSFEBY": {
+    "split": "train",
+    "group": "B004TSFEBY"
+  },
+  "B099231V35": {
+    "split": "train",
+    "group": "B099231V35"
+  },
+  "B07XTK3P89": {
+    "split": "train",
+    "group": "B07XTK3P89"
+  },
+  "B09D42HCTN": {
+    "split": "train",
+    "group": "B09D42HCTN"
+  },
+  "B08FQTMCNM": {
+    "split": "train",
+    "group": "B08FQTMCNM"
+  },
+  "B00V57WXMU": {
+    "split": "train",
+    "group": "B00V57WXMU"
+  },
+  "B0924PKLQ4": {
+    "split": "train",
+    "group": "B0924PKLQ4"
+  },
+  "B08XQRDDT1": {
+    "split": "train",
+    "group": "B08XQRDDT1"
+  },
+  "B074J81XRB": {
+    "split": "train",
+    "group": "B074J81XRB"
+  },
+  "B09PV9J15D": {
+    "split": "train",
+    "group": "B09PV9J15D"
+  },
+  "B07CN9RZ1C": {
+    "split": "train",
+    "group": "B07CN9RZ1C"
+  },
+  "B098M9KX7K": {
+    "split": "train",
+    "group": "B098M9KX7K"
+  },
+  "B07W92ZTVW": {
+    "split": "train",
+    "group": "B07W92ZTVW"
+  },
+  "B08LD3XCPQ": {
+    "split": "train",
+    "group": "B08LD3XCPQ"
+  },
+  "B09PY89B1S": {
+    "split": "train",
+    "group": "B09PY89B1S"
+  },
+  "B07FLKB8CV": {
+    "split": "train",
+    "group": "B07FLKB8CV"
+  },
+  "B07BHQ6ZFT": {
+    "split": "train",
+    "group": "B07BHQ6ZFT"
+  },
+  "B00A974J3I": {
+    "split": "train",
+    "group": "B00A974J3I"
+  },
+  "B07WDRM4HG": {
+    "split": "train",
+    "group": "B07WDRM4HG"
+  },
+  "B098824K9T": {
+    "split": "train",
+    "group": "B098824K9T"
+  },
+  "B01LYSBBX5": {
+    "split": "train",
+    "group": "B01LYSBBX5"
+  },
+  "B09KGN7XF4": {
+    "split": "train",
+    "group": "B09KGN7XF4"
+  },
+  "B09DG92LJL": {
+    "split": "train",
+    "group": "B09DG92LJL"
+  },
+  "B077D7RL4P": {
+    "split": "train",
+    "group": "B077D7RL4P"
+  },
+  "B00QFWWZMI": {
+    "split": "train",
+    "group": "B00QFWWZMI"
+  },
+  "B091CNTBNS": {
+    "split": "train",
+    "group": "B091CNTBNS"
+  },
+  "B09R7H66FC": {
+    "split": "train",
+    "group": "B09R7H66FC"
+  },
+  "B089R7JZHK": {
+    "split": "train",
+    "group": "B089R7JZHK"
+  },
+  "B0784G74Z9": {
+    "split": "train",
+    "group": "B0784G74Z9"
+  },
+  "B097DSB79F": {
+    "split": "train",
+    "group": "B097DSB79F"
+  },
+  "B08NXTHM2W": {
+    "split": "train",
+    "group": "B08NXTHM2W"
+  },
+  "B07GH3J1Z1": {
+    "split": "train",
+    "group": "B07GH3J1Z1"
+  },
+  "B09J4RH84G": {
+    "split": "train",
+    "group": "B09J4RH84G"
+  },
+  "B097TTL54K": {
+    "split": "train",
+    "group": "B097TTL54K"
+  },
+  "B083WSK6F2": {
+    "split": "train",
+    "group": "B083WSK6F2"
+  },
+  "B07HYF111T": {
+    "split": "train",
+    "group": "B07HYF111T"
+  },
+  "B0927BXC6B": {
+    "split": "train",
+    "group": "B0927BXC6B"
+  },
+  "B001LDRMVU": {
+    "split": "train",
+    "group": "B001LDRMVU"
+  },
+  "B07JMS4SL4": {
+    "split": "train",
+    "group": "B07JMS4SL4"
+  },
+  "B00IMMU4G8": {
+    "split": "train",
+    "group": "B00IMMU4G8"
+  },
+  "B08YWKVNLT": {
+    "split": "train",
+    "group": "B08YWKVNLT"
+  },
+  "B00Q5DO1KQ": {
+    "split": "train",
+    "group": "B00Q5DO1KQ"
+  },
+  "B083ZK4NRS": {
+    "split": "train",
+    "group": "B083ZK4NRS"
+  },
+  "B083YVHBXH": {
+    "split": "train",
+    "group": "B083YVHBXH"
+  },
+  "B094QQ7X9T": {
+    "split": "train",
+    "group": "B094QQ7X9T"
+  },
+  "B08QRKJWW9": {
+    "split": "train",
+    "group": "B08QRKJWW9"
+  },
+  "B0851Y9BDC": {
+    "split": "train",
+    "group": "B0851Y9BDC"
+  },
+  "B08X93ZXR5": {
+    "split": "train",
+    "group": "B08X93ZXR5"
+  },
+  "B08SMS3CNY": {
+    "split": "train",
+    "group": "B08SMS3CNY"
+  },
+  "B08HXR3BGR": {
+    "split": "train",
+    "group": "B08HXR3BGR"
+  },
+  "B091DMZNR4": {
+    "split": "train",
+    "group": "B091DMZNR4"
+  },
+  "B09BW4S48B": {
+    "split": "train",
+    "group": "B09BW4S48B"
+  },
+  "B004N1T7VK": {
+    "split": "train",
+    "group": "B004N1T7VK"
+  },
+  "B07L6PR5WS": {
+    "split": "train",
+    "group": "B07L6PR5WS"
+  },
+  "B08533PJ4S": {
+    "split": "train",
+    "group": "B08533PJ4S"
+  },
+  "B095PF5BXT": {
+    "split": "train",
+    "group": "B095PF5BXT"
+  },
+  "B09NPZHTTY": {
+    "split": "train",
+    "group": "B09NPZHTTY"
+  },
+  "B005WXS61A": {
+    "split": "train",
+    "group": "B005WXS61A"
+  },
+  "B09CGNH5XT": {
+    "split": "train",
+    "group": "B09CGNH5XT"
+  },
+  "B09KRL9W5C": {
+    "split": "train",
+    "group": "B09KRL9W5C"
+  },
+  "B09K4S16YT": {
+    "split": "train",
+    "group": "B09K4S16YT"
+  },
+  "B00HTXJLL0": {
+    "split": "train",
+    "group": "B00HTXJLL0"
+  },
+  "B07PX22S9F": {
+    "split": "train",
+    "group": "B07PX22S9F"
+  },
+  "B08TR23329": {
+    "split": "train",
+    "group": "B08TR23329"
+  },
+  "B08D3S1KK4": {
+    "split": "train",
+    "group": "B08D3S1KK4"
+  },
+  "B08MFGNXW3": {
+    "split": "train",
+    "group": "B08MFGNXW3"
+  },
+  "B00UYJEU8A": {
+    "split": "train",
+    "group": "B00UYJEU8A"
+  },
+  "B09JJ5W1N4": {
+    "split": "train",
+    "group": "B09JJ5W1N4"
+  },
+  "B09L1G6H5Z": {
+    "split": "train",
+    "group": "B09L1G6H5Z"
+  },
+  "B00JH23QMQ": {
+    "split": "train",
+    "group": "B00JH23QMQ"
+  },
+  "B06Y3VLDFB": {
+    "split": "train",
+    "group": "B06Y3VLDFB"
+  },
+  "B09QMGM5S3": {
+    "split": "train",
+    "group": "B09QMGM5S3"
+  },
+  "B08D74SKT2": {
+    "split": "train",
+    "group": "B08D74SKT2"
+  },
+  "B07CYS9J9N": {
+    "split": "train",
+    "group": "B07CYS9J9N"
+  },
+  "B08P8LRFZ4": {
+    "split": "train",
+    "group": "B08P8LRFZ4"
+  },
+  "B07T3VMGDG": {
+    "split": "train",
+    "group": "B07T3VMGDG"
+  },
+  "B08W2XSDST": {
+    "split": "train",
+    "group": "B08W2XSDST"
+  },
+  "B09LSKQF8C": {
+    "split": "train",
+    "group": "B09LSKQF8C"
+  },
+  "B073WX1ZSK": {
+    "split": "train",
+    "group": "B073WX1ZSK"
+  },
+  "B09QQWRW2M": {
+    "split": "train",
+    "group": "B09QQWRW2M"
+  },
+  "B01BV3XRG8": {
+    "split": "train",
+    "group": "B01BV3XRG8"
+  },
+  "B07X9623L4": {
+    "split": "train",
+    "group": "B07X9623L4"
+  },
+  "B01ITTAW1U": {
+    "split": "train",
+    "group": "B01ITTAW1U"
+  },
+  "B08QRHVS6N": {
+    "split": "train",
+    "group": "B08QRHVS6N"
+  },
+  "B09FNLS51H": {
+    "split": "train",
+    "group": "B09FNLS51H"
+  },
+  "B07VTR9SYD": {
+    "split": "train",
+    "group": "B07VTR9SYD"
+  },
+  "B09C8FZ9YS": {
+    "split": "train",
+    "group": "B09C8FZ9YS"
+  },
+  "B000V53HHC": {
+    "split": "train",
+    "group": "B000V53HHC"
+  },
+  "B08W2WTW4Z": {
+    "split": "train",
+    "group": "B08W2WTW4Z"
+  },
+  "B004RK7I2W": {
+    "split": "train",
+    "group": "B004RK7I2W"
+  },
+  "B09J4RS3V1": {
+    "split": "train",
+    "group": "B09J4RS3V1"
+  },
+  "B08SKH3LTM": {
+    "split": "train",
+    "group": "B08SKH3LTM"
+  },
+  "B09J9Y9H95": {
+    "split": "train",
+    "group": "B09J9Y9H95"
+  },
+  "B07CYXLSF2": {
+    "split": "train",
+    "group": "B07CYXLSF2"
+  },
+  "B099WH1RTM": {
+    "split": "train",
+    "group": "B099WH1RTM"
+  },
+  "B07ZDJZJFD": {
+    "split": "train",
+    "group": "B07ZDJZJFD"
+  },
+  "B07HYCDLN6": {
+    "split": "train",
+    "group": "B07HYCDLN6"
+  },
+  "B07DJJXGB5": {
+    "split": "train",
+    "group": "B07DJJXGB5"
+  },
+  "B09HK6JF63": {
+    "split": "train",
+    "group": "B09HK6JF63"
+  },
+  "B00I3O3BSS": {
+    "split": "train",
+    "group": "B00I3O3BSS"
+  },
+  "B09H6G6PT9": {
+    "split": "train",
+    "group": "B09H6G6PT9"
+  },
+  "B087TR48KK": {
+    "split": "train",
+    "group": "B087TR48KK"
+  },
+  "B09B77K9YQ": {
+    "split": "train",
+    "group": "B09B77K9YQ"
+  },
+  "B08HF132PN": {
+    "split": "train",
+    "group": "B08HF132PN"
+  },
+  "B07TVMCK3F": {
+    "split": "train",
+    "group": "B07TVMCK3F"
+  },
+  "B09PL5W9PD": {
+    "split": "train",
+    "group": "B09PL5W9PD"
+  },
+  "B095SWN6C3": {
+    "split": "train",
+    "group": "B095SWN6C3"
+  },
+  "B085LSKHM6": {
+    "split": "train",
+    "group": "B085LSKHM6"
+  },
+  "B07SRS3MXP": {
+    "split": "train",
+    "group": "B07SRS3MXP"
+  },
+  "B004VMVLLU": {
+    "split": "train",
+    "group": "B004VMVLLU"
+  },
+  "B07QXZL1K5": {
+    "split": "train",
+    "group": "B07QXZL1K5"
+  },
+  "B07F6MN8RH": {
+    "split": "train",
+    "group": "B07F6MN8RH"
+  },
+  "B07MVN1K94": {
+    "split": "train",
+    "group": "B07MVN1K94"
+  },
+  "B08FX48B6X": {
+    "split": "train",
+    "group": "B08FX48B6X"
+  },
+  "B00V0OCMXS": {
+    "split": "train",
+    "group": "B00V0OCMXS"
+  },
+  "B0957XW92M": {
+    "split": "train",
+    "group": "B0957XW92M"
+  },
+  "B08CV7M1HV": {
+    "split": "train",
+    "group": "B08CV7M1HV"
+  },
+  "B07ZBCF88X": {
+    "split": "train",
+    "group": "B07ZBCF88X"
+  },
+  "B07KK7G5YJ": {
+    "split": "train",
+    "group": "B07KK7G5YJ"
+  },
+  "B06XG74CXC": {
+    "split": "train",
+    "group": "B06XG74CXC"
+  },
+  "B072FCNCGP": {
+    "split": "train",
+    "group": "B072FCNCGP"
+  },
+  "B09HX5CD2D": {
+    "split": "train",
+    "group": "B09HX5CD2D"
+  },
+  "B08XDKBH2P": {
+    "split": "train",
+    "group": "B08XDKBH2P"
+  },
+  "B09T2MW12R": {
+    "split": "train",
+    "group": "B09T2MW12R"
+  },
+  "B09L4WSCBS": {
+    "split": "train",
+    "group": "B09L4WSCBS"
+  },
+  "B01FT2KXJG": {
+    "split": "train",
+    "group": "B01FT2KXJG"
+  },
+  "B09D4L5H3V": {
+    "split": "train",
+    "group": "B09D4L5H3V"
+  },
+  "B07WV38GWM": {
+    "split": "train",
+    "group": "B07WV38GWM"
+  },
+  "B09JT3Z6JV": {
+    "split": "train",
+    "group": "B09JT3Z6JV"
+  },
+  "B09S6S7LG1": {
+    "split": "train",
+    "group": "B09S6S7LG1"
+  },
+  "B099F1NHY1": {
+    "split": "train",
+    "group": "B099F1NHY1"
+  },
+  "B09LC67HYC": {
+    "split": "train",
+    "group": "B09LC67HYC"
+  },
+  "B004K6B5TK": {
+    "split": "train",
+    "group": "B004K6B5TK"
+  },
+  "B08FZDJRQ7": {
+    "split": "train",
+    "group": "B08FZDJRQ7"
+  },
+  "B092CKF9YF": {
+    "split": "train",
+    "group": "B092CKF9YF"
+  },
+  "B074F9FBV3": {
+    "split": "train",
+    "group": "B074F9FBV3"
+  },
+  "B01M7U6F8T": {
+    "split": "train",
+    "group": "B01M7U6F8T"
+  },
+  "B07YPYJ32Z": {
+    "split": "train",
+    "group": "B07YPYJ32Z"
+  },
+  "B07GYWW3NY": {
+    "split": "train",
+    "group": "B07GYWW3NY"
+  },
+  "B08DXL22JN": {
+    "split": "train",
+    "group": "B08DXL22JN"
+  },
+  "B000JS0V70": {
+    "split": "train",
+    "group": "B000JS0V70"
+  },
+  "B09NRWND4H": {
+    "split": "train",
+    "group": "B09NRWND4H"
+  },
+  "B07GLPCY1C": {
+    "split": "train",
+    "group": "B07GLPCY1C"
+  },
+  "B09KQQNRRM": {
+    "split": "train",
+    "group": "B09KQQNRRM"
+  },
+  "B09Q3NSH3D": {
+    "split": "train",
+    "group": "B09Q3NSH3D"
+  },
+  "B08FGWZZ8J": {
+    "split": "train",
+    "group": "B08FGWZZ8J"
+  },
+  "B08L9SFBXV": {
+    "split": "train",
+    "group": "B08L9SFBXV"
+  },
+  "B0832YXLRK": {
+    "split": "train",
+    "group": "B0832YXLRK"
+  },
+  "B084Q7C6TX": {
+    "split": "train",
+    "group": "B084Q7C6TX"
+  },
+  "B09QCP4579": {
+    "split": "train",
+    "group": "B09QCP4579"
+  },
+  "B07YCGBPRD": {
+    "split": "train",
+    "group": "B07YCGBPRD"
+  },
+  "B009EEVDSQ": {
+    "split": "train",
+    "group": "B009EEVDSQ"
+  },
+  "B091GHBJZ1": {
+    "split": "train",
+    "group": "B091GHBJZ1"
+  },
+  "B09H3N5P74": {
+    "split": "train",
+    "group": "B09H3N5P74"
+  },
+  "B09G9V3G1N": {
+    "split": "train",
+    "group": "B09G9V3G1N"
+  },
+  "B09NSMMHTY": {
+    "split": "train",
+    "group": "B09NSMMHTY"
+  },
+  "B098SV78BW": {
+    "split": "train",
+    "group": "B098SV78BW"
+  },
+  "B09HPMWHM4": {
+    "split": "train",
+    "group": "B09HPMWHM4"
+  },
+  "B08D4MH7XQ": {
+    "split": "train",
+    "group": "B08D4MH7XQ"
+  },
+  "B07L5T94C5": {
+    "split": "train",
+    "group": "B07L5T94C5"
+  },
+  "B09PFWVXVS": {
+    "split": "train",
+    "group": "B09PFWVXVS"
+  },
+  "B00B04344Y": {
+    "split": "train",
+    "group": "B00B04344Y"
+  },
+  "B01JJR8GJG": {
+    "split": "train",
+    "group": "B01JJR8GJG"
+  },
+  "B088WSDHTW": {
+    "split": "train",
+    "group": "B088WSDHTW"
+  },
+  "B099YQ75WT": {
+    "split": "train",
+    "group": "B099YQ75WT"
+  },
+  "B09MW563KN": {
+    "split": "train",
+    "group": "B09MW563KN"
+  },
+  "B073KYWX93": {
+    "split": "train",
+    "group": "B073KYWX93"
+  },
+  "B089KGBJGW": {
+    "split": "train",
+    "group": "B089KGBJGW"
+  },
+  "B015MSXCL8": {
+    "split": "train",
+    "group": "B015MSXCL8"
+  },
+  "B09DG3YTHY": {
+    "split": "train",
+    "group": "B09DG3YTHY"
+  },
+  "B00X2UAMXU": {
+    "split": "train",
+    "group": "B00X2UAMXU"
+  },
+  "B003HBR86S": {
+    "split": "train",
+    "group": "B003HBR86S"
+  },
+  "B07DRFDWVT": {
+    "split": "train",
+    "group": "B07DRFDWVT"
+  },
+  "B085RRL27J": {
+    "split": "train",
+    "group": "B085RRL27J"
+  },
+  "B07C8NSB75": {
+    "split": "train",
+    "group": "B07C8NSB75"
+  },
+  "B07DTWJYND": {
+    "split": "train",
+    "group": "B07DTWJYND"
+  },
+  "B09JJWGGD9": {
+    "split": "train",
+    "group": "B09JJWGGD9"
+  },
+  "B089VWZB64": {
+    "split": "train",
+    "group": "B089VWZB64"
+  },
+  "B09S6LZYHQ": {
+    "split": "train",
+    "group": "B09S6LZYHQ"
+  },
+  "B095KCTB3Y": {
+    "split": "train",
+    "group": "B095KCTB3Y"
+  },
+  "B09CDRQGLS": {
+    "split": "train",
+    "group": "B09CDRQGLS"
+  },
+  "B07S8F7SHK": {
+    "split": "train",
+    "group": "B07S8F7SHK"
+  },
+  "B08T6Y8VVT": {
+    "split": "train",
+    "group": "B08T6Y8VVT"
+  },
+  "B08YH6Y6FQ": {
+    "split": "train",
+    "group": "B08YH6Y6FQ"
+  },
+  "B0943TLW3L": {
+    "split": "train",
+    "group": "B0943TLW3L"
+  },
+  "B08RCVFMQ7": {
+    "split": "train",
+    "group": "B08RCVFMQ7"
+  },
+  "B09S5KV1MY": {
+    "split": "train",
+    "group": "B09S5KV1MY"
+  },
+  "B09BYX42DW": {
+    "split": "train",
+    "group": "B09BYX42DW"
+  },
+  "B07CXTNVRJ": {
+    "split": "train",
+    "group": "B07CXTNVRJ"
+  },
+  "B081QR9F3V": {
+    "split": "train",
+    "group": "B081QR9F3V"
+  },
+  "B083HXHG75": {
+    "split": "train",
+    "group": "B083HXHG75"
+  },
+  "B09RFDP1C3": {
+    "split": "train",
+    "group": "B09RFDP1C3"
+  },
+  "B09M6VXD6W": {
+    "split": "train",
+    "group": "B09M6VXD6W"
+  },
+  "B015D7YII4": {
+    "split": "train",
+    "group": "B015D7YII4"
+  },
+  "B00VQJ07CA": {
+    "split": "train",
+    "group": "B00VQJ07CA"
+  },
+  "B06Y1C21SC": {
+    "split": "train",
+    "group": "B06Y1C21SC"
+  },
+  "B09NRF2QGD": {
+    "split": "train",
+    "group": "B09NRF2QGD"
+  },
+  "B01LXP39SN": {
+    "split": "train",
+    "group": "B01LXP39SN"
+  },
+  "B074FMTQNC": {
+    "split": "train",
+    "group": "B074FMTQNC"
+  },
+  "B099NJ5YRG": {
+    "split": "train",
+    "group": "B099NJ5YRG"
+  },
+  "B00HWHS3ZS": {
+    "split": "train",
+    "group": "B00HWHS3ZS"
+  },
+  "B0816QM13S": {
+    "split": "train",
+    "group": "B0816QM13S"
+  },
+  "B00BL2YE2Q": {
+    "split": "train",
+    "group": "B00BL2YE2Q"
+  },
+  "B09FFV98FY": {
+    "split": "train",
+    "group": "B09FFV98FY"
+  },
+  "B0769HRGD2": {
+    "split": "train",
+    "group": "B0769HRGD2"
+  },
+  "B082WKKPDH": {
+    "split": "train",
+    "group": "B082WKKPDH"
+  },
+  "B09CYYD51R": {
+    "split": "train",
+    "group": "B09CYYD51R"
+  },
+  "B06ZYS6NW4": {
+    "split": "train",
+    "group": "B06ZYS6NW4"
+  },
+  "B08GS6B87J": {
+    "split": "train",
+    "group": "B08GS6B87J"
+  },
+  "B015PWVRPO": {
+    "split": "train",
+    "group": "B015PWVRPO"
+  },
+  "B07GFS3MNT": {
+    "split": "train",
+    "group": "B07GFS3MNT"
+  },
+  "B0002J1HOC": {
+    "split": "train",
+    "group": "B0002J1HOC"
+  },
+  "B0969G2DH8": {
+    "split": "train",
+    "group": "B0969G2DH8"
+  },
+  "B089K79PQ1": {
+    "split": "train",
+    "group": "B089K79PQ1"
+  },
+  "B01I5B1Q1M": {
+    "split": "train",
+    "group": "B01I5B1Q1M"
+  },
+  "B09LQHW84R": {
+    "split": "train",
+    "group": "B09LQHW84R"
+  },
+  "B08KY1G31G": {
+    "split": "train",
+    "group": "B08KY1G31G"
+  },
+  "B09SZ4RMNY": {
+    "split": "train",
+    "group": "B09SZ4RMNY"
+  },
+  "B07THL8PP1": {
+    "split": "train",
+    "group": "B07THL8PP1"
+  },
+  "B017L3XL54": {
+    "split": "train",
+    "group": "B017L3XL54"
+  },
+  "B0912FQSMT": {
+    "split": "train",
+    "group": "B0912FQSMT"
+  },
+  "B08GZ88BLT": {
+    "split": "train",
+    "group": "B08GZ88BLT"
+  },
+  "B01GR1ABDG": {
+    "split": "train",
+    "group": "B01GR1ABDG"
+  },
+  "B08W568RSB": {
+    "split": "train",
+    "group": "B08W568RSB"
+  },
+  "B09B1M51SK": {
+    "split": "train",
+    "group": "B09B1M51SK"
+  },
+  "B07VVVDRCX": {
+    "split": "train",
+    "group": "B07VVVDRCX"
+  },
+  "B088LZPNG6": {
+    "split": "train",
+    "group": "B088LZPNG6"
+  },
+  "B08RJ279HW": {
+    "split": "train",
+    "group": "B08RJ279HW"
+  },
+  "B08FY843HB": {
+    "split": "train",
+    "group": "B08FY843HB"
+  },
+  "B08G8DXR5N": {
+    "split": "train",
+    "group": "B08G8DXR5N"
+  },
+  "B09GVF8WWY": {
+    "split": "train",
+    "group": "B09GVF8WWY"
+  },
+  "B08Q2YQ35N": {
+    "split": "train",
+    "group": "B08Q2YQ35N"
+  },
+  "B07YYNY2ZZ": {
+    "split": "train",
+    "group": "B07YYNY2ZZ"
+  },
+  "B00VI88X7U": {
+    "split": "train",
+    "group": "B00VI88X7U"
+  },
+  "B09P39QN2W": {
+    "split": "train",
+    "group": "B09P39QN2W"
+  },
+  "B01M8HL69L": {
+    "split": "train",
+    "group": "B01M8HL69L"
+  },
+  "B07CKTXS1J": {
+    "split": "train",
+    "group": "B07CKTXS1J"
+  },
+  "B09MM1S15K": {
+    "split": "train",
+    "group": "B09MM1S15K"
+  },
+  "B08W4H39JR": {
+    "split": "train",
+    "group": "B08W4H39JR"
+  },
+  "B087C56PZQ": {
+    "split": "train",
+    "group": "B087C56PZQ"
+  },
+  "B013WXK2QI": {
+    "split": "train",
+    "group": "B013WXK2QI"
+  },
+  "B08N16XC83": {
+    "split": "train",
+    "group": "B08N16XC83"
+  },
+  "B09M4C31FL": {
+    "split": "train",
+    "group": "B09M4C31FL"
+  },
+  "B00M777566": {
+    "split": "train",
+    "group": "B00M777566"
+  },
+  "B01LM6W7Z6": {
+    "split": "train",
+    "group": "B01LM6W7Z6"
+  },
+  "B08PBDHVN8": {
+    "split": "train",
+    "group": "B08PBDHVN8"
+  },
+  "B09GK4XTJG": {
+    "split": "train",
+    "group": "B09GK4XTJG"
+  },
+  "B0916MNM1W": {
+    "split": "train",
+    "group": "B0916MNM1W"
+  },
+  "B000GLTJ3M": {
+    "split": "train",
+    "group": "B000GLTJ3M"
+  },
+  "B01L2JKW6E": {
+    "split": "train",
+    "group": "B01L2JKW6E"
+  },
+  "B09KQNH5C6": {
+    "split": "train",
+    "group": "B09KQNH5C6"
+  },
+  "B09C896SN6": {
+    "split": "train",
+    "group": "B09C896SN6"
+  },
+  "B09RF2DLZX": {
+    "split": "train",
+    "group": "B09RF2DLZX"
+  },
+  "B08P28NXH3": {
+    "split": "train",
+    "group": "B08P28NXH3"
+  },
+  "B07YN72RH4": {
+    "split": "train",
+    "group": "B07YN72RH4"
+  },
+  "B00JIKV6E2": {
+    "split": "train",
+    "group": "B00JIKV6E2"
+  },
+  "B07WH2WBF2": {
+    "split": "train",
+    "group": "B07WH2WBF2"
+  },
+  "B07DGXZJ1K": {
+    "split": "train",
+    "group": "B07DGXZJ1K"
+  },
+  "B09L44298X": {
+    "split": "train",
+    "group": "B09L44298X"
+  },
+  "B09RYN5ZS7": {
+    "split": "train",
+    "group": "B09RYN5ZS7"
+  },
+  "B001IGMS28": {
+    "split": "train",
+    "group": "B001IGMS28"
+  },
+  "B08HN55NGW": {
+    "split": "train",
+    "group": "B08HN55NGW"
+  },
+  "B088X39YNP": {
+    "split": "train",
+    "group": "B088X39YNP"
+  },
+  "B08QSNM69H": {
+    "split": "train",
+    "group": "B08QSNM69H"
+  },
+  "B09KLQLLT2": {
+    "split": "train",
+    "group": "B09KLQLLT2"
+  },
+  "B09NTCCVGX": {
+    "split": "train",
+    "group": "B09NTCCVGX"
+  },
+  "B09QYN9MYN": {
+    "split": "train",
+    "group": "B09QYN9MYN"
+  },
+  "B082T4FKHD": {
+    "split": "train",
+    "group": "B082T4FKHD"
+  },
+  "B07BB1FJV8": {
+    "split": "train",
+    "group": "B07BB1FJV8"
+  },
+  "B08T9KJJPZ": {
+    "split": "train",
+    "group": "B08T9KJJPZ"
+  },
+  "B01IADZ9LI": {
+    "split": "train",
+    "group": "B01IADZ9LI"
+  },
+  "B072MR7PPJ": {
+    "split": "train",
+    "group": "B072MR7PPJ"
+  },
+  "B09ND8P2QR": {
+    "split": "train",
+    "group": "B09ND8P2QR"
+  },
+  "B0874Y2KJR": {
+    "split": "train",
+    "group": "B0874Y2KJR"
+  },
+  "B08Q42DTN1": {
+    "split": "train",
+    "group": "B08Q42DTN1"
+  },
+  "B004A9L7ZO": {
+    "split": "train",
+    "group": "B004A9L7ZO"
+  },
+  "B08329Z669": {
+    "split": "train",
+    "group": "B08329Z669"
+  },
+  "B09SHRV5JW": {
+    "split": "train",
+    "group": "B09SHRV5JW"
+  },
+  "B08R9QHFPC": {
+    "split": "train",
+    "group": "B08R9QHFPC"
+  },
+  "B0743JKHBV": {
+    "split": "train",
+    "group": "B0743JKHBV"
+  },
+  "B08DHS3TH5": {
+    "split": "train",
+    "group": "B08DHS3TH5"
+  },
+  "B000GQ4KX6": {
+    "split": "train",
+    "group": "B000GQ4KX6"
+  },
+  "B09QSQ8RT9": {
+    "split": "train",
+    "group": "B09QSQ8RT9"
+  },
+  "B085GLK7X4": {
+    "split": "train",
+    "group": "B085GLK7X4"
+  },
+  "B09GW3N8TF": {
+    "split": "train",
+    "group": "B09GW3N8TF"
+  },
+  "B00IKXU4OQ": {
+    "split": "train",
+    "group": "B00IKXU4OQ"
+  },
+  "B00RIK1LI0": {
+    "split": "train",
+    "group": "B00RIK1LI0"
+  },
+  "B08LNFNXSD": {
+    "split": "train",
+    "group": "B08LNFNXSD"
+  },
+  "B08VH8MZZ6": {
+    "split": "train",
+    "group": "B08VH8MZZ6"
+  },
+  "B09BKMRMDV": {
+    "split": "train",
+    "group": "B09BKMRMDV"
+  },
+  "B09GL561XH": {
+    "split": "train",
+    "group": "B09GL561XH"
+  },
+  "B08936C8GH": {
+    "split": "train",
+    "group": "B08936C8GH"
+  },
+  "B07V5WMYXS": {
+    "split": "train",
+    "group": "B07V5WMYXS"
+  },
+  "B09NSJX1WC": {
+    "split": "train",
+    "group": "B09NSJX1WC"
+  },
+  "B006Y3IDMO": {
+    "split": "train",
+    "group": "B006Y3IDMO"
+  },
+  "B09GRD2SK4": {
+    "split": "train",
+    "group": "B09GRD2SK4"
+  },
+  "B096RV56XP": {
+    "split": "train",
+    "group": "B096RV56XP"
+  },
+  "B00A0WG5KW": {
+    "split": "train",
+    "group": "B00A0WG5KW"
+  },
+  "B07RKLL1ZK": {
+    "split": "train",
+    "group": "B07RKLL1ZK"
+  },
+  "B01BCOAE7G": {
+    "split": "train",
+    "group": "B01BCOAE7G"
+  },
+  "B09P7XL5RF": {
+    "split": "train",
+    "group": "B09P7XL5RF"
+  },
+  "B09PBG3GYB": {
+    "split": "train",
+    "group": "B09PBG3GYB"
+  },
+  "B07ZKCYT47": {
+    "split": "train",
+    "group": "B07ZKCYT47"
+  },
+  "B07FD13LP1": {
+    "split": "train",
+    "group": "B07FD13LP1"
+  },
+  "B09SJ5YGMZ": {
+    "split": "train",
+    "group": "B09SJ5YGMZ"
+  },
+  "B08SM5R231": {
+    "split": "train",
+    "group": "B08SM5R231"
+  },
+  "B0198VF30I": {
+    "split": "train",
+    "group": "B0198VF30I"
+  },
+  "B07VVGKHLH": {
+    "split": "train",
+    "group": "B07VVGKHLH"
+  },
+  "B07BKXMCNB": {
+    "split": "train",
+    "group": "B07BKXMCNB"
+  },
+  "B073J29HJW": {
+    "split": "train",
+    "group": "B073J29HJW"
+  },
+  "B00YZ5KT98": {
+    "split": "train",
+    "group": "B00YZ5KT98"
+  },
+  "B07WC14R63": {
+    "split": "train",
+    "group": "B07WC14R63"
+  },
+  "B07T9LZKM7": {
+    "split": "train",
+    "group": "B07T9LZKM7"
+  },
+  "B0893JSZHZ": {
+    "split": "train",
+    "group": "B0893JSZHZ"
+  },
+  "B01C8RQ1NM": {
+    "split": "train",
+    "group": "B01C8RQ1NM"
+  },
+  "B07H179NY3": {
+    "split": "train",
+    "group": "B07H179NY3"
+  },
+  "B01N9RL0AX": {
+    "split": "train",
+    "group": "B01N9RL0AX"
+  },
+  "B07TNKTKF4": {
+    "split": "train",
+    "group": "B07TNKTKF4"
+  },
+  "B01N1T77OM": {
+    "split": "train",
+    "group": "B01N1T77OM"
+  },
+  "B089T9S33Y": {
+    "split": "train",
+    "group": "B089T9S33Y"
+  },
+  "B074DVCKHB": {
+    "split": "train",
+    "group": "B074DVCKHB"
+  },
+  "B08ZKDQPZ3": {
+    "split": "train",
+    "group": "B08ZKDQPZ3"
+  },
+  "B017MOAUGA": {
+    "split": "train",
+    "group": "B017MOAUGA"
+  },
+  "B09QMPV75P": {
+    "split": "train",
+    "group": "B09QMPV75P"
+  },
+  "B07PXMFDQ3": {
+    "split": "train",
+    "group": "B07PXMFDQ3"
+  },
+  "B06XDG8XFX": {
+    "split": "train",
+    "group": "B06XDG8XFX"
+  },
+  "B00KM40FHM": {
+    "split": "train",
+    "group": "B00KM40FHM"
+  },
+  "B09GLMTMHM": {
+    "split": "train",
+    "group": "B09GLMTMHM"
+  },
+  "B00D4NQQ7G": {
+    "split": "train",
+    "group": "B00D4NQQ7G"
+  },
+  "B089ZJ7H1N": {
+    "split": "train",
+    "group": "B089ZJ7H1N"
+  },
+  "B09NFG3XXY": {
+    "split": "train",
+    "group": "B09NFG3XXY"
+  },
+  "B097PCJMP5": {
+    "split": "train",
+    "group": "B097PCJMP5"
+  },
+  "B08HNFTG83": {
+    "split": "train",
+    "group": "B08HNFTG83"
+  },
+  "B00390ALA2": {
+    "split": "train",
+    "group": "B00390ALA2"
+  },
+  "B07YL7L9BF": {
+    "split": "train",
+    "group": "B07YL7L9BF"
+  },
+  "B07S7D6RQC": {
+    "split": "train",
+    "group": "B07S7D6RQC"
+  },
+  "B07YBM2JHT": {
+    "split": "train",
+    "group": "B07YBM2JHT"
+  },
+  "B07SXLVPF3": {
+    "split": "train",
+    "group": "B07SXLVPF3"
+  },
+  "B08D3GRMHK": {
+    "split": "train",
+    "group": "B08D3GRMHK"
+  },
+  "B09KWX51GJ": {
+    "split": "train",
+    "group": "B09KWX51GJ"
+  },
+  "B00FR4V65M": {
+    "split": "train",
+    "group": "B00FR4V65M"
+  },
+  "B07H5GWRL4": {
+    "split": "train",
+    "group": "B07H5GWRL4"
+  },
+  "B09BKPV8LR": {
+    "split": "train",
+    "group": "B09BKPV8LR"
+  },
+  "B09J2QLPR1": {
+    "split": "train",
+    "group": "B09J2QLPR1"
+  },
+  "B09RPRRNVP": {
+    "split": "train",
+    "group": "B09RPRRNVP"
+  },
+  "B018A8MPJ2": {
+    "split": "train",
+    "group": "B018A8MPJ2"
+  },
+  "B077KJXD99": {
+    "split": "train",
+    "group": "B077KJXD99"
+  },
+  "B099F5HHZK": {
+    "split": "train",
+    "group": "B099F5HHZK"
+  },
+  "B084DF7NLZ": {
+    "split": "train",
+    "group": "B084DF7NLZ"
+  },
+  "B07YFF7B78": {
+    "split": "train",
+    "group": "B07YFF7B78"
+  },
+  "B09FYXV44L": {
+    "split": "train",
+    "group": "B09FYXV44L"
+  },
+  "B09MHLS36W": {
+    "split": "train",
+    "group": "B09MHLS36W"
+  },
+  "B01IA9EC06": {
+    "split": "train",
+    "group": "B01IA9EC06"
+  },
+  "B008QA6YOC": {
+    "split": "train",
+    "group": "B008QA6YOC"
+  },
+  "B09NSC5VDG": {
+    "split": "train",
+    "group": "B09NSC5VDG"
+  },
+  "B01M0FH8J8": {
+    "split": "train",
+    "group": "B01M0FH8J8"
+  },
+  "B07CBFM96F": {
+    "split": "train",
+    "group": "B07CBFM96F"
+  },
+  "B07K6TCDR9": {
+    "split": "train",
+    "group": "B07K6TCDR9"
+  },
+  "B08QTTR98M": {
+    "split": "train",
+    "group": "B08QTTR98M"
+  },
+  "B09JBZQJ9M": {
+    "split": "train",
+    "group": "B09JBZQJ9M"
+  },
+  "B07XCY8DND": {
+    "split": "train",
+    "group": "B07XCY8DND"
+  },
+  "B07Q48JVT8": {
+    "split": "train",
+    "group": "B07Q48JVT8"
+  },
+  "B07H35M2PY": {
+    "split": "train",
+    "group": "B07H35M2PY"
+  },
+  "B08HR1P3Z9": {
+    "split": "train",
+    "group": "B08HR1P3Z9"
+  },
+  "B07ZWVS584": {
+    "split": "train",
+    "group": "B07ZWVS584"
+  },
+  "B09T6LTTCY": {
+    "split": "train",
+    "group": "B09T6LTTCY"
+  },
+  "B07F1JDWJP": {
+    "split": "train",
+    "group": "B07F1JDWJP"
+  },
+  "B079N3VLRJ": {
+    "split": "train",
+    "group": "B079N3VLRJ"
+  },
+  "B07Q8JM1JZ": {
+    "split": "train",
+    "group": "B07Q8JM1JZ"
+  },
+  "B093HFSQ3B": {
+    "split": "train",
+    "group": "B093HFSQ3B"
+  },
+  "B08CV24121": {
+    "split": "train",
+    "group": "B08CV24121"
+  },
+  "B07FM9K5S3": {
+    "split": "train",
+    "group": "B07FM9K5S3"
+  },
+  "B079V5YD92": {
+    "split": "train",
+    "group": "B079V5YD92"
+  },
+  "B09L86RDXS": {
+    "split": "train",
+    "group": "B09L86RDXS"
+  },
+  "B08XX6QRK4": {
+    "split": "train",
+    "group": "B08XX6QRK4"
+  },
+  "B08MBG3421": {
+    "split": "train",
+    "group": "B08MBG3421"
+  },
+  "B08GKZNTHK": {
+    "split": "train",
+    "group": "B08GKZNTHK"
+  },
+  "B09P7H5YK7": {
+    "split": "train",
+    "group": "B09P7H5YK7"
+  },
+  "B07GRP1WCD": {
+    "split": "train",
+    "group": "B07GRP1WCD"
+  },
+  "B09N55XTPL": {
+    "split": "train",
+    "group": "B09N55XTPL"
+  },
+  "B014HKGM9Q": {
+    "split": "train",
+    "group": "B014HKGM9Q"
+  },
+  "B06Y44FL9J": {
+    "split": "train",
+    "group": "B06Y44FL9J"
+  },
+  "B08PYQVNBQ": {
+    "split": "train",
+    "group": "B08PYQVNBQ"
+  },
+  "B009AFLXZM": {
+    "split": "train",
+    "group": "B009AFLXZM"
+  },
+  "B091SK8ZH5": {
+    "split": "train",
+    "group": "B091SK8ZH5"
+  },
+  "B004PCJTR4": {
+    "split": "train",
+    "group": "B004PCJTR4"
+  },
+  "B07KHWY7YT": {
+    "split": "train",
+    "group": "B07KHWY7YT"
+  },
+  "B09DYFZM1X": {
+    "split": "train",
+    "group": "B09DYFZM1X"
+  },
+  "B097TTFZ43": {
+    "split": "train",
+    "group": "B097TTFZ43"
+  },
+  "B07XRDD75B": {
+    "split": "train",
+    "group": "B07XRDD75B"
+  },
+  "B08QDRGTDY": {
+    "split": "train",
+    "group": "B08QDRGTDY"
+  },
+  "B09HKZS7LV": {
+    "split": "train",
+    "group": "B09HKZS7LV"
+  },
+  "B08X4GMMZV": {
+    "split": "train",
+    "group": "B08X4GMMZV"
+  },
+  "B09R8RN6S5": {
+    "split": "train",
+    "group": "B09R8RN6S5"
+  },
+  "B09LVDSDQG": {
+    "split": "train",
+    "group": "B09LVDSDQG"
+  },
+  "B09P1HJ32G": {
+    "split": "train",
+    "group": "B09P1HJ32G"
+  },
+  "B08NF4L614": {
+    "split": "train",
+    "group": "B08NF4L614"
+  },
+  "B0836D6CW4": {
+    "split": "train",
+    "group": "B0836D6CW4"
+  },
+  "B08ZYQC4PL": {
+    "split": "train",
+    "group": "B08ZYQC4PL"
+  },
+  "B07BFLJQCX": {
+    "split": "train",
+    "group": "B07BFLJQCX"
+  },
+  "B07MJGQ6NK": {
+    "split": "train",
+    "group": "B07MJGQ6NK"
+  },
+  "B09JPCC7MJ": {
+    "split": "train",
+    "group": "B09JPCC7MJ"
+  },
+  "B09CPZH548": {
+    "split": "train",
+    "group": "B09CPZH548"
+  },
+  "B079ZBPR2X": {
+    "split": "train",
+    "group": "B079ZBPR2X"
+  },
+  "B0972M4N2W": {
+    "split": "train",
+    "group": "B0972M4N2W"
+  },
+  "B01N4JDM7G": {
+    "split": "train",
+    "group": "B01N4JDM7G"
+  },
+  "B07XP6DGJH": {
+    "split": "train",
+    "group": "B07XP6DGJH"
+  },
+  "B09QXG3BM2": {
+    "split": "train",
+    "group": "B09QXG3BM2"
+  },
+  "B07P24ZMXK": {
+    "split": "train",
+    "group": "B07P24ZMXK"
+  },
+  "B08YQKXLVG": {
+    "split": "train",
+    "group": "B08YQKXLVG"
+  },
+  "B09KG58GWJ": {
+    "split": "train",
+    "group": "B09KG58GWJ"
+  },
+  "B06ZYJ4JHT": {
+    "split": "train",
+    "group": "B06ZYJ4JHT"
+  },
+  "B07PDKXJSK": {
+    "split": "train",
+    "group": "B07PDKXJSK"
+  },
+  "B088KSY32D": {
+    "split": "train",
+    "group": "B088KSY32D"
+  },
+  "B07KY5X445": {
+    "split": "train",
+    "group": "B07KY5X445"
+  },
+  "B09ND9DP7J": {
+    "split": "train",
+    "group": "B09ND9DP7J"
+  },
+  "B079HGJ5MH": {
+    "split": "train",
+    "group": "B079HGJ5MH"
+  },
+  "B09DVS5MQW": {
+    "split": "train",
+    "group": "B09DVS5MQW"
+  },
+  "B005X7IXTK": {
+    "split": "train",
+    "group": "B005X7IXTK"
+  },
+  "B08ZMR6MCR": {
+    "split": "train",
+    "group": "B08ZMR6MCR"
+  },
+  "B083FBJVDY": {
+    "split": "train",
+    "group": "B083FBJVDY"
+  },
+  "B08WR7WFGM": {
+    "split": "train",
+    "group": "B08WR7WFGM"
+  },
+  "B00GUQZHJW": {
+    "split": "train",
+    "group": "B00GUQZHJW"
+  },
+  "B096L3FNMR": {
+    "split": "train",
+    "group": "B096L3FNMR"
+  },
+  "B09C1YWG8W": {
+    "split": "train",
+    "group": "B09C1YWG8W"
+  },
+  "B01LWI2TLG": {
+    "split": "train",
+    "group": "B01LWI2TLG"
+  },
+  "B09P8JXLSY": {
+    "split": "train",
+    "group": "B09P8JXLSY"
+  },
+  "B09PGQQQDL": {
+    "split": "train",
+    "group": "B09PGQQQDL"
+  },
+  "B08HWG1NFW": {
+    "split": "train",
+    "group": "B08HWG1NFW"
+  },
+  "B01NCQLFPH": {
+    "split": "train",
+    "group": "B01NCQLFPH"
+  },
+  "B094JTNPWK": {
+    "split": "train",
+    "group": "B094JTNPWK"
+  },
+  "B08MB4NQGQ": {
+    "split": "train",
+    "group": "B08MB4NQGQ"
+  },
+  "B0912JD5KF": {
+    "split": "train",
+    "group": "B0912JD5KF"
+  },
+  "B00UN9GR8W": {
+    "split": "train",
+    "group": "B00UN9GR8W"
+  },
+  "B08SHNQJBW": {
+    "split": "train",
+    "group": "B08SHNQJBW"
+  },
+  "B08Z3PLHLL": {
+    "split": "train",
+    "group": "B08Z3PLHLL"
+  },
+  "B00NYLV8EY": {
+    "split": "train",
+    "group": "B00NYLV8EY"
+  },
+  "B00DL08RWY": {
+    "split": "train",
+    "group": "B00DL08RWY"
+  },
+  "B0049KSSKQ": {
+    "split": "train",
+    "group": "B0049KSSKQ"
+  },
+  "B005F2EVMQ": {
+    "split": "train",
+    "group": "B005F2EVMQ"
+  },
+  "B0048U51N4": {
+    "split": "train",
+    "group": "B0048U51N4"
+  },
+  "B07GZLDJMC": {
+    "split": "train",
+    "group": "B07GZLDJMC"
+  },
+  "B09P42GFBR": {
+    "split": "train",
+    "group": "B09P42GFBR"
+  },
+  "B08PFRP4RN": {
+    "split": "train",
+    "group": "B08PFRP4RN"
+  },
+  "B096MM7XM4": {
+    "split": "train",
+    "group": "B096MM7XM4"
+  },
+  "B08R8K8H6S": {
+    "split": "train",
+    "group": "B08R8K8H6S"
+  },
+  "B08XH9JMTG": {
+    "split": "train",
+    "group": "B08XH9JMTG"
+  },
+  "B07FMR5JGX": {
+    "split": "train",
+    "group": "B07FMR5JGX"
+  },
+  "B08J3WFRBT": {
+    "split": "train",
+    "group": "B08J3WFRBT"
+  },
+  "B075GC6LWC": {
+    "split": "train",
+    "group": "B075GC6LWC"
+  },
+  "B07KYC4B45": {
+    "split": "train",
+    "group": "B07KYC4B45"
+  },
+  "B0101Q3V7Q": {
+    "split": "train",
+    "group": "B0101Q3V7Q"
+  },
+  "B09J5HJ8DL": {
+    "split": "train",
+    "group": "B09J5HJ8DL"
+  },
+  "B01E7UY7AC": {
+    "split": "train",
+    "group": "B01E7UY7AC"
+  },
+  "B07SDSG3TT": {
+    "split": "train",
+    "group": "B07SDSG3TT"
+  },
+  "B07TB37SG5": {
+    "split": "train",
+    "group": "B07TB37SG5"
+  },
+  "B00EY177C0": {
+    "split": "train",
+    "group": "B00EY177C0"
+  },
+  "B01LW6NN8T": {
+    "split": "train",
+    "group": "B01LW6NN8T"
+  },
+  "B07VT81LP5": {
+    "split": "train",
+    "group": "B07VT81LP5"
+  },
+  "B09T33VS4Y": {
+    "split": "train",
+    "group": "B09T33VS4Y"
+  },
+  "B08226NDZW": {
+    "split": "train",
+    "group": "B08226NDZW"
+  },
+  "B07CZPMFQ2": {
+    "split": "train",
+    "group": "B07CZPMFQ2"
+  },
+  "B0892Y9F83": {
+    "split": "train",
+    "group": "B0892Y9F83"
+  },
+  "B08X2FSR21": {
+    "split": "validation",
+    "group": "B08X2FSR21"
+  },
+  "B0936C6MBM": {
+    "split": "validation",
+    "group": "B0936C6MBM"
+  },
+  "B0973XVPCD": {
+    "split": "validation",
+    "group": "B0973XVPCD"
+  },
+  "B08WKT3X4Z": {
+    "split": "validation",
+    "group": "B08WKT3X4Z"
+  },
+  "B093YT83QR": {
+    "split": "validation",
+    "group": "B093K5JK25"
+  },
+  "B07B41K2VV": {
+    "split": "validation",
+    "group": "B07B41K2VV"
+  },
+  "B08Q3FW68R": {
+    "split": "validation",
+    "group": "B08Q3FW68R"
+  },
+  "B09C8YNWWB": {
+    "split": "validation",
+    "group": "B09C8YNWWB"
+  },
+  "B00062IG3A": {
+    "split": "validation",
+    "group": "B00062IG3A"
+  },
+  "B09T6FCCY9": {
+    "split": "validation",
+    "group": "B09T6FCCY9"
+  },
+  "B093K5JK25": {
+    "split": "validation",
+    "group": "B093K5JK25"
+  },
+  "B00NCSNO78": {
+    "split": "validation",
+    "group": "B00NCSNO78"
+  },
+  "B089GN6L6R": {
+    "split": "validation",
+    "group": "B089GN6L6R"
+  },
+  "B094QGVQLK": {
+    "split": "validation",
+    "group": "B094QGVQLK"
+  },
+  "B07CJSNLNZ": {
+    "split": "validation",
+    "group": "B07CJSNLNZ"
+  },
+  "B079R9H2KB": {
+    "split": "validation",
+    "group": "B079R9H2KB"
+  },
+  "B092D51DYS": {
+    "split": "validation",
+    "group": "B092D51DYS"
+  },
+  "B015CSUKG8": {
+    "split": "validation",
+    "group": "B015CSUKG8"
+  },
+  "B01MTYK2T9": {
+    "split": "validation",
+    "group": "B01MTYK2T9"
+  },
+  "B0046VILG4": {
+    "split": "validation",
+    "group": "B0046VILG4"
+  },
+  "B09688C4XM": {
+    "split": "validation",
+    "group": "B09688C4XM"
+  },
+  "B01N37FSYX": {
+    "split": "validation",
+    "group": "B01N37FSYX"
+  },
+  "B09QKJHF4Q": {
+    "split": "validation",
+    "group": "B09QKJHF4Q"
+  },
+  "B01MQH5VGR": {
+    "split": "validation",
+    "group": "B01MQH5VGR"
+  },
+  "B004LCZEJK": {
+    "split": "validation",
+    "group": "B004LCZEJK"
+  },
+  "B0029LHT7A": {
+    "split": "validation",
+    "group": "B0029LHT7A"
+  },
+  "B09DD2C1XD": {
+    "split": "validation",
+    "group": "B09DD2C1XD"
+  },
+  "B07L5XKY24": {
+    "split": "validation",
+    "group": "B07L5XKY24"
+  },
+  "B07FVHPK5X": {
+    "split": "validation",
+    "group": "B07FVHPK5X"
+  },
+  "B07M5VGSW1": {
+    "split": "validation",
+    "group": "B07M5VGSW1"
+  },
+  "B08NB29KXH": {
+    "split": "validation",
+    "group": "B08NB29KXH"
+  },
+  "B08K7LDM7Q": {
+    "split": "validation",
+    "group": "B08K7LDM7Q"
+  },
+  "B09MCF64RM": {
+    "split": "validation",
+    "group": "B09MCF64RM"
+  },
+  "B09NLX1BC4": {
+    "split": "validation",
+    "group": "B09NLX1BC4"
+  },
+  "B08SFMB8YZ": {
+    "split": "validation",
+    "group": "B08SFMB8YZ"
+  },
+  "B00UVRUFNE": {
+    "split": "validation",
+    "group": "B00UVRUFNE"
+  },
+  "B07QNLY8KV": {
+    "split": "validation",
+    "group": "B07QNLY8KV"
+  },
+  "B09MS5RTDD": {
+    "split": "validation",
+    "group": "B09MS5RTDD"
+  },
+  "B07SS8QC3G": {
+    "split": "validation",
+    "group": "B07SS8QC3G"
+  },
+  "B096G437B4": {
+    "split": "validation",
+    "group": "B096G437B4"
+  },
+  "B08WYZWYN1": {
+    "split": "validation",
+    "group": "B08WYZWYN1"
+  },
+  "B09LDGGBS8": {
+    "split": "validation",
+    "group": "B09LDGGBS8"
+  },
+  "B078PKLZFB": {
+    "split": "validation",
+    "group": "B078PKLZFB"
+  },
+  "B07T3PZ3S9": {
+    "split": "validation",
+    "group": "B07T3PZ3S9"
+  },
+  "B094YFJ95K": {
+    "split": "validation",
+    "group": "B094YFJ95K"
+  },
+  "B089Q6FS79": {
+    "split": "validation",
+    "group": "B089Q6FS79"
+  },
+  "B09MM9NCQQ": {
+    "split": "validation",
+    "group": "B09MM9NCQQ"
+  },
+  "B007PCP2OU": {
+    "split": "validation",
+    "group": "B007PCP2OU"
+  },
+  "B01MR4Q0WA": {
+    "split": "validation",
+    "group": "B01MR4Q0WA"
+  },
+  "B09PZZJ2XG": {
+    "split": "validation",
+    "group": "B09PZZJ2XG"
+  },
+  "B07KK49655": {
+    "split": "validation",
+    "group": "B07KK49655"
+  },
+  "B091HFPLPW": {
+    "split": "validation",
+    "group": "B091HFPLPW"
+  },
+  "B091YV7CRB": {
+    "split": "validation",
+    "group": "B091YV7CRB"
+  },
+  "B093KBGC44": {
+    "split": "validation",
+    "group": "B093K5JK25"
+  },
+  "B09QHT6WKQ": {
+    "split": "validation",
+    "group": "B09QHT6WKQ"
+  },
+  "B07ZR54L56": {
+    "split": "validation",
+    "group": "B07ZR54L56"
+  },
+  "B005P0T90C": {
+    "split": "validation",
+    "group": "B005P0T90C"
+  },
+  "B08ZNVVZ91": {
+    "split": "validation",
+    "group": "B08ZNVVZ91"
+  },
+  "B09P8D2Q1Q": {
+    "split": "validation",
+    "group": "B09P8D2Q1Q"
+  },
+  "B0015DH8AQ": {
+    "split": "validation",
+    "group": "B0015DH8AQ"
+  },
+  "B09S3NVLCV": {
+    "split": "validation",
+    "group": "B09S3NVLCV"
+  },
+  "B09KM7X1G4": {
+    "split": "validation",
+    "group": "B09KM7X1G4"
+  },
+  "B09P3BXF1H": {
+    "split": "validation",
+    "group": "B09P3BXF1H"
+  },
+  "B09GBF12CY": {
+    "split": "validation",
+    "group": "B09GBF12CY"
+  },
+  "B0982W8RKZ": {
+    "split": "validation",
+    "group": "B0982W8RKZ"
+  },
+  "B09DVQ3646": {
+    "split": "validation",
+    "group": "B09DVQ3646"
+  },
+  "B09MSZ4VS8": {
+    "split": "validation",
+    "group": "B09MSZ4VS8"
+  },
+  "B09PKHJN8P": {
+    "split": "validation",
+    "group": "B09PKHJN8P"
+  },
+  "B08M6D6TVK": {
+    "split": "validation",
+    "group": "B08M6D6TVK"
+  },
+  "B079Z5V2WK": {
+    "split": "validation",
+    "group": "B079Z5V2WK"
+  },
+  "B07NLHNQCG": {
+    "split": "validation",
+    "group": "B07NLHNQCG"
+  },
+  "B004EEG95I": {
+    "split": "validation",
+    "group": "B004EEG95I"
+  },
+  "B000SKM4CE": {
+    "split": "validation",
+    "group": "B000SKM4CE"
+  },
+  "B07B9QWJW9": {
+    "split": "validation",
+    "group": "B07B9QWJW9"
+  },
+  "B0851PC2TM": {
+    "split": "validation",
+    "group": "B0851PC2TM"
+  },
+  "B07FFHJ8YL": {
+    "split": "validation",
+    "group": "B07FFHJ8YL"
+  },
+  "B08XXDGPKR": {
+    "split": "validation",
+    "group": "B08XXDGPKR"
+  },
+  "B08FMSRJRP": {
+    "split": "validation",
+    "group": "B08FMSRJRP"
+  },
+  "B07D21HNGZ": {
+    "split": "test",
+    "group": "B07D21HNGZ"
+  },
+  "B08KLLJJXG": {
+    "split": "test",
+    "group": "B08KLLJJXG"
+  },
+  "B07LBNRY7H": {
+    "split": "test",
+    "group": "B07LBNRY7H"
+  },
+  "B083G2416L": {
+    "split": "test",
+    "group": "B083G2416L"
+  },
+  "B08532HWVM": {
+    "split": "test",
+    "group": "B08532HWVM"
+  },
+  "B07Q87P8DQ": {
+    "split": "test",
+    "group": "B07Q87P8DQ"
+  },
+  "B08TGMZX1F": {
+    "split": "test",
+    "group": "B08TGMZX1F"
+  },
+  "B09KTB1VG6": {
+    "split": "test",
+    "group": "B09KTB1VG6"
+  },
+  "B00NFV6V3Q": {
+    "split": "test",
+    "group": "B00NFV6V3Q"
+  },
+  "B07JMXLXNY": {
+    "split": "test",
+    "group": "B07JMXLXNY"
+  },
+  "B09FK6LQ59": {
+    "split": "test",
+    "group": "B09FK6LQ59"
+  },
+  "B07G4HJR5V": {
+    "split": "test",
+    "group": "B07G4HJR5V"
+  },
+  "B09MYFGDY5": {
+    "split": "test",
+    "group": "B09MYFGDY5"
+  },
+  "B07XPR3R7N": {
+    "split": "test",
+    "group": "B07XPR3R7N"
+  },
+  "B07TPRMHFG": {
+    "split": "test",
+    "group": "B07TPRMHFG"
+  },
+  "B073P9Z1K9": {
+    "split": "test",
+    "group": "B073P9Z1K9"
+  },
+  "B08WG7VLQF": {
+    "split": "test",
+    "group": "B08WG7VLQF"
+  },
+  "B09QL82H1L": {
+    "split": "test",
+    "group": "B09QL82H1L"
+  },
+  "B00OHHTTVS": {
+    "split": "test",
+    "group": "B00OHHTTVS"
+  },
+  "B08L2ZDWN2": {
+    "split": "test",
+    "group": "B08L2ZDWN2"
+  },
+  "B09G2F3HQ2": {
+    "split": "test",
+    "group": "B09G2F3HQ2"
+  },
+  "B09476F64C": {
+    "split": "test",
+    "group": "B09476F64C"
+  },
+  "B08XQWJX8P": {
+    "split": "test",
+    "group": "B08XQWJX8P"
+  },
+  "B002AO9GSG": {
+    "split": "test",
+    "group": "B002AO9GSG"
+  },
+  "B092QQBW4Y": {
+    "split": "test",
+    "group": "B092QQBW4Y"
+  },
+  "B09FYBZNQL": {
+    "split": "test",
+    "group": "B09FYBZNQL"
+  },
+  "B07XTQ1ZMN": {
+    "split": "test",
+    "group": "B07XTQ1ZMN"
+  },
+  "B07TN3Y9H1": {
+    "split": "test",
+    "group": "B07TN3Y9H1"
+  },
+  "B09KCF4KPT": {
+    "split": "test",
+    "group": "B09KCF4KPT"
+  },
+  "B09LM3H2F5": {
+    "split": "test",
+    "group": "B09LM3H2F5"
+  },
+  "B08XWT6RND": {
+    "split": "test",
+    "group": "B08XWT6RND"
+  },
+  "B084PCSG5H": {
+    "split": "test",
+    "group": "B084PCSG5H"
+  },
+  "B01LZWDNX6": {
+    "split": "test",
+    "group": "B01LZWDNX6"
+  },
+  "B09S3TWKSC": {
+    "split": "test",
+    "group": "B09S3TWKSC"
+  },
+  "B09LCM3NKN": {
+    "split": "test",
+    "group": "B09LCM3NKN"
+  },
+  "B07ZYVWCZ7": {
+    "split": "test",
+    "group": "B07ZYVWCZ7"
+  },
+  "B00KTPKPQA": {
+    "split": "test",
+    "group": "B00KTPKPQA"
+  },
+  "B086VP8Q9T": {
+    "split": "test",
+    "group": "B086VP8Q9T"
+  },
+  "B09NLZFMRG": {
+    "split": "test",
+    "group": "B09NLZFMRG"
+  },
+  "B09MCTMRH6": {
+    "split": "test",
+    "group": "B09MCTMRH6"
+  },
+  "B09RZRQVGT": {
+    "split": "test",
+    "group": "B09RZRQVGT"
+  },
+  "B07Y81FQV3": {
+    "split": "test",
+    "group": "B07Y81FQV3"
+  },
+  "B079Y4B4YP": {
+    "split": "test",
+    "group": "B079Y4B4YP"
+  },
+  "B09N8SLFRJ": {
+    "split": "test",
+    "group": "B09N8SLFRJ"
+  },
+  "B09PJ6QZWW": {
+    "split": "test",
+    "group": "B09PJ6QZWW"
+  },
+  "B09NMBV996": {
+    "split": "test",
+    "group": "B09NMBV996"
+  },
+  "B076R28M2M": {
+    "split": "test",
+    "group": "B076R28M2M"
+  },
+  "B007F4B69S": {
+    "split": "test",
+    "group": "B007F4B69S"
+  },
+  "B08W874R8Z": {
+    "split": "test",
+    "group": "B08W874R8Z"
+  },
+  "B003FPD3IS": {
+    "split": "test",
+    "group": "B003FPD3IS"
+  },
+  "B08GFNJN5R": {
+    "split": "test",
+    "group": "B08GFNJN5R"
+  },
+  "B07BKRV1QH": {
+    "split": "test",
+    "group": "B07BKRV1QH"
+  },
+  "B00PZ006U4": {
+    "split": "test",
+    "group": "B00PZ006U4"
+  },
+  "B00IB6AW4Y": {
+    "split": "test",
+    "group": "B00IB6AW4Y"
+  },
+  "B07JVVDJ6L": {
+    "split": "test",
+    "group": "B07JVVDJ6L"
+  },
+  "B09NYHTCVX": {
+    "split": "test",
+    "group": "B09NYHTCVX"
+  },
+  "B07PM8MJKZ": {
+    "split": "test",
+    "group": "B07PM8MJKZ"
+  },
+  "B00OYBADQ2": {
+    "split": "test",
+    "group": "B00OYBADQ2"
+  },
+  "B092LSVMTY": {
+    "split": "test",
+    "group": "B092LSVMTY"
+  },
+  "B08CHHHB46": {
+    "split": "test",
+    "group": "B08CHHHB46"
+  },
+  "B09G2ZL7CP": {
+    "split": "test",
+    "group": "B09G2ZL7CP"
+  },
+  "B09GF68QPJ": {
+    "split": "test",
+    "group": "B09GF68QPJ"
+  },
+  "B0873B8Y7P": {
+    "split": "test",
+    "group": "B0873B8Y7P"
+  },
+  "B006G5CYAM": {
+    "split": "test",
+    "group": "B006G5CYAM"
+  },
+  "B09Q5ZHRVM": {
+    "split": "test",
+    "group": "B09Q5ZHRVM"
+  },
+  "B00UETYYV8": {
+    "split": "test",
+    "group": "B00UETYYV8"
+  },
+  "B0065YIB8I": {
+    "split": "test",
+    "group": "B0065YIB8I"
+  },
+  "B079LQTZNC": {
+    "split": "test",
+    "group": "B079LQTZNC"
+  },
+  "B06XQYN77L": {
+    "split": "test",
+    "group": "B06XQYN77L"
+  },
+  "B085RG99KT": {
+    "split": "test",
+    "group": "B085RG99KT"
+  },
+  "B09P65MG4G": {
+    "split": "test",
+    "group": "B09P65MG4G"
+  },
+  "B09Q6CZ59K": {
+    "split": "test",
+    "group": "B09Q6CZ59K"
+  },
+  "B097F54DT8": {
+    "split": "test",
+    "group": "B097F54DT8"
+  },
+  "B07Z397262": {
+    "split": "test",
+    "group": "B07Z397262"
+  },
+  "B0895PSD5P": {
+    "split": "test",
+    "group": "B0895PSD5P"
+  },
+  "B08JQ5TLQV": {
+    "split": "test",
+    "group": "B08JQ5TLQV"
+  },
+  "B004Q5CYH2": {
+    "split": "test",
+    "group": "B004Q5CYH2"
+  },
+  "B092W6WNH4": {
+    "split": "test",
+    "group": "B092W6WNH4"
+  }
+}
