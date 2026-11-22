@@ -91,7 +91,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--adapter", required=True)
     parser.add_argument("--output", required=True)
-    parser.add_argument("--split", choices=("validation", "test", "challenge"), default="test")
+    parser.add_argument("--split", choices=("validation", "test"), default="test")
     parser.add_argument("--limit", type=int)
     args = parser.parse_args()
     if args.limit is not None and args.limit < 1:
