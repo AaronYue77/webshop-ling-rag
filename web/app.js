@@ -387,7 +387,6 @@ function renderTurn(event) {
       content.append(list);
     }
     const evidence = node("div","reply-meta");
-    evidence.append(node("h2","reply-summary",out.summary));
     if (out.conditions?.length || out.taskLabels?.length) {
       const chips = node("div","chips");
       for (const item of out.conditions ?? []) chips.append(node("span","chip condition",item));
@@ -400,7 +399,7 @@ function renderTurn(event) {
       for (const card of cards) details.append(productEvidence(card));
       evidence.append(details);
     }
-    content.append(evidence);
+    if (evidence.childElementCount) content.append(evidence);
   }
   response.append(mark,content);
   turn.append(response);
