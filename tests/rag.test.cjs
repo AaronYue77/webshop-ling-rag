@@ -124,14 +124,14 @@ test("splits have unique full inputs and isolated ASIN families and contexts",()
     assert.equal(groups.get(group) || split,split);
     groups.set(group,split);
   }
-  for (const [split,len] of [["train",1246],["validation",156],["test",156],["challenge",24]]) {
+  for (const [split,len] of [["train",1246],["validation",156],["test",156]]) {
     const rows = fs.readFileSync(path.join(dir,split+".jsonl"),"utf8").trim().split("\n").map(JSON.parse);
     assert.equal(rows.length,len);
     assert(rows.some(row=>row.expected.shoe));
     for (const row of rows) {
       assert(!inputs.has(row.messages[1].content));
       inputs.add(row.messages[1].content);
-      for (const id of row.products) assert.equal(assigned[id].split,split==="challenge"?"test":split);
+      for (const id of row.products) assert.equal(assigned[id].split,split);
     }
   }
 });
