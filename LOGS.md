@@ -15,7 +15,7 @@ node scripts/audit-questions.cjs
 node scripts/audit-questions.cjs --run runs/webshop-run
 ```
 
-第一条生成 `runs/audit/local-questions.txt`，覆盖训练、验证、测试和挑战题。第二条读取已下载并解压到 `runs/webshop-run` 的 Kaggle 产物，核对分组和数据哈希后，生成 `runs/audit/kaggle-questions.txt`。正式测试和挑战题分别保留基座与微调两条记录。评测只按已有逐题预测回放任务计划，无需再次运行 GPU。可用 `--split test` 选择单组，或用 `--output 路径` 指定文件名。
+第一条生成 `runs/audit/local-questions.txt`，覆盖训练、验证和测试。第二条从已解压到 `runs/webshop-run` 的评测产物回放正式测试集，核对数据哈希后，生成 `runs/audit/kaggle-questions.txt`。每题分别保留基座和 LoRA 两条记录，回放无需再次运行 GPU。可用 `--split test` 显式选择测试集，或用 `--output 路径` 指定文件名。[正式测试 156 题完整题目](docs/formal-test-questions.md)。
 
 | 字段 | 记录口径 |
 |---|---|
@@ -33,13 +33,13 @@ node scripts/audit-questions.cjs --run runs/webshop-run
 | 运行 | 已核对的结果 |
 |---|---|
 | 冒烟测试 `372056035` | 单步 QLoRA 损失 0.1205，输出了冒烟适配器。4 道评测题遇到生成接口拒收 `token_type_ids`，旧报告中的零分不能用于衡量模型效果。 |
-| 正式训练 `372062430` | 已完成一轮训练及 360 次对照生成，训练平均损失 0.0290。已校验 ZIP、适配器与两组数据哈希。两组聚合报告见[正式测试](docs/results/test/comparison.json)和[挑战题](docs/results/challenge/comparison.json)。按上文命令可从评测输出生成逐题记录。 |
+| 正式训练 `372062430` | 已完成一轮训练，平均训练损失 0.0290。基座和 LoRA 各评测 156 道正式测试题，共 312 次生成。已核对正式测试数据和适配器哈希。[正式测试报告](docs/results/test/comparison.json) |
 
-| 指标 | 测试集 156 题（基座 → LoRA） | 挑战题 24 题（基座 → LoRA） |
-|---|---:|---:|
-| 任务宏 F1 | 29.58% → 90.04% | 20.60% → 71.48% |
-| 约束完全匹配 | 55.13% → 96.15% | 29.17% → 54.17% |
-| 完整计划匹配 | 0% → 76.92% | 0% → 25.00% |
+| 指标 | 测试集 156 题（基座 → LoRA） |
+|---|---:|
+| 任务宏 F1 | 29.58% → 90.04% |
+| 约束完全匹配 | 55.13% → 96.15% |
+| 完整计划匹配 | 0% → 76.92% |
 
 指标来自格式严格的任务规划评测。正式评测的原始逐题文件仅记录生成及解析总耗时。在线推理接口记录独立生成耗时，并兼容大于 0 且不超过 300 的数字尺码。
 

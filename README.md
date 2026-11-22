@@ -31,7 +31,7 @@ Ling-3.0-tiny QLoRA × FastAPI × BM25 与结构化筛选 · Kaggle GPU 推理�
 
 ### 3. 复现训练与评测
 
-将[训练 Notebook](kaggle/webshop-ling-rag.ipynb) 导入 Kaggle，开启 GPU 和 Internet。Notebook 下载 GitHub 生成的源码 ZIP 并定位项目根目录。先用 `smoke` 检查环境，再切换到 `train` 跑一轮 QLoRA 与两组评测。[训练配置、推理与评测命令](RECIPE.md)
+将[训练 Notebook](kaggle/webshop-ling-rag.ipynb) 导入 Kaggle，开启 GPU 和 Internet。Notebook 下载 GitHub 生成的源码 ZIP 并定位项目根目录。先用 `smoke` 检查环境，再切换到 `train` 跑一轮 QLoRA 并执行正式测试。[训练配置、推理与评测命令](RECIPE.md)
 
 本地回归可在项目根目录运行。
 
@@ -84,15 +84,15 @@ flowchart TD
 
 ## 实测结果
 
-底座和 LoRA 使用相同的模型版本、评测输入与生成设置，各跑 156 道正式测试题和 24 道挑战题，共 360 次生成。正式测试使用留出的问句模板。挑战题采用手写问法，商品来自测试分组。
+底座和 LoRA 使用相同的模型版本、评测输入与生成设置，各跑 156 道正式测试题，共 312 次生成。正式测试使用留出的问句模板。
 
-| 指标 | 正式测试 156 题（底座 → LoRA） | 挑战题 24 题（底座 → LoRA） |
-|---|---:|---:|
-| 任务宏 F1 | 29.58% → 90.04% | 20.60% → 71.48% |
-| 约束完全匹配 | 55.13% → 96.15% | 29.17% → 54.17% |
-| 完整计划匹配 | 0% → 76.92% | 0% → 25.00% |
+| 指标 | 正式测试 156 题（底座 → LoRA） |
+|---|---:|
+| 任务宏 F1 | 29.58% → 90.04% |
+| 约束完全匹配 | 55.13% → 96.15% |
+| 完整计划匹配 | 0% → 76.92% |
 
-这些指标衡量结构化计划。商品证据、排序和推荐由网页执行。数据按 ASIN 家族和近重复分组，共 1,246 条训练题、156 条验证题、156 条正式测试题和 24 条挑战题。[数据清单](data/sft/manifest.json) · [测试集指标](docs/results/test/comparison.json) · [挑战题指标](docs/results/challenge/comparison.json) · [逐题结果说明](LOGS.md#逐题-txt)
+这些指标衡量结构化计划。商品证据、排序和推荐由网页执行。数据按 ASIN 家族和近重复分组，共 1,246 条训练题、156 条验证题、156 条正式测试题。[数据清单](data/sft/manifest.json) · [测试集指标](docs/results/test/comparison.json) · [正式测试 156 题完整题目](docs/formal-test-questions.md) · [逐题结果说明](LOGS.md#逐题-txt)
 
 ## 仓库目录
 
