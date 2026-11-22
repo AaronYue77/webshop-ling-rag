@@ -2,6 +2,7 @@ const {test} = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const vm = require("node:vm");
 require("../web/catalog");
 const rag = require("../web/rag");
 const {products,meta} = globalThis.ShopCatalog;
@@ -116,6 +117,80 @@ test("cloud planner preserves locally recognized hard constraints",()=>{
   assert(out.cards.length && out.cards.every(c=>c.price<=2500 && c.images.length));
   assert.throws(()=>ask("查询",{},{}),/Invalid planner output/);
 });
+test("live answers follow the model plan without merging constraints from local query rules",()=>{
+  const plan = rag.makePlan({action:"search",category:"fashion",shoe:true,audience:"men",color:"black",tasks:["recommend"]});
+  plan.required_terms = ["leather"];
+  plan.excluded_terms = ["faux leather"];
+  for (const question of ["我想买一双黑色男士皮鞋，请推荐并告诉我理由","找女士运动鞋，预算 1 美元"]) {
+    const answer = rag.runModel(idx,question,{},plan);
+    assert.equal(answer.plan.audience,"men");
+    assert.equal(answer.plan.max_price,null);
+    assert.deepEqual(answer.cards.map(c=>c.id),["B07CN9RZ1C"]);
+    assert.ok(answer.cards[0].facts.some(([label,value,field])=>
+      label === "筛选依据" && value === "leather" && field === "商品说明"));
+  }
+  assert.throws(()=>rag.runModel(idx,"男士皮鞋",{},null),/Invalid planner output/);
+  const noReference = rag.runModel(idx,"比较第一款和第二款",{resultIds:["B07CN9RZ1C","B09S3TWKSC"]},
+    rag.makePlan({action:"compare"}));
+  assert.deepEqual(noReference.cards,[]);
+});
+
+test("model-specified evidence phrases must all match and exclusions block matching products",()=>{
+  const sample = idx.byId.get("B07CN9RZ1C");
+  const products = [
+    {...sample,id:"B000000001",name:"Electric Kettle",category:"garden",shoe:false,description:"Stainless steel body and removable filter."},
+    {...sample,id:"B000000002",name:"Electric Kettle",category:"garden",shoe:false,description:"Stainless steel body with plastic lid."},
+    {...sample,id:"B000000003",name:"Electric Kettle",category:"garden",shoe:false,description:"Glass body and removable filter."},
+  ];
+  const plan = {...rag.makePlan({category:"garden",tasks:["recommend"]}),
+    required_terms:["stainless steel","removable filter"],excluded_terms:["plastic lid"]};
+  const catalog = rag.index(products);
+  assert.deepEqual(rag.runModel(catalog,"找符合条件的水壶",{},plan).cards.map(c=>c.id),["B000000001"]);
+  plan.required_terms = ["ceramic body"];
+  assert.deepEqual(rag.runModel(catalog,"找符合条件的水壶",{},plan).cards,[]);
+});
+
+test("workbench only presents prose received from Kaggle and logs a failed answer",async()=>{
+  const source = fs.readFileSync(path.join(__dirname,"../web/app.js"),"utf8");
+  const workflow = source.slice(source.indexOf("function answerEvidence("),source.indexOf("function historyDate("));
+  const thread = {id:"thread",events:[],state:{}};
+  const calls = [];
+  const noop = ()=>{};
+  let answerAvailable = false;
+  let settingsShown = false;
+  const plan = {...rag.makePlan({category:"fashion",audience:"men",shoe:true,color:"black",tasks:["recommend"]}),
+    required_terms:["leather"],excluded_terms:["faux leather"]};
+  const ctx = vm.createContext({thread,settings:null,processing:null,view:{kind:"chat"},threads:new Map(),idx,
+    ShopRag:{runModel:rag.runModel},performance,TextEncoder,ConnectionError:Error,save:noop,updateComposer:noop,render:noop,
+    scrollBottom:noop,newId:()=>"question",showSettings:()=>{ settingsShown = true; }, $:()=>({value:"",children:[]}),
+    callPlanner:async (_config,_kernel,endpoint,data)=>{
+      calls.push([endpoint,data]);
+      if (endpoint === "/v1/plan") return {plan,adapter:true,generation_ms:30};
+      if (answerAvailable) return {paragraphs:["可以先看第一款。目录有黑色选项，商品说明也提到了皮革。"],generation_ms:20};
+      throw Object.assign(new Error("Generation failed"),{plannerStatus:422,plannerStage:"model_answer"});
+    }});
+  vm.runInContext(workflow,ctx);
+  const question = "能推荐黑色男士皮鞋吗？";
+  await ctx.ask(question);
+  assert(settingsShown);
+  assert.equal(calls.length,0);
+  assert.equal(thread.events.length,0);
+  ctx.settings = {kernelId:"kernel",version:{}};
+  await ctx.ask(question);
+  assert.deepEqual(calls.map(([endpoint])=>endpoint),["/v1/plan","/v1/answer"]);
+  const evidence = JSON.parse(calls[1][1].catalog);
+  assert.deepEqual(evidence.products.map(item=>item.asin),["B07CN9RZ1C"]);
+  assert.match(evidence.products[0].matched_evidence[0],/full-grain ECCO leather/);
+  assert.equal(thread.events[0].answer,undefined);
+  assert.equal(thread.events[0].issue,"answer_failed");
+  assert.equal(thread.events[0].recalledPages[0].asin,"B07CN9RZ1C");
+  assert.deepEqual(thread.state,{});
+  answerAvailable = true;
+  await ctx.ask(question);
+  assert.match(thread.events[1].answer.reply_paragraphs[0],/可以先看第一款/);
+  assert.equal(thread.events[1].generationMs,50);
+});
+
 test("splits have unique full inputs and isolated ASIN families and contexts",()=>{
   const dir = path.join(__dirname,"../data/sft");
   const assigned = JSON.parse(fs.readFileSync(path.join(dir,"asin-splits.json"),"utf8"));

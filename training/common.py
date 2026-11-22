@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -55,6 +56,11 @@ def model_config():
     return config
 
 
+def startup_step(name):
+    if os.environ.get("WEBSHOP_STARTUP_PROGRESS") == "1":
+        print(f"WEBSHOP_STARTUP {name}", flush=True)
+
+
 def load_base(config, train=False):
     import torch
     from huggingface_hub import snapshot_download
@@ -65,7 +71,9 @@ def load_base(config, train=False):
     dtype = torch.bfloat16 if torch.cuda.is_bf16_supported(including_emulation=False) else torch.float16
     if torch.cuda.get_device_capability(0)[0] < 8:
         logging.warning("Pre-Ampere GPU. FLA kernel support must pass the smoke test. Select L4 or A100 if Triton fails.")
+    startup_step("download")
     snapshot = snapshot_download(config["model_id"], revision=config["model_revision"])
+    startup_step("load")
     tokenizer = AutoTokenizer.from_pretrained(snapshot, trust_remote_code=True)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -87,14 +95,36 @@ def parse_plan(text, schema, *, allow_numeric_size=False, normalize_live=False):
     if candidate.startswith("```"):
         candidate = candidate.split("\n", 1)[-1].removesuffix("```").strip()
     plan, end = decoder.raw_decode(candidate)
-    if candidate[end:].strip() or not isinstance(plan, dict) or set(plan) != set(schema):
+    if normalize_live and isinstance(plan, dict) and set(plan) == {"plan"}:
+        plan = plan["plan"]
+    optional = {"required_terms", "excluded_terms"} if normalize_live else set()
+    if (candidate[end:].strip() or not isinstance(plan, dict)
+            or not set(schema) <= set(plan) <= set(schema) | optional):
         raise ValueError("Planner output must contain exactly the schema keys.")
     if normalize_live:
-        for key in ("category", "audience", "size_system"):
+        for key in ("category", "audience", "size_system", "color"):
             if isinstance(plan[key], list) and len(plan[key]) == 1:
                 plan[key] = plan[key][0]
+        for key in ("category", "audience", "sort", "budget_scope"):
+            if isinstance(plan[key], str):
+                plan[key] = plan[key].strip().lower()
+        if isinstance(plan["size_system"], str):
+            plan["size_system"] = plan["size_system"].strip().upper()
         if plan["category"] == "furniture":
             plan["category"] = "garden"
+        if isinstance(plan["limit"], str) and re.fullmatch(r"[0-9]{1,2}", plan["limit"]):
+            plan["limit"] = int(plan["limit"])
+        if isinstance(plan["refs"], list):
+            plan["refs"] = [int(ref) if isinstance(ref, str) and re.fullmatch(r"[0-9]{1,3}", ref) else ref
+                            for ref in plan["refs"]]
+        for key in optional.intersection(plan):
+            values = plan[key]
+            if not isinstance(values, list) or len(values) > 8 or any(
+                not isinstance(value, str) or len(value) > 55 or not re.search(r"[A-Za-z0-9]", value)
+                for value in values
+            ):
+                raise ValueError(f"Invalid planner evidence phrases in {key}.")
+            plan[key] = list(dict.fromkeys(value.strip() for value in values))
     if plan["action"] not in {"search", "detail", "compare"}:
         raise ValueError("Invalid planner action.")
     if not all(isinstance(plan[key], list) for key in ("refs", "tasks", "terms")):
@@ -131,8 +161,9 @@ def generate(model, tokenizer, messages, config):
     import torch
     prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True, enable_thinking=False)
     batch = tokenizer(prompt, return_tensors="pt", add_special_tokens=False, return_token_type_ids=False)
-    if batch["input_ids"].shape[1] > 2048:
-        raise ValueError("Planner prompt exceeds 2048 tokens.")
+    prompt_limit = config.get("prompt_token_limit", 2048)
+    if batch["input_ids"].shape[1] > prompt_limit:
+        raise ValueError(f"Prompt exceeds {prompt_limit} tokens.")
     batch = batch.to(model.get_input_embeddings().weight.device)
     eos = [tokenizer.eos_token_id]
     with torch.inference_mode():
