@@ -370,7 +370,7 @@ function renderTurn(event) {
   const out = event.answer;
   if (!out) {
     const running = event.pending && processing === event.questionId;
-    bubble.append(node("p",null,running ? "正在 Kaggle GPU 上解析需求…" :
+    bubble.append(node("p",null,running ? (event.progress ?? "正在 Kaggle GPU 上解析需求…") :
       event.error || "这条问题已保存，尚未收到回答。"));
     if (!running) content.append(button("重试此问题",() => {
       if (processing) return;
@@ -378,7 +378,8 @@ function renderTurn(event) {
       ask(event.question);
     }));
   } else {
-    for (const paragraph of out.reply_paragraphs ?? ShopRag.replyParagraphs(out)) bubble.append(node("p",null,paragraph));
+    for (const paragraph of out.reply_paragraphs ?? []) bubble.append(node("p",null,paragraph));
+    if (!out.reply_paragraphs?.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
     const cards = out.cards ?? [];
     const withPictures = cards.filter(card=>card.images?.length || out.plan?.action === "search");
     if (withPictures.length) {
@@ -526,6 +527,17 @@ function plannerCode(path, payload) {
     "                data = json.load(response)",
     "        except urllib.error.HTTPError as error:",
     "            data = {'bridge_error': 'planner-http', 'status': error.code}",
+    "            if error.code == 422:",
+    "                try:",
+    "                    detail = json.loads(error.read(8192)).get('detail')",
+    "                    if detail == 'Invalid planner output':",
+    "                        data['stage'] = 'model_output'",
+    "                    elif detail == 'Invalid model answer':",
+    "                        data['stage'] = 'model_answer'",
+    "                    elif detail == 'Planner input or generation value is invalid' or isinstance(detail, list):",
+    "                        data['stage'] = 'request_or_generation'",
+    "                except (ValueError, TypeError, AttributeError, OSError):",
+    "                    pass",
     "        except (OSError, ValueError):",
     "            data = {'bridge_error': 'service-not-ready'}",
     "    display({'" + replyMime + "': data}, raw=True)",
@@ -535,9 +547,17 @@ function plannerCode(path, payload) {
 }
 function requirePlannerReply(result) {
   if (result && !result.bridge_error) return result;
-  throw new ConnectionError(result?.bridge_error === "planner-http" && result.status === 422 ?
-    "模型没有生成可执行的任务计划，请调整问题后重试。" :
-    "Kaggle 内核中的 WebShop 推理服务未就绪或请求失败。请确认已在一键推理 Notebook 中执行 Run All，并看到模型就绪提示。");
+  const status = result?.bridge_error === "planner-http" ? result.status : null;
+  const stage = ["model_output","model_answer","request_or_generation"].includes(result?.stage) ? result.stage : null;
+  const error = new ConnectionError(status === 422 ?
+    (stage === "model_answer" ? "Kaggle 模型本轮未能生成回答，可以点「重试此问题」。" :
+      stage === "model_output" ? "Kaggle 模型本轮未能返回可执行的计划，可以点「重试此问题」。" :
+      "Kaggle 未能完成这次请求，可以点「重试此问题」。") :
+    status === 429 ? "Kaggle 模型正忙，请稍后重试此问题。" :
+      "Kaggle 内核中的 WebShop 推理服务未就绪或请求失败。请确认已在一键推理 Notebook 中执行 Run All，并看到模型就绪提示。");
+  error.plannerStatus = status;
+  error.plannerStage = stage;
+  throw error;
 }
 async function callPlanner(config, kernelId, path, payload) {
   const session = newId();
@@ -604,6 +624,9 @@ async function getConnection(raw) {
       if (health.service !== "webshop-ling-planner" || health.ready !== true || health.adapter !== true || health.smoke_adapter === true) {
         throw new ConnectionError("当前会话未加载正式的 WebShop LoRA 推理服务。");
       }
+      if (!(health.model_and_config_version?.planner_protocol >= 3)) {
+        throw new ConnectionError("当前是旧版 Kaggle 会话。请从连接指南打开公开的一键推理 Notebook，创建新副本并运行后重新连接。");
+      }
       return {...config,kernelId:kernel.id,version:health.model_and_config_version ?? {
         model:"Ling-3.0-tiny",revision:health.revision ?? null,config_version:null
       }};
@@ -615,6 +638,29 @@ async function getConnection(raw) {
 function showSettings() {
   $("connect-result").textContent = "";
   if (!$("connection").open) $("connection").showModal();
+}
+function answerEvidence(out) {
+  const short = (text, limit) => String(text ?? "").slice(0,limit);
+  const catalog = {
+    action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, matches:out.matched,
+    notes:out.notes.map(text=>short(text,300)),
+    products:out.cards.map(card=>({
+      position:card.position, asin:card.id, name:short(card.name,160),
+      snapshot_price_usd:card.price === null ? null : card.price / 100,
+      image_available:Boolean(card.images.length),
+      facts:card.facts.map(([label,value])=>[label,short(value,label === "规格" ? 200 : 150)]),
+      matched_evidence:[...new Set((card.matchedEvidence ?? []).map(item=>item.excerpt))].map(text=>short(text,210)),
+      gaps:card.gaps.map(text=>short(text,140))
+    }))
+  };
+  const encoded = JSON.stringify(catalog);
+  if (encoded.length <= 12000 && new TextEncoder().encode(encoded).length <= 22000) return encoded;
+  for (const product of catalog.products) {
+    product.facts = product.facts.map(([label,value])=>[label,short(value,65)]);
+    product.matched_evidence = product.matched_evidence.map(text=>short(text,80));
+    product.gaps = product.gaps.map(text=>short(text,75));
+  }
+  return JSON.stringify(catalog);
 }
 async function ask(text) {
   const question = text.trim();
@@ -639,6 +685,8 @@ async function ask(text) {
   render();
   scrollBottom();
   const start = performance.now();
+  let stage = "plan";
+  let retrieved;
   try {
     const prior = (owner.state.resultIds || []).map((id,i) => ({position:i+1,id,name:idx.byId.get(id)?.name.slice(0,140)}));
     const result = await callPlanner(config,config.kernelId,"/v1/plan",{question,questionId:event.questionId,
@@ -647,17 +695,38 @@ async function ask(text) {
       throw new ConnectionError("Kaggle 会话未返回有效的 WebShop LoRA 计划，请重新连接后重试。");
     }
     event.version = result.model_and_config_version ?? config.version;
-    event.generationMs = result.generation_ms ?? null;
+    event.planningMs = result.generation_ms ?? null;
+    event.generationMs = event.planningMs;
     event.modelOutput = result.plan;
-    event.answer = ShopRag.run(idx,question,owner.state,result.plan);
-    event.answer.reply_paragraphs = ShopRag.replyParagraphs(event.answer);
-    owner.state = event.answer.state;
+    retrieved = ShopRag.runModel(idx,question,owner.state,result.plan);
+    stage = "answer";
+    event.progress = "已核对目录，正在 Kaggle GPU 上生成回答…";
+    if (thread.id === owner.id && view.kind === "chat") render();
+    const reply = await callPlanner(config,config.kernelId,"/v1/answer",{question,questionId:event.questionId,
+      catalog:answerEvidence(retrieved)});
+    if (!Array.isArray(reply.paragraphs) || !reply.paragraphs.length ||
+        reply.paragraphs.some(paragraph=>typeof paragraph !== "string" || !paragraph.trim())) {
+      throw new ConnectionError("Kaggle 模型本轮未能生成回答，可以点「重试此问题」。");
+    }
+    event.answerGenerationMs = reply.generation_ms ?? null;
+    if (event.answerGenerationMs !== null) event.generationMs = (event.planningMs ?? 0) + event.answerGenerationMs;
+    event.answer = {...retrieved,reply_paragraphs:reply.paragraphs};
+    owner.state = retrieved.state;
   } catch (error) {
-    event.issue = event.modelOutput ? "invalid_model_plan" : "planner_unavailable";
+    event.plannerStatus = error.plannerStatus ?? null;
+    event.plannerStage = error.plannerStage ?? null;
+    if (retrieved) {
+      event.recalledPages = retrieved.recalledPages;
+      event.retrievalMs = retrieved.retrievalMs;
+    }
+    event.issue = stage === "answer" ? "answer_failed" :
+      event.modelOutput || event.plannerStage === "model_output" ? "invalid_model_plan" :
+      event.plannerStatus === 422 ? "planner_rejected" : "planner_unavailable";
     event.resolution = "retry_kaggle";
     event.error = error instanceof ConnectionError ? error.message : "本轮未能使用模型计划查询商品，请重试。";
   } finally {
     event.pending = false;
+    delete event.progress;
     event.elapsedMs = Math.round(performance.now() - start);
     processing = null;
     save();
@@ -777,6 +846,10 @@ function exportThread(threadToExport) {
     id:item.questionId ?? item.session + "-" + item.time,question:item.question,answer:item.answer,
     modelOutput:item.modelOutput,generationMs:item.generationMs,version:item.version,time:item.time,session:item.session,
     mode:item.mode,attempted_model_version:item.attemptedVersion ?? null,issue:item.issue ?? (item.pending ? "pending" : null),
+    planner_status:item.plannerStatus ?? null,planner_stage:item.plannerStage ?? null,
+    planning_ms:item.planningMs ?? null,answer_generation_ms:item.answerGenerationMs ?? null,
+    recalled_pages:item.answer?.recalledPages ?? item.recalledPages ?? null,
+    retrieval_ms:item.answer?.retrievalMs ?? item.retrievalMs ?? null,
     resolution:item.resolution ?? null,error:item.error ?? item.code ?? null
   }))).join("\n");
   if (!content) return;

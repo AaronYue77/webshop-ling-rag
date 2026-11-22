@@ -127,10 +127,21 @@
     });
     return {plan,foreignCurrency};
   }
-  function mergePlan(local, remote) {
+  function validatedPlan(remote) {
     if (!remote || typeof remote !== "object" || !["search","detail","compare"].includes(remote.action) ||
         !Array.isArray(remote.tasks) || !Array.isArray(remote.terms) || !Array.isArray(remote.refs)) throw Error("Invalid planner output");
-    const cloud = makePlan(remote);
+    const plan = makePlan(remote);
+    for (const key of ["required_terms","excluded_terms"]) {
+      if (!Object.hasOwn(remote,key)) continue;
+      const list = remote[key];
+      if (!Array.isArray(list) || list.length > 8 || list.some(value=>
+        typeof value !== "string" || value.length > 55 || !tokens(value).length)) throw Error("Invalid planner evidence filters");
+      plan[key] = unique(list.map(strip));
+    }
+    return plan;
+  }
+  function mergePlan(local, remote) {
+    const cloud = validatedPlan(remote);
     const result = {...cloud,tasks:unique([...local.tasks,...cloud.tasks])};
     for (const key of ["category","audience","size","size_system","color","max_price","min_price","compatibility_target"]) if (local[key] !== null) result[key] = local[key];
     if (local.max_price !== null) result.price_exclusive = local.price_exclusive;
@@ -184,7 +195,8 @@
   function index(products) {
     const docs = [], df = new Map(), byId = new Map();
     for (const product of products) {
-      const words = tokens([product.name,product.name,product.name,product.trail,product.query,product.brand,product.description.slice(0,440)].join(" "));
+      const words = tokens([product.name,product.name,product.name,product.trail,product.query,product.brand,
+        product.description.slice(0,440),...product.material.map(([,value])=>value)].join(" "));
       const tf = new Map();
       for (const t of words) tf.set(t,(tf.get(t) || 0)+1);
       for (const t of tf.keys()) df.set(t,(df.get(t) || 0)+1);
@@ -193,17 +205,34 @@
     }
     return {docs,df,byId,avg:docs.reduce((n,d)=>n+d.length,0)/Math.max(1,docs.length)};
   }
-  function rank(idx,plan) {
+  function filterEvidence(product) {
+    return [
+      [product.name,"商品名称"], [product.brand,"品牌"], [product.trail,"目录分类"],
+      ...product.material.map(([,value])=>[value,"材质字段"]),
+      ...Object.values(product.specs).map(value=>[value,"规格字段"]),
+      ...product.description.split(/(?<=[.!?])\s+|[\r\n]+/).map(text=>[text,"商品说明"])
+    ].filter(([value])=>value).map(([value,field])=>({text:" "+tokens(value).join(" ")+" ",field,excerpt:value}));
+  }
+  function rank(idx,plan,modelOnly = false) {
     const terms = unique(tokens(plan.terms.join(" ")).filter(x=>!stop.has(x)));
     const exact = plan.terms.find(x=>/^[a-z0-9]{10}$/i.test(x) && idx.byId.has(x.toUpperCase()));
     const max = plan.max_price === null ? null : Math.round(plan.max_price*100);
     const min = plan.min_price === null ? null : Math.round(plan.min_price*100);
-    const phoneCase = terms.includes("case") && (terms.includes("phone") || /\b(?:iphone|galaxy|pixel)\b/i.test(plan.compatibility_target || ""));
+    const required = (plan.required_terms ?? []).map(value=>[value," "+tokens(value).join(" ")+" "]);
+    const excluded = (plan.excluded_terms ?? []).map(value=>" "+tokens(value).join(" ")+" ");
+    const phoneCase = !modelOnly && terms.includes("case") && (terms.includes("phone") || /\b(?:iphone|galaxy|pixel)\b/i.test(plan.compatibility_target || ""));
     const hits = [];
     for (const doc of idx.docs) {
       const p = doc.product;
       if (exact && p.id !== exact.toUpperCase()) continue;
       if (plan.category && p.category !== plan.category || plan.shoe && !p.shoe || plan.audience && p.audience !== plan.audience) continue;
+      let matchedTerms = [];
+      if (required.length || excluded.length) {
+        const evidence = filterEvidence(p);
+        if (excluded.some(term=>evidence.some(item=>item.text.includes(term)))) continue;
+        matchedTerms = required.map(([term,phrase])=>[term,evidence.find(item=>item.text.includes(phrase))]);
+        if (matchedTerms.some(([,source])=>!source)) continue;
+      }
       if (phoneCase && !/\b(?:cases?|protective cover)\b/i.test(p.name+" "+p.trail)) continue;
       if (plan.color && !colorOptions(p).some(v=>tokens(v.value).includes(plan.color))) continue;
       const size = sizeEvidence(p,plan.size,plan.size_system);
@@ -221,21 +250,21 @@
         const df = idx.df.get(t) || 0;
         if (tf) score += Math.log(1+(idx.docs.length-df+.5)/(df+.5))*(tf*2.2)/(tf+1.2*(.25+.75*doc.length/Math.max(1,idx.avg)));
       }
-      if (!exact && terms.length && !score && fit?.status !== "supported") continue;
+      if (!exact && terms.length && !score && fit?.status !== "supported" && !matchedTerms.length) continue;
       if (plan.size && size.kind === "option") score += 8;
       if (fit?.status === "supported") score += 30;
       if (p.images.length && plan.tasks.includes("image")) score += .15;
-      if (!terms.length && plan.category === "beauty" && plan.tasks.includes("recommend")) {
+      if (!modelOnly && !terms.length && plan.category === "beauty" && plan.tasks.includes("recommend")) {
         if (/\b(?:needles?|piercing|tattoo)\b/i.test(p.name)) score -= 2;
         if (p.brand && p.specs["Item Form"]) score += .5;
       }
-      hits.push({p,score,size,priceBasis});
+      hits.push({p,score,size,priceBasis,matchedTerms});
     }
     hits.sort((a,b)=>(plan.sort === "price_asc" ? (a.priceBasis ?? Infinity)-(b.priceBasis ?? Infinity) :
       plan.sort === "price_desc" ? (b.priceBasis ?? -1)-(a.priceBasis ?? -1) : b.score-a.score) ||
       (a.priceBasis ?? Infinity)-(b.priceBasis ?? Infinity) || a.p.id.localeCompare(b.p.id));
     if (plan.budget_scope !== "total" || max === null) {
-      if (plan.sort === "relevance" && plan.category && !terms.length && !plan.shoe && plan.tasks.includes("recommend")) {
+      if (!modelOnly && plan.sort === "relevance" && plan.category && !terms.length && !plan.shoe && plan.tasks.includes("recommend")) {
         const seen = new Set(), head = [], tail = [];
         for (const hit of hits) {
           const aisle = hit.p.query || hit.p.trail;
@@ -256,10 +285,11 @@
     }
     return {hits:basket,total:hits.length,totalPrice:sum};
   }
-  function card(p,position,plan,size = sizeEvidence(p,plan.size,plan.size_system)) {
+  function card(p,position,plan,size = sizeEvidence(p,plan.size,plan.size_system),matchedTerms = []) {
     const sizeList = sizeOptions(p), colorList = colorOptions(p), facts = [], gaps = [];
     const has = key=>plan.tasks.includes(key);
     const detailed = plan.action !== "search";
+    for (const [term,source] of matchedTerms) facts.push(["筛选依据",term,source.field]);
     if (has("color") || detailed || plan.color) {
       if (colorList.length) facts.push(["颜色选项",colorList.map(x=>x.value).join("、"),"customization_options / product_information"]);
       else gaps.push("目录未记录颜色选项。");
@@ -309,6 +339,8 @@
     let reason = null;
     if (has("recommend")) {
       const parts = [];
+      for (const [term,source] of matchedTerms) parts.push(source.field+"记录了 "+term);
+      if (plan.color) parts.push("目录有 "+plan.color+" 颜色选项");
       if (plan.size && size.kind === "option") parts.push("选项表记录了 "+size.label+" 码");
       if (p.material.length) parts.push("材质标注为 "+p.material.slice(0,2).map(([k,v])=>k+" "+v).join("、"));
       if (p.trail) parts.push("目录归类为 "+p.trail.split("›").slice(-1)[0].trim());
@@ -318,7 +350,8 @@
       else if (p.brand) parts.push("目录品牌为 "+p.brand);
       reason = parts.length ? parts.join("，")+"。" : "目录仅提供商品名称，可结合商品页面进一步核实。";
     }
-    return {id:p.id,position,name:p.name,category:p.category,trail:p.trail,brand:p.brand,price:p.price,listPrice:p.listPrice,
+    const matchedEvidence = matchedTerms.map(([term,source])=>({term,field:source.field,excerpt:String(source.excerpt).slice(0,250)}));
+    return {id:p.id,position,name:p.name,category:p.category,trail:p.trail,brand:p.brand,price:p.price,listPrice:p.listPrice,matchedEvidence,
       images:has("image") || plan.action === "search" ? p.images : [],facts,gaps,reason,link:"https://www.amazon.com/dp/"+p.id};
   }
   function compare(cards) {
@@ -335,12 +368,15 @@
     if (foreignCurrency) { plan.max_price = null; plan.min_price = null; }
     return execute(idx,question,state,plan,foreignCurrency);
   }
-  function execute(idx,question,state,plan,foreignCurrency = false) {
+  function runModel(idx,question,state,remote) {
+    return execute(idx,question,state,validatedPlan(remote),false,true);
+  }
+  function execute(idx,question,state,plan,foreignCurrency = false,modelOnly = false) {
     const retrievalStart = performance.now();
     const notes = [], oldIds = state.resultIds || [];
     let resultIds = oldIds, active = state.active || null, hits = [], total = 0, basketPrice;
     if (plan.action !== "search") {
-      const positions = plan.refs.length ? plan.refs : plan.action === "compare" ? oldIds.slice(0,2).map((_,i)=>i+1) : active ? [active] : oldIds.length === 1 ? [1] : [];
+      const positions = modelOnly || plan.refs.length ? plan.refs : plan.action === "compare" ? oldIds.slice(0,2).map((_,i)=>i+1) : active ? [active] : oldIds.length === 1 ? [1] : [];
       if (!positions.length) notes.push(oldIds.length ? "请指明要查看的商品序号，例如「第三款」。" : "请先检索商品生成清单，再按序号追问。");
       for (const position of positions) {
         const p = idx.byId.get(oldIds[position-1]);
@@ -349,9 +385,10 @@
       }
       if (hits.length === 1) active = hits[0].position;
       total = hits.length;
-    } else if (plan.category || plan.shoe || plan.terms.length || plan.audience || plan.size || plan.color ||
-      plan.max_price !== null || plan.min_price !== null || /目录|商品|catalog/i.test(question) && !plan.tasks.includes("inventory")) {
-      const ranked = rank(idx,plan);
+    } else if (plan.category || plan.shoe || plan.terms.length || plan.audience || plan.size || plan.color || plan.required_terms?.length ||
+      plan.max_price !== null || plan.min_price !== null || plan.compatibility_target || plan.excluded_terms?.length ||
+      !modelOnly && /目录|商品|catalog/i.test(question) && !plan.tasks.includes("inventory")) {
+      const ranked = rank(idx,plan,modelOnly);
       hits = ranked.hits.map((hit,i)=>({...hit,position:i+1}));
       total = ranked.total;
       basketPrice = ranked.totalPrice;
@@ -359,7 +396,7 @@
       if (!hits.length) notes.push("目录中没有找到满足已识别条件的商品。可以提供商品的英文名称、品牌或型号来缩小查找范围。");
     } else notes.push("请提供想查看的商品类别、名称、品牌或型号。");
     const retrievalMs = Math.round((performance.now()-retrievalStart)*1000)/1000;
-    const cards = hits.map(hit=>card(hit.p,hit.position,plan,hit.size));
+    const cards = hits.map(hit=>card(hit.p,hit.position,plan,hit.size,hit.matchedTerms));
     const recalledPages = hits.map(({p,position,score},index)=>({
       asin:p.id,url:cards[index].link,rank:index+1,position,score:score ?? null
     }));
@@ -379,6 +416,7 @@
       plan.size && [plan.size_system,plan.size+" 码"].filter(Boolean).join(" "),plan.color,
       plan.min_price !== null && "≥ "+money(Math.round(plan.min_price*100)),
       plan.max_price !== null && (plan.budget_scope === "total" ? "总预算 " : "")+(plan.price_exclusive ? "< " : "≤ ")+money(Math.round(plan.max_price*100)),
+      ...(plan.required_terms ?? []),...(plan.excluded_terms ?? []).map(term=>"排除 "+term),
       plan.compatibility_target].filter(Boolean);
     const summary = cards.length ? plan.action === "search" ? "找到 "+total+" 件目录候选"+(cards.length < total ? "，显示 "+cards.length+" 件":"")+"。" :
       "已核对清单中的 "+cards.length+" 件商品。" : "目前没有可展示的匹配商品。";
@@ -470,7 +508,9 @@
     if (detail && (tasks.has("price") || tasks.has("price_history"))) {
       descriptions.push(card.price == null ? "目录快照没有标价" : "目录快照价为 " + money(card.price));
     }
-    if (tasks.has("recommend") && !descriptions.length && card.reason) descriptions.push(shortFact(card.reason,125));
+    if (tasks.has("recommend") && (!descriptions.length || plan.required_terms?.length && plan.action === "search") && card.reason) {
+      descriptions.push(shortFact(card.reason,125));
+    }
     if (detail && !descriptions.length && card.brand) descriptions.push("目录标注的品牌是 " + card.brand);
     if (!descriptions.length && !detail) return "";
     const number = "第 " + card.position + " 款";
@@ -534,6 +574,6 @@
       generation_ms:generationMs ?? null, model_and_config_version:version ?? null, ...meta
     };
   }
-  return {index,rank,run,execute,questionRecord,replyParagraphs,localPlan,makePlan,mergePlan,taskLabels,labels,money,sizeEvidence,compatibility,colorOptions,sizeOptions,
+  return {index,rank,run,runModel,execute,questionRecord,replyParagraphs,localPlan,makePlan,mergePlan,taskLabels,labels,money,sizeEvidence,compatibility,colorOptions,sizeOptions,
     localConfigVersion:"webshop-local-v2"};
 });
