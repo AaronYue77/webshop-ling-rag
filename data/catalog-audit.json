@@ -1,0 +1,19 @@
+{
+  "count": 779,
+  "byCategory": {
+    "beauty": 221,
+    "electronics": 203,
+    "fashion": 63,
+    "garden": 196,
+    "grocery": 96
+  },
+  "sha256": "9cd22585dc15a240ba2d554627b1d72a15c81f435376225341274550176fa62f",
+  "snapshotDate": null,
+  "currency": "USD",
+  "historySeries": false,
+  "womenShoes": 6,
+  "imageCount": 778,
+  "priceCount": 779,
+  "variantSizePriceCount": 60,
+  "inventoryQuantityCount": 242
+}
