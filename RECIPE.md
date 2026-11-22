@@ -27,6 +27,8 @@ python training/evaluate.py --adapter runs/webshop/adapter --split test --output
 
 ## 推理样例
 
+连接后，Ling 在 Kaggle 上先理解问题并生成计划。问答台核对商品证据，再把证据交给 Ling 生成回答。
+
 设置环境变量 WEBSHOP_SERVICE_TOKEN 为至少 24 位的 ASCII 令牌。从下面的 Release 下载三个文件到同一目录，例如 `runs/webshop/adapter`，再启动服务。
 
 ~~~bash

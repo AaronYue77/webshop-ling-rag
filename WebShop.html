@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-U5GozgW+OF7phs4IfjKFXT6wDIJAbHvlDIS3SFftNTc=' 'sha256-rXaeE5dHUm4spzxEgglTg3SLZ0GGapJuELz7Tt33D6I='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-MAgVxwz1W6roBDV0eYE3mn2FELDci3lBZh7MqGZBB84=' 'sha256-IQ5hzFYh3/wBGMbZbVz9zR3EpLx9JlriGboNEnF+r14='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
   <title>WebShop 商品档案 · 问答台</title>
   <style>:root {
   color-scheme: light;
@@ -275,7 +275,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
   <dialog id="connection" aria-labelledby="connection-title">
     <form id="connection-form">
       <div class="dialog-title"><h2 id="connection-title">连接 Kaggle GPU</h2><button id="close-settings" class="icon-button" type="button" aria-label="关闭">×</button></div>
-      <p><a href="https://www.kaggle.com/code/aaronyue77/webshop-ling-inference" target="_blank" rel="noopener noreferrer">打开一键推理 Notebook ↗</a>，点 <strong>Run All</strong>。模型就绪后，粘贴 <strong>VSCode Compatible URL</strong>。</p>
+      <p><a href="https://www.kaggle.com/code/aaronyue77/webshop-ling-inference" target="_blank" rel="noopener noreferrer">打开一键推理 Notebook ↗</a>，选择 <strong>Copy &amp; Edit</strong>，再点 <strong>Run All</strong>。模型就绪后，粘贴 <strong>VSCode Compatible URL</strong>。</p>
       <details id="connection-guide" class="connection-guide">
         <summary>点击查看详细图文说明</summary>
         <ol class="guide-steps">
@@ -483,10 +483,21 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     });
     return {plan,foreignCurrency};
   }
-  function mergePlan(local, remote) {
+  function validatedPlan(remote) {
     if (!remote || typeof remote !== "object" || !["search","detail","compare"].includes(remote.action) ||
         !Array.isArray(remote.tasks) || !Array.isArray(remote.terms) || !Array.isArray(remote.refs)) throw Error("Invalid planner output");
-    const cloud = makePlan(remote);
+    const plan = makePlan(remote);
+    for (const key of ["required_terms","excluded_terms"]) {
+      if (!Object.hasOwn(remote,key)) continue;
+      const list = remote[key];
+      if (!Array.isArray(list) || list.length > 8 || list.some(value=>
+        typeof value !== "string" || value.length > 55 || !tokens(value).length)) throw Error("Invalid planner evidence filters");
+      plan[key] = unique(list.map(strip));
+    }
+    return plan;
+  }
+  function mergePlan(local, remote) {
+    const cloud = validatedPlan(remote);
     const result = {...cloud,tasks:unique([...local.tasks,...cloud.tasks])};
     for (const key of ["category","audience","size","size_system","color","max_price","min_price","compatibility_target"]) if (local[key] !== null) result[key] = local[key];
     if (local.max_price !== null) result.price_exclusive = local.price_exclusive;
@@ -540,7 +551,8 @@ dialog .small { font-size: 12px; margin: 9px 0; }
   function index(products) {
     const docs = [], df = new Map(), byId = new Map();
     for (const product of products) {
-      const words = tokens([product.name,product.name,product.name,product.trail,product.query,product.brand,product.description.slice(0,440)].join(" "));
+      const words = tokens([product.name,product.name,product.name,product.trail,product.query,product.brand,
+        product.description.slice(0,440),...product.material.map(([,value])=>value)].join(" "));
       const tf = new Map();
       for (const t of words) tf.set(t,(tf.get(t) || 0)+1);
       for (const t of tf.keys()) df.set(t,(df.get(t) || 0)+1);
@@ -549,17 +561,34 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     }
     return {docs,df,byId,avg:docs.reduce((n,d)=>n+d.length,0)/Math.max(1,docs.length)};
   }
-  function rank(idx,plan) {
+  function filterEvidence(product) {
+    return [
+      [product.name,"商品名称"], [product.brand,"品牌"], [product.trail,"目录分类"],
+      ...product.material.map(([,value])=>[value,"材质字段"]),
+      ...Object.values(product.specs).map(value=>[value,"规格字段"]),
+      ...product.description.split(/(?<=[.!?])\s+|[\r\n]+/).map(text=>[text,"商品说明"])
+    ].filter(([value])=>value).map(([value,field])=>({text:" "+tokens(value).join(" ")+" ",field,excerpt:value}));
+  }
+  function rank(idx,plan,modelOnly = false) {
     const terms = unique(tokens(plan.terms.join(" ")).filter(x=>!stop.has(x)));
     const exact = plan.terms.find(x=>/^[a-z0-9]{10}$/i.test(x) && idx.byId.has(x.toUpperCase()));
     const max = plan.max_price === null ? null : Math.round(plan.max_price*100);
     const min = plan.min_price === null ? null : Math.round(plan.min_price*100);
-    const phoneCase = terms.includes("case") && (terms.includes("phone") || /\b(?:iphone|galaxy|pixel)\b/i.test(plan.compatibility_target || ""));
+    const required = (plan.required_terms ?? []).map(value=>[value," "+tokens(value).join(" ")+" "]);
+    const excluded = (plan.excluded_terms ?? []).map(value=>" "+tokens(value).join(" ")+" ");
+    const phoneCase = !modelOnly && terms.includes("case") && (terms.includes("phone") || /\b(?:iphone|galaxy|pixel)\b/i.test(plan.compatibility_target || ""));
     const hits = [];
     for (const doc of idx.docs) {
       const p = doc.product;
       if (exact && p.id !== exact.toUpperCase()) continue;
       if (plan.category && p.category !== plan.category || plan.shoe && !p.shoe || plan.audience && p.audience !== plan.audience) continue;
+      let matchedTerms = [];
+      if (required.length || excluded.length) {
+        const evidence = filterEvidence(p);
+        if (excluded.some(term=>evidence.some(item=>item.text.includes(term)))) continue;
+        matchedTerms = required.map(([term,phrase])=>[term,evidence.find(item=>item.text.includes(phrase))]);
+        if (matchedTerms.some(([,source])=>!source)) continue;
+      }
       if (phoneCase && !/\b(?:cases?|protective cover)\b/i.test(p.name+" "+p.trail)) continue;
       if (plan.color && !colorOptions(p).some(v=>tokens(v.value).includes(plan.color))) continue;
       const size = sizeEvidence(p,plan.size,plan.size_system);
@@ -577,21 +606,21 @@ dialog .small { font-size: 12px; margin: 9px 0; }
         const df = idx.df.get(t) || 0;
         if (tf) score += Math.log(1+(idx.docs.length-df+.5)/(df+.5))*(tf*2.2)/(tf+1.2*(.25+.75*doc.length/Math.max(1,idx.avg)));
       }
-      if (!exact && terms.length && !score && fit?.status !== "supported") continue;
+      if (!exact && terms.length && !score && fit?.status !== "supported" && !matchedTerms.length) continue;
       if (plan.size && size.kind === "option") score += 8;
       if (fit?.status === "supported") score += 30;
       if (p.images.length && plan.tasks.includes("image")) score += .15;
-      if (!terms.length && plan.category === "beauty" && plan.tasks.includes("recommend")) {
+      if (!modelOnly && !terms.length && plan.category === "beauty" && plan.tasks.includes("recommend")) {
         if (/\b(?:needles?|piercing|tattoo)\b/i.test(p.name)) score -= 2;
         if (p.brand && p.specs["Item Form"]) score += .5;
       }
-      hits.push({p,score,size,priceBasis});
+      hits.push({p,score,size,priceBasis,matchedTerms});
     }
     hits.sort((a,b)=>(plan.sort === "price_asc" ? (a.priceBasis ?? Infinity)-(b.priceBasis ?? Infinity) :
       plan.sort === "price_desc" ? (b.priceBasis ?? -1)-(a.priceBasis ?? -1) : b.score-a.score) ||
       (a.priceBasis ?? Infinity)-(b.priceBasis ?? Infinity) || a.p.id.localeCompare(b.p.id));
     if (plan.budget_scope !== "total" || max === null) {
-      if (plan.sort === "relevance" && plan.category && !terms.length && !plan.shoe && plan.tasks.includes("recommend")) {
+      if (!modelOnly && plan.sort === "relevance" && plan.category && !terms.length && !plan.shoe && plan.tasks.includes("recommend")) {
         const seen = new Set(), head = [], tail = [];
         for (const hit of hits) {
           const aisle = hit.p.query || hit.p.trail;
@@ -612,10 +641,11 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     }
     return {hits:basket,total:hits.length,totalPrice:sum};
   }
-  function card(p,position,plan,size = sizeEvidence(p,plan.size,plan.size_system)) {
+  function card(p,position,plan,size = sizeEvidence(p,plan.size,plan.size_system),matchedTerms = []) {
     const sizeList = sizeOptions(p), colorList = colorOptions(p), facts = [], gaps = [];
     const has = key=>plan.tasks.includes(key);
     const detailed = plan.action !== "search";
+    for (const [term,source] of matchedTerms) facts.push(["筛选依据",term,source.field]);
     if (has("color") || detailed || plan.color) {
       if (colorList.length) facts.push(["颜色选项",colorList.map(x=>x.value).join("、"),"customization_options / product_information"]);
       else gaps.push("目录未记录颜色选项。");
@@ -665,6 +695,8 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     let reason = null;
     if (has("recommend")) {
       const parts = [];
+      for (const [term,source] of matchedTerms) parts.push(source.field+"记录了 "+term);
+      if (plan.color) parts.push("目录有 "+plan.color+" 颜色选项");
       if (plan.size && size.kind === "option") parts.push("选项表记录了 "+size.label+" 码");
       if (p.material.length) parts.push("材质标注为 "+p.material.slice(0,2).map(([k,v])=>k+" "+v).join("、"));
       if (p.trail) parts.push("目录归类为 "+p.trail.split("›").slice(-1)[0].trim());
@@ -674,7 +706,8 @@ dialog .small { font-size: 12px; margin: 9px 0; }
       else if (p.brand) parts.push("目录品牌为 "+p.brand);
       reason = parts.length ? parts.join("，")+"。" : "目录仅提供商品名称，可结合商品页面进一步核实。";
     }
-    return {id:p.id,position,name:p.name,category:p.category,trail:p.trail,brand:p.brand,price:p.price,listPrice:p.listPrice,
+    const matchedEvidence = matchedTerms.map(([term,source])=>({term,field:source.field,excerpt:String(source.excerpt).slice(0,250)}));
+    return {id:p.id,position,name:p.name,category:p.category,trail:p.trail,brand:p.brand,price:p.price,listPrice:p.listPrice,matchedEvidence,
       images:has("image") || plan.action === "search" ? p.images : [],facts,gaps,reason,link:"https://www.amazon.com/dp/"+p.id};
   }
   function compare(cards) {
@@ -691,12 +724,15 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     if (foreignCurrency) { plan.max_price = null; plan.min_price = null; }
     return execute(idx,question,state,plan,foreignCurrency);
   }
-  function execute(idx,question,state,plan,foreignCurrency = false) {
+  function runModel(idx,question,state,remote) {
+    return execute(idx,question,state,validatedPlan(remote),false,true);
+  }
+  function execute(idx,question,state,plan,foreignCurrency = false,modelOnly = false) {
     const retrievalStart = performance.now();
     const notes = [], oldIds = state.resultIds || [];
     let resultIds = oldIds, active = state.active || null, hits = [], total = 0, basketPrice;
     if (plan.action !== "search") {
-      const positions = plan.refs.length ? plan.refs : plan.action === "compare" ? oldIds.slice(0,2).map((_,i)=>i+1) : active ? [active] : oldIds.length === 1 ? [1] : [];
+      const positions = modelOnly || plan.refs.length ? plan.refs : plan.action === "compare" ? oldIds.slice(0,2).map((_,i)=>i+1) : active ? [active] : oldIds.length === 1 ? [1] : [];
       if (!positions.length) notes.push(oldIds.length ? "请指明要查看的商品序号，例如「第三款」。" : "请先检索商品生成清单，再按序号追问。");
       for (const position of positions) {
         const p = idx.byId.get(oldIds[position-1]);
@@ -705,9 +741,10 @@ dialog .small { font-size: 12px; margin: 9px 0; }
       }
       if (hits.length === 1) active = hits[0].position;
       total = hits.length;
-    } else if (plan.category || plan.shoe || plan.terms.length || plan.audience || plan.size || plan.color ||
-      plan.max_price !== null || plan.min_price !== null || /目录|商品|catalog/i.test(question) && !plan.tasks.includes("inventory")) {
-      const ranked = rank(idx,plan);
+    } else if (plan.category || plan.shoe || plan.terms.length || plan.audience || plan.size || plan.color || plan.required_terms?.length ||
+      plan.max_price !== null || plan.min_price !== null || plan.compatibility_target || plan.excluded_terms?.length ||
+      !modelOnly && /目录|商品|catalog/i.test(question) && !plan.tasks.includes("inventory")) {
+      const ranked = rank(idx,plan,modelOnly);
       hits = ranked.hits.map((hit,i)=>({...hit,position:i+1}));
       total = ranked.total;
       basketPrice = ranked.totalPrice;
@@ -715,7 +752,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
       if (!hits.length) notes.push("目录中没有找到满足已识别条件的商品。可以提供商品的英文名称、品牌或型号来缩小查找范围。");
     } else notes.push("请提供想查看的商品类别、名称、品牌或型号。");
     const retrievalMs = Math.round((performance.now()-retrievalStart)*1000)/1000;
-    const cards = hits.map(hit=>card(hit.p,hit.position,plan,hit.size));
+    const cards = hits.map(hit=>card(hit.p,hit.position,plan,hit.size,hit.matchedTerms));
     const recalledPages = hits.map(({p,position,score},index)=>({
       asin:p.id,url:cards[index].link,rank:index+1,position,score:score ?? null
     }));
@@ -735,6 +772,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
       plan.size && [plan.size_system,plan.size+" 码"].filter(Boolean).join(" "),plan.color,
       plan.min_price !== null && "≥ "+money(Math.round(plan.min_price*100)),
       plan.max_price !== null && (plan.budget_scope === "total" ? "总预算 " : "")+(plan.price_exclusive ? "< " : "≤ ")+money(Math.round(plan.max_price*100)),
+      ...(plan.required_terms ?? []),...(plan.excluded_terms ?? []).map(term=>"排除 "+term),
       plan.compatibility_target].filter(Boolean);
     const summary = cards.length ? plan.action === "search" ? "找到 "+total+" 件目录候选"+(cards.length < total ? "，显示 "+cards.length+" 件":"")+"。" :
       "已核对清单中的 "+cards.length+" 件商品。" : "目前没有可展示的匹配商品。";
@@ -826,7 +864,9 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     if (detail && (tasks.has("price") || tasks.has("price_history"))) {
       descriptions.push(card.price == null ? "目录快照没有标价" : "目录快照价为 " + money(card.price));
     }
-    if (tasks.has("recommend") && !descriptions.length && card.reason) descriptions.push(shortFact(card.reason,125));
+    if (tasks.has("recommend") && (!descriptions.length || plan.required_terms?.length && plan.action === "search") && card.reason) {
+      descriptions.push(shortFact(card.reason,125));
+    }
     if (detail && !descriptions.length && card.brand) descriptions.push("目录标注的品牌是 " + card.brand);
     if (!descriptions.length && !detail) return "";
     const number = "第 " + card.position + " 款";
@@ -890,7 +930,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
       generation_ms:generationMs ?? null, model_and_config_version:version ?? null, ...meta
     };
   }
-  return {index,rank,run,execute,questionRecord,replyParagraphs,localPlan,makePlan,mergePlan,taskLabels,labels,money,sizeEvidence,compatibility,colorOptions,sizeOptions,
+  return {index,rank,run,runModel,execute,questionRecord,replyParagraphs,localPlan,makePlan,mergePlan,taskLabels,labels,money,sizeEvidence,compatibility,colorOptions,sizeOptions,
     localConfigVersion:"webshop-local-v2"};
 });
 </script>
@@ -1266,7 +1306,7 @@ function renderTurn(event) {
   const out = event.answer;
   if (!out) {
     const running = event.pending && processing === event.questionId;
-    bubble.append(node("p",null,running ? "正在 Kaggle GPU 上解析需求…" :
+    bubble.append(node("p",null,running ? (event.progress ?? "正在 Kaggle GPU 上解析需求…") :
       event.error || "这条问题已保存，尚未收到回答。"));
     if (!running) content.append(button("重试此问题",() => {
       if (processing) return;
@@ -1274,7 +1314,8 @@ function renderTurn(event) {
       ask(event.question);
     }));
   } else {
-    for (const paragraph of out.reply_paragraphs ?? ShopRag.replyParagraphs(out)) bubble.append(node("p",null,paragraph));
+    for (const paragraph of out.reply_paragraphs ?? []) bubble.append(node("p",null,paragraph));
+    if (!out.reply_paragraphs?.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
     const cards = out.cards ?? [];
     const withPictures = cards.filter(card=>card.images?.length || out.plan?.action === "search");
     if (withPictures.length) {
@@ -1422,6 +1463,17 @@ function plannerCode(path, payload) {
     "                data = json.load(response)",
     "        except urllib.error.HTTPError as error:",
     "            data = {'bridge_error': 'planner-http', 'status': error.code}",
+    "            if error.code == 422:",
+    "                try:",
+    "                    detail = json.loads(error.read(8192)).get('detail')",
+    "                    if detail == 'Invalid planner output':",
+    "                        data['stage'] = 'model_output'",
+    "                    elif detail == 'Invalid model answer':",
+    "                        data['stage'] = 'model_answer'",
+    "                    elif detail == 'Planner input or generation value is invalid' or isinstance(detail, list):",
+    "                        data['stage'] = 'request_or_generation'",
+    "                except (ValueError, TypeError, AttributeError, OSError):",
+    "                    pass",
     "        except (OSError, ValueError):",
     "            data = {'bridge_error': 'service-not-ready'}",
     "    display({'" + replyMime + "': data}, raw=True)",
@@ -1431,9 +1483,17 @@ function plannerCode(path, payload) {
 }
 function requirePlannerReply(result) {
   if (result && !result.bridge_error) return result;
-  throw new ConnectionError(result?.bridge_error === "planner-http" && result.status === 422 ?
-    "模型没有生成可执行的任务计划，请调整问题后重试。" :
-    "Kaggle 内核中的 WebShop 推理服务未就绪或请求失败。请确认已在一键推理 Notebook 中执行 Run All，并看到模型就绪提示。");
+  const status = result?.bridge_error === "planner-http" ? result.status : null;
+  const stage = ["model_output","model_answer","request_or_generation"].includes(result?.stage) ? result.stage : null;
+  const error = new ConnectionError(status === 422 ?
+    (stage === "model_answer" ? "Kaggle 模型本轮未能生成回答，可以点「重试此问题」。" :
+      stage === "model_output" ? "Kaggle 模型本轮未能返回可执行的计划，可以点「重试此问题」。" :
+      "Kaggle 未能完成这次请求，可以点「重试此问题」。") :
+    status === 429 ? "Kaggle 模型正忙，请稍后重试此问题。" :
+      "Kaggle 内核中的 WebShop 推理服务未就绪或请求失败。请确认已在一键推理 Notebook 中执行 Run All，并看到模型就绪提示。");
+  error.plannerStatus = status;
+  error.plannerStage = stage;
+  throw error;
 }
 async function callPlanner(config, kernelId, path, payload) {
   const session = newId();
@@ -1500,6 +1560,9 @@ async function getConnection(raw) {
       if (health.service !== "webshop-ling-planner" || health.ready !== true || health.adapter !== true || health.smoke_adapter === true) {
         throw new ConnectionError("当前会话未加载正式的 WebShop LoRA 推理服务。");
       }
+      if (!(health.model_and_config_version?.planner_protocol >= 3)) {
+        throw new ConnectionError("当前是旧版 Kaggle 会话。请从连接指南打开公开的一键推理 Notebook，创建新副本并运行后重新连接。");
+      }
       return {...config,kernelId:kernel.id,version:health.model_and_config_version ?? {
         model:"Ling-3.0-tiny",revision:health.revision ?? null,config_version:null
       }};
@@ -1511,6 +1574,29 @@ async function getConnection(raw) {
 function showSettings() {
   $("connect-result").textContent = "";
   if (!$("connection").open) $("connection").showModal();
+}
+function answerEvidence(out) {
+  const short = (text, limit) => String(text ?? "").slice(0,limit);
+  const catalog = {
+    action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, matches:out.matched,
+    notes:out.notes.map(text=>short(text,300)),
+    products:out.cards.map(card=>({
+      position:card.position, asin:card.id, name:short(card.name,160),
+      snapshot_price_usd:card.price === null ? null : card.price / 100,
+      image_available:Boolean(card.images.length),
+      facts:card.facts.map(([label,value])=>[label,short(value,label === "规格" ? 200 : 150)]),
+      matched_evidence:[...new Set((card.matchedEvidence ?? []).map(item=>item.excerpt))].map(text=>short(text,210)),
+      gaps:card.gaps.map(text=>short(text,140))
+    }))
+  };
+  const encoded = JSON.stringify(catalog);
+  if (encoded.length <= 12000 && new TextEncoder().encode(encoded).length <= 22000) return encoded;
+  for (const product of catalog.products) {
+    product.facts = product.facts.map(([label,value])=>[label,short(value,65)]);
+    product.matched_evidence = product.matched_evidence.map(text=>short(text,80));
+    product.gaps = product.gaps.map(text=>short(text,75));
+  }
+  return JSON.stringify(catalog);
 }
 async function ask(text) {
   const question = text.trim();
@@ -1535,6 +1621,8 @@ async function ask(text) {
   render();
   scrollBottom();
   const start = performance.now();
+  let stage = "plan";
+  let retrieved;
   try {
     const prior = (owner.state.resultIds || []).map((id,i) => ({position:i+1,id,name:idx.byId.get(id)?.name.slice(0,140)}));
     const result = await callPlanner(config,config.kernelId,"/v1/plan",{question,questionId:event.questionId,
@@ -1543,17 +1631,38 @@ async function ask(text) {
       throw new ConnectionError("Kaggle 会话未返回有效的 WebShop LoRA 计划，请重新连接后重试。");
     }
     event.version = result.model_and_config_version ?? config.version;
-    event.generationMs = result.generation_ms ?? null;
+    event.planningMs = result.generation_ms ?? null;
+    event.generationMs = event.planningMs;
     event.modelOutput = result.plan;
-    event.answer = ShopRag.run(idx,question,owner.state,result.plan);
-    event.answer.reply_paragraphs = ShopRag.replyParagraphs(event.answer);
-    owner.state = event.answer.state;
+    retrieved = ShopRag.runModel(idx,question,owner.state,result.plan);
+    stage = "answer";
+    event.progress = "已核对目录，正在 Kaggle GPU 上生成回答…";
+    if (thread.id === owner.id && view.kind === "chat") render();
+    const reply = await callPlanner(config,config.kernelId,"/v1/answer",{question,questionId:event.questionId,
+      catalog:answerEvidence(retrieved)});
+    if (!Array.isArray(reply.paragraphs) || !reply.paragraphs.length ||
+        reply.paragraphs.some(paragraph=>typeof paragraph !== "string" || !paragraph.trim())) {
+      throw new ConnectionError("Kaggle 模型本轮未能生成回答，可以点「重试此问题」。");
+    }
+    event.answerGenerationMs = reply.generation_ms ?? null;
+    if (event.answerGenerationMs !== null) event.generationMs = (event.planningMs ?? 0) + event.answerGenerationMs;
+    event.answer = {...retrieved,reply_paragraphs:reply.paragraphs};
+    owner.state = retrieved.state;
   } catch (error) {
-    event.issue = event.modelOutput ? "invalid_model_plan" : "planner_unavailable";
+    event.plannerStatus = error.plannerStatus ?? null;
+    event.plannerStage = error.plannerStage ?? null;
+    if (retrieved) {
+      event.recalledPages = retrieved.recalledPages;
+      event.retrievalMs = retrieved.retrievalMs;
+    }
+    event.issue = stage === "answer" ? "answer_failed" :
+      event.modelOutput || event.plannerStage === "model_output" ? "invalid_model_plan" :
+      event.plannerStatus === 422 ? "planner_rejected" : "planner_unavailable";
     event.resolution = "retry_kaggle";
     event.error = error instanceof ConnectionError ? error.message : "本轮未能使用模型计划查询商品，请重试。";
   } finally {
     event.pending = false;
+    delete event.progress;
     event.elapsedMs = Math.round(performance.now() - start);
     processing = null;
     save();
@@ -1673,6 +1782,10 @@ function exportThread(threadToExport) {
     id:item.questionId ?? item.session + "-" + item.time,question:item.question,answer:item.answer,
     modelOutput:item.modelOutput,generationMs:item.generationMs,version:item.version,time:item.time,session:item.session,
     mode:item.mode,attempted_model_version:item.attemptedVersion ?? null,issue:item.issue ?? (item.pending ? "pending" : null),
+    planner_status:item.plannerStatus ?? null,planner_stage:item.plannerStage ?? null,
+    planning_ms:item.planningMs ?? null,answer_generation_ms:item.answerGenerationMs ?? null,
+    recalled_pages:item.answer?.recalledPages ?? item.recalledPages ?? null,
+    retrieval_ms:item.answer?.retrievalMs ?? item.retrievalMs ?? null,
     resolution:item.resolution ?? null,error:item.error ?? item.code ?? null
   }))).join("\n");
   if (!content) return;
