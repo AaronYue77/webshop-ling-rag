@@ -1,10 +1,19 @@
-# 选物 · WebShop 商品问答
+# WebShop RAG · 电商商品问答工作台
 
-> 把购物问题拆成可执行的任务，在 779 件商品的目录中找证据，再给出可核对的推荐。
+**购物问题常常同时涉及预算、尺码、颜色和选购理由。WebShop 用微调后的 Ling-3.0-tiny 拆解这些需求，在 779 件商品中检索并核对目录证据，再给出带图片和依据的回答。用户可以按上一轮的商品序号追问，目录缺少的资料会在回答中标明。**
 
-用户可以同时问预算、尺码、颜色和历史价格，也可以接着问「第二款有哪些尺码单独标价？」。项目用 Ling-3.0-tiny 规划问题，用 BM25 和结构化条件执行检索。商品卡片附带来源，缺少记录的字段会在回答里标明。Windows 问答台内置本地规划，可以直接体验同一套目录查询。
+Ling-3.0-tiny QLoRA × FastAPI × BM25 与结构化筛选 · Kaggle GPU 推理与 Windows 问答台
+
+[![模型 · Ling-3.0-tiny](https://img.shields.io/badge/Model-Ling--3.0--tiny-3C4A78)](https://huggingface.co/inclusionAI/Ling-3.0-tiny)
+[![训练 · QLoRA](https://img.shields.io/badge/Training-QLoRA-6750A4)](RECIPE.md)
+[![推理 API · FastAPI](https://img.shields.io/badge/API-FastAPI-009688)](training/serve.py)
+[![Kaggle · 一键推理](https://img.shields.io/badge/Kaggle-Inference-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference)
+
+[打开 Kaggle 一键推理](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference) · [下载 Windows 问答台](https://github.com/AaronYue77/webshop-ling-rag/archive/refs/heads/main.zip)
 
 [快速开始](#快速开始) · [问答示例](#问答示例) · [问答流程](#问答流程) · [实测结果](#实测结果) · [复现 Recipe](RECIPE.md)
+
+![WebShop Windows 问答台截图，展示已连接的 Ling LoRA、商品推荐及目录依据](docs/webshop-workbench.png)
 
 ## 快速开始
 
