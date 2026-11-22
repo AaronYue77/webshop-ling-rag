@@ -89,6 +89,15 @@ def load_base(config, train=False):
     return model, tokenizer, dtype
 
 
+PLAN_ACTIONS = ("search", "detail", "compare")
+
+
+class InvalidPlannerAction(ValueError):
+    def __init__(self, plan):
+        super().__init__("Invalid planner action.")
+        self.plan = plan
+
+
 def parse_plan(text, schema, *, allow_numeric_size=False, normalize_live=False):
     decoder = json.JSONDecoder()
     candidate = text.strip()
@@ -105,7 +114,7 @@ def parse_plan(text, schema, *, allow_numeric_size=False, normalize_live=False):
         for key in ("category", "audience", "size_system", "color"):
             if isinstance(plan[key], list) and len(plan[key]) == 1:
                 plan[key] = plan[key][0]
-        for key in ("category", "audience", "sort", "budget_scope"):
+        for key in ("action", "category", "audience", "sort", "budget_scope"):
             if isinstance(plan[key], str):
                 plan[key] = plan[key].strip().lower()
         if isinstance(plan["size_system"], str):
@@ -125,8 +134,6 @@ def parse_plan(text, schema, *, allow_numeric_size=False, normalize_live=False):
             ):
                 raise ValueError(f"Invalid planner evidence phrases in {key}.")
             plan[key] = list(dict.fromkeys(value.strip() for value in values))
-    if plan["action"] not in {"search", "detail", "compare"}:
-        raise ValueError("Invalid planner action.")
     if not all(isinstance(plan[key], list) for key in ("refs", "tasks", "terms")):
         raise ValueError("Invalid planner lists.")
     if not all(type(x) is int and 1 <= x <= 100 for x in plan["refs"]):
@@ -154,19 +161,31 @@ def parse_plan(text, schema, *, allow_numeric_size=False, normalize_live=False):
     if not set(plan["tasks"]) <= {"image", "price", "price_history", "size", "color", "material", "specs", "recommend",
                                  "compare", "variant_price", "inventory", "compatibility", "current_price"}:
         raise ValueError("Invalid planner task.")
+    if plan["action"] not in PLAN_ACTIONS:
+        raise InvalidPlannerAction(plan)
     return plan
 
 
-def generate(model, tokenizer, messages, config):
+def generate(model, tokenizer, messages, config, *, choices=()):
     import torch
     prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True, enable_thinking=False)
     batch = tokenizer(prompt, return_tensors="pt", add_special_tokens=False, return_token_type_ids=False)
     prompt_limit = config.get("prompt_token_limit", 2048)
     if batch["input_ids"].shape[1] > prompt_limit:
         raise ValueError(f"Prompt exceeds {prompt_limit} tokens.")
+    prompt_length = batch["input_ids"].shape[1]
     batch = batch.to(model.get_input_embeddings().weight.device)
     eos = [tokenizer.eos_token_id]
+    generation_options = {"max_new_tokens": config["max_new_tokens"]}
+    if choices:
+        candidates = [tokenizer.encode(choice, add_special_tokens=False) + eos for choice in choices]
+
+        def allowed_tokens(_batch_id, input_ids):
+            prefix = input_ids[prompt_length:].tolist()
+            return [candidate[len(prefix)] for candidate in candidates if candidate[:len(prefix)] == prefix]
+
+        generation_options = {"max_new_tokens": max(map(len, candidates)), "prefix_allowed_tokens_fn": allowed_tokens}
     with torch.inference_mode():
         out = model.generate(**batch, do_sample=False, temperature=1.0, top_p=1.0, top_k=50,
-                             max_new_tokens=config["max_new_tokens"], eos_token_id=eos, use_cache=True)
-    return tokenizer.decode(out[0, batch["input_ids"].shape[1]:], skip_special_tokens=True)
+                             eos_token_id=eos, use_cache=True, **generation_options)
+    return tokenizer.decode(out[0, prompt_length:], skip_special_tokens=True)
