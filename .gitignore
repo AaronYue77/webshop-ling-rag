@@ -1,0 +1,16 @@
+__pycache__/
+.venv/
+*.pyc
+data/webshop-779.json
+runs/
+*.safetensors
+*.jsonl.local
+logs/conversations*
+logs/inference*
+.env
+
+*.zip
+*.bundle
+/logs/
+/GITHUB-SUBMIT.md
+/WebShop-779*.json

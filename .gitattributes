@@ -1,0 +1,8 @@
+# Keep generated copies out of the repository language breakdown.
+/WebShop.html linguist-generated
+/web/catalog.js linguist-generated
+/kaggle/*.ipynb linguist-generated
+
+* text=auto eol=lf
+*.cmd -text
+/data/sft/*.jsonl -text

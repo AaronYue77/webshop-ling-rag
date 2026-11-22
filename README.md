@@ -1,0 +1,101 @@
+# 选物 · WebShop 商品问答
+
+> 把购物问题拆成可执行的任务，在 779 件商品的目录中找证据，再给出可核对的推荐。
+
+用户可以同时问预算、尺码、颜色和历史价格，也可以接着问「第二款有哪些尺码单独标价？」。项目用 Ling-3.0-tiny 规划问题，用 BM25 和结构化条件执行检索。商品卡片附带来源，缺少记录的字段会在回答里标明。Windows 问答台内置本地规划，可以直接体验同一套目录查询。
+
+[快速开始](#快速开始) · [问答示例](#问答示例) · [问答流程](#问答流程) · [实测结果](#实测结果) · [复现 Recipe](RECIPE.md)
+
+## 快速开始
+
+### 1. 打开 Windows 问答台
+
+**Code → Download ZIP → 解压 → 双击启动问答.cmd**。[下载 main 分支源码 ZIP](https://github.com/AaronYue77/webshop-ling-rag/archive/refs/heads/main.zip)
+
+问答台会在浏览器打开，可以检索商品、继续之前的对话，也可右键导出单条对话。直接打开 `WebShop.html` 可浏览商品目录和 Kaggle 图文说明。对话记录的位置见[公开日志说明](LOGS.md)。
+
+### 2. 连接 Kaggle 模型
+
+**Kaggle Copy & Edit → Run All → 复制 VSCode Compatible URL**。
+
+打开 [Kaggle 一键推理 Notebook](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference)，创建副本，在 **Settings** 开启 GPU 和 Internet，再运行全部单元。看到 **WebShop LoRA 已就绪** 后，从 **Run → Kaggle Jupyter Server** 复制 **VSCode Compatible URL**，粘贴到问答台，保持 Kaggle 会话运行。也可以将[仓库版一键推理 Notebook](kaggle/webshop-ling-inference.ipynb) 导入 Kaggle，从 GitHub Release 读取适配器。
+
+### 3. 复现训练与评测
+
+将[训练 Notebook](kaggle/webshop-ling-rag.ipynb) 导入 Kaggle，开启 GPU 和 Internet。Notebook 下载 GitHub 生成的源码 ZIP 并定位项目根目录。先用 `smoke` 检查环境，再切换到 `train` 跑一轮 QLoRA 与两组评测。[训练配置、推理与评测命令](RECIPE.md)
+
+本地回归可在项目根目录运行。
+
+```bash
+node --test tests/rag.test.cjs
+python -m unittest discover -s tests -p "test_*.py"
+```
+
+## 问答示例
+
+> 我想给女朋友买一双 8.5 码的女士鞋，预算 50 美元以内。请给我图片、历史价格和推荐理由，并列出颜色与尺码信息。
+
+本地检索识别为女士鞋、US 8.5 码、单件预算不超过 50 美元。以下是用项目目录运行这一问题得到的四条结果，页面会同时显示图片、颜色、尺码和推荐理由。
+
+| 商品 ASIN | 目录快照价 | 选项表尺码 |
+|---|---:|---|
+| `B09S3TWKSC` | $6.99 | 8.5 |
+| `B09RPRRNVP` | $15.99 | 8.5 |
+| `B09QL82H1L` | $23.29 | 8.5 |
+| `B09QKJHF4Q` | $37.99 | 8.5 |
+
+目录只保存了未标明采集日期的价格快照，因此页面会说明缺少历史价格序列。还可以追问「第一款和第三款差多少钱？」或「第二款有哪些尺码单独标价？」。
+
+## 问答流程
+
+```mermaid
+flowchart TD
+  Q["问题与上一轮结果"] --> C{"已配置远程模型？"}
+  C -->|是| L["Ling 规划 API"]
+  L -->|返回有效计划| M["校验计划并保留硬条件"]
+  L -->|请求失败或计划无效| P["本地规则规划"]
+  C -->|否| P
+  P --> R{"按任务执行"}
+  M --> R
+  R -->|商品搜索| S["目录检索与筛选"]
+  R -->|详情或对比| D["按 ASIN 定位商品"]
+  S --> V["核对价格、规格与适用性"]
+  D --> V
+  V --> A["商品卡片、理由与缺失说明"]
+```
+
+| 能力 | 实现 |
+|---|---|
+| 任务规划 | 识别检索、详情、对比和多个资料需求。配置 Ling 服务后，浏览器校验远程计划，并保留本地识别的硬条件。[规划协议](web/policy.js) · [计划与执行](web/rag.js) |
+| 商品检索 | 在 779 条目录记录上使用 BM25、结构化筛选和预算判断。详情和对比可按上一轮商品序号定位。[检索与证据](web/rag.js) |
+| 证据核对 | 分开检查目录价格、独立尺码价、颜色、库存记录和兼容线索。遇到资料不足时，说明缺失项并继续回答其他问题。[检索与证据](web/rag.js) |
+| 网页与推理服务 | Windows 页面可离线检索、显示来源并导出对话。启用模型服务后通过 HTTPS 请求结构化计划。[网页交互](web/app.js) · [FastAPI 服务](training/serve.py) |
+
+[架构与训练流程](docs/ARCHITECTURE.md)
+
+## 实测结果
+
+底座和 LoRA 使用相同的模型版本、评测输入与生成设置，各跑 156 道正式测试题和 24 道挑战题，共 360 次生成。正式测试使用留出的问句模板。挑战题采用手写问法，商品来自测试分组。
+
+| 指标 | 正式测试 156 题（底座 → LoRA） | 挑战题 24 题（底座 → LoRA） |
+|---|---:|---:|
+| 任务宏 F1 | 29.58% → 90.04% | 20.60% → 71.48% |
+| 约束完全匹配 | 55.13% → 96.15% | 29.17% → 54.17% |
+| 完整计划匹配 | 0% → 76.92% | 0% → 25.00% |
+
+这些指标衡量结构化计划。商品证据、排序和推荐由网页执行。数据按 ASIN 家族和近重复分组，共 1,246 条训练题、156 条验证题、156 条正式测试题和 24 条挑战题。[数据清单](data/sft/manifest.json) · [测试集指标](docs/results/test/comparison.json) · [挑战题指标](docs/results/challenge/comparison.json) · [逐题结果说明](LOGS.md#逐题-txt)
+
+## 仓库目录
+
+| 目录 | 入口 |
+|---|---|
+| [web/](web/) | Windows 页面、目录索引、任务规划与检索 |
+| [training/](training/) | 4-bit QLoRA、对照评测、FastAPI 和训练配置 |
+| [kaggle/](kaggle/) | 训练、评测和推理 Notebook |
+| [data/sft/](data/sft/) | ASIN 分组、结构化计划样本与数据清单 |
+| [docs/](docs/) | 架构、评测与运行说明 |
+| [tests/](tests/) · [scripts/](scripts/) | 回归测试、数据处理、Notebook 与单页生成 |
+
+价格、库存与兼容性以当前目录可查到的字段为证据。实时供货、实时售价和未记录的规格组合需向商家核对。
+
+[WebShop 数据来源](https://github.com/princeton-nlp/WebShop) · [Adaptive RAG 路由参考](https://github.com/JEen-wang/Adaptive-rag) · [Ling Cookbook #11](https://github.com/inclusionAI/ling-cookbook/issues/11)
