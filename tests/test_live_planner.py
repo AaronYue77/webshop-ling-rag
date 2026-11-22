@@ -6,8 +6,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "training"))
-from common import parse_plan
-from serve import answer_messages, answer_paragraphs
+from common import InvalidPlannerAction, parse_plan
+from serve import action_messages, answer_messages, answer_paragraphs
 
 
 class LivePlannerTest(unittest.TestCase):
@@ -61,6 +61,14 @@ class LivePlannerTest(unittest.TestCase):
                          ["目录注明使用皮革。", "库存请另行确认。"])
         with self.assertRaises(ValueError):
             answer_paragraphs('{"action":"search"}')
+
+    def test_live_action_repair_preserves_model_selected_fields(self):
+        raw = json.dumps({**self.plan, "action": "search|detail|compare", "required_terms": ["leather"]})
+        with self.assertRaises(InvalidPlannerAction) as caught:
+            parse_plan(raw, self.plan, normalize_live=True)
+        repaired = {**caught.exception.plan, "action": "compare"}
+        self.assertEqual(parse_plan(json.dumps(repaired), self.plan, normalize_live=True), repaired)
+        self.assertEqual(action_messages("original model input")[1]["content"], "original model input")
 
 
 if __name__ == "__main__":
