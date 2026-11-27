@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-MAgVxwz1W6roBDV0eYE3mn2FELDci3lBZh7MqGZBB84=' 'sha256-IQ5hzFYh3/wBGMbZbVz9zR3EpLx9JlriGboNEnF+r14='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-uBY1nNAwQGRqP8KmZ6luChmhGokST9EusO2cA+mtbeU=' 'sha256-gGMfXP7LFYmPFx3beuMiHkt3TAbZxzh8BTTSiN3X63Q='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
   <title>WebShop 商品档案 · 问答台</title>
   <style>:root {
   color-scheme: light;
@@ -283,6 +283,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
             <h3>复制推理 Notebook</h3>
             <p>打开 <a href="https://www.kaggle.com/code/aaronyue77/webshop-ling-inference" target="_blank" rel="noopener noreferrer">WebShop Ling-3.0-tiny 一键推理 Notebook ↗</a>，点 <strong>Copy &amp; Edit</strong>。如果右上角显示 <strong>Edit</strong>，从旁边的 <strong>⋮</strong> 选择 <strong>Copy &amp; edit notebook</strong>。</p>
             <div class="guide-images"><img src="data:image/png;base64,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" alt="Kaggle 更多菜单中的 Copy &amp; edit notebook" loading="lazy"></div>
+            <p>如果连接时提示会话版本过旧，在自己的 Kaggle 副本里导入项目中的 <code>kaggle/webshop-ling-inference.ipynb</code>，再运行全部单元。</p>
           </li>
           <li>
             <h3>启用 GPU 和 Internet</h3>
@@ -744,7 +745,8 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     } else if (plan.category || plan.shoe || plan.terms.length || plan.audience || plan.size || plan.color || plan.required_terms?.length ||
       plan.max_price !== null || plan.min_price !== null || plan.compatibility_target || plan.excluded_terms?.length ||
       !modelOnly && /目录|商品|catalog/i.test(question) && !plan.tasks.includes("inventory")) {
-      const ranked = rank(idx,plan,modelOnly);
+      const candidateLimit = modelOnly && plan.budget_scope !== "total" ? Math.max(8,plan.limit) : plan.limit;
+      const ranked = rank(idx,{...plan,limit:candidateLimit},modelOnly);
       hits = ranked.hits.map((hit,i)=>({...hit,position:i+1}));
       total = ranked.total;
       basketPrice = ranked.totalPrice;
@@ -1316,6 +1318,12 @@ function renderTurn(event) {
   } else {
     for (const paragraph of out.reply_paragraphs ?? []) bubble.append(node("p",null,paragraph));
     if (!out.reply_paragraphs?.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
+    if (out.conditions?.length || out.taskLabels?.length) {
+      const chips = node("div","chips");
+      for (const item of out.conditions ?? []) chips.append(node("span","chip condition",item));
+      for (const item of out.taskLabels ?? []) chips.append(node("span","chip",item));
+      content.append(chips);
+    }
     const cards = out.cards ?? [];
     const withPictures = cards.filter(card=>card.images?.length || out.plan?.action === "search");
     if (withPictures.length) {
@@ -1323,20 +1331,14 @@ function renderTurn(event) {
       for (const card of withPictures) list.append(productCard(card));
       content.append(list);
     }
-    const evidence = node("div","reply-meta");
-    if (out.conditions?.length || out.taskLabels?.length) {
-      const chips = node("div","chips");
-      for (const item of out.conditions ?? []) chips.append(node("span","chip condition",item));
-      for (const item of out.taskLabels ?? []) chips.append(node("span","chip",item));
-      evidence.append(chips);
-    }
     if (cards.length) {
+      const evidence = node("div","reply-meta");
       const details = node("details","answer-evidence");
       details.append(node("summary",null,"查看目录依据 · " + cards.length + " 款"));
       for (const card of cards) details.append(productEvidence(card));
       evidence.append(details);
+      content.append(evidence);
     }
-    if (evidence.childElementCount) content.append(evidence);
   }
   response.append(mark,content);
   turn.append(response);
@@ -1560,8 +1562,8 @@ async function getConnection(raw) {
       if (health.service !== "webshop-ling-planner" || health.ready !== true || health.adapter !== true || health.smoke_adapter === true) {
         throw new ConnectionError("当前会话未加载正式的 WebShop LoRA 推理服务。");
       }
-      if (!(health.model_and_config_version?.planner_protocol >= 3)) {
-        throw new ConnectionError("当前是旧版 Kaggle 会话。请从连接指南打开公开的一键推理 Notebook，创建新副本并运行后重新连接。");
+      if (!(health.model_and_config_version?.planner_protocol >= 4)) {
+        throw new ConnectionError("当前 Kaggle 会话不支持证据核选。请导入项目内的 kaggle/webshop-ling-inference.ipynb，运行后重新连接。");
       }
       return {...config,kernelId:kernel.id,version:health.model_and_config_version ?? {
         model:"Ling-3.0-tiny",revision:health.revision ?? null,config_version:null
@@ -1576,27 +1578,54 @@ function showSettings() {
   if (!$("connection").open) $("connection").showModal();
 }
 function answerEvidence(out) {
-  const short = (text, limit) => String(text ?? "").slice(0,limit);
+  const short = (text, limit) => String(text ?? "").replace(/\s+/g," ").trim().slice(0,limit);
   const catalog = {
-    action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, matches:out.matched,
+    action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, recalled_count:out.matched,
+    result_limit:out.plan.limit,
     notes:out.notes.map(text=>short(text,300)),
-    products:out.cards.map(card=>({
-      position:card.position, asin:card.id, name:short(card.name,160),
-      snapshot_price_usd:card.price === null ? null : card.price / 100,
-      image_available:Boolean(card.images.length),
-      facts:card.facts.map(([label,value])=>[label,short(value,label === "规格" ? 200 : 150)]),
-      matched_evidence:[...new Set((card.matchedEvidence ?? []).map(item=>item.excerpt))].map(text=>short(text,210)),
-      gaps:card.gaps.map(text=>short(text,140))
-    }))
+    products:out.cards.map(card=>{
+      const product = idx.byId.get(card.id);
+      const facts = card.facts.map(([label,value])=>[label,short(value,label === "规格" ? 200 : 150)]);
+      if (product?.material.length && !facts.some(([label])=>label === "材质")) {
+        facts.push(["材质",short(product.material.map(([label,value])=>label+" · "+value).join("；"),150)]);
+      }
+      return {
+        position:card.position, asin:card.id, name:short(card.name,160), category_path:short(card.trail,165),
+        description:short(product?.description,500), highlights:(product?.bullets ?? []).slice(0,2).map(text=>short(text,150)),
+        snapshot_price_usd:card.price === null ? null : card.price / 100,
+        image_available:Boolean(card.images.length),
+        facts,
+        matched_evidence:[...new Set((card.matchedEvidence ?? []).map(item=>item.excerpt))].map(text=>short(text,210)),
+        gaps:card.gaps.map(text=>short(text,140))
+      };
+    })
   };
   const encoded = JSON.stringify(catalog);
   if (encoded.length <= 12000 && new TextEncoder().encode(encoded).length <= 22000) return encoded;
   for (const product of catalog.products) {
     product.facts = product.facts.map(([label,value])=>[label,short(value,65)]);
+    product.description = short(product.description,260);
+    product.highlights = product.highlights.map(text=>short(text,65));
     product.matched_evidence = product.matched_evidence.map(text=>short(text,80));
     product.gaps = product.gaps.map(text=>short(text,75));
   }
   return JSON.stringify(catalog);
+}
+function selectedSearchAnswer(retrieved, selections, state, question) {
+  if (!Array.isArray(selections) || selections.length > retrieved.plan.limit) {
+    throw new ConnectionError("Kaggle 未返回可核对的商品清单，请重试。");
+  }
+  const candidates = new Map(retrieved.cards.map(card=>[card.position,card]));
+  const cards = selections.map(({position,quote},i)=>{
+    const card = candidates.get(position);
+    if (!card || typeof quote !== "string" || !quote.trim()) {
+      throw new ConnectionError("Kaggle 未返回可核对的商品清单，请重试。");
+    }
+    candidates.delete(position);
+    return {...card,position:i+1,facts:[...card.facts,["推荐依据原文",quote,"目录证据"]]};
+  });
+  return {...retrieved,cards,state:cards.length ? {resultIds:cards.map(card=>card.id),active:cards.length === 1 ? 1 : null,
+    lastQuestion:question} : state};
 }
 async function ask(text) {
   const question = text.trim();
@@ -1646,8 +1675,9 @@ async function ask(text) {
     }
     event.answerGenerationMs = reply.generation_ms ?? null;
     if (event.answerGenerationMs !== null) event.generationMs = (event.planningMs ?? 0) + event.answerGenerationMs;
-    event.answer = {...retrieved,reply_paragraphs:reply.paragraphs};
-    owner.state = retrieved.state;
+    const displayed = retrieved.plan.action === "search" ? selectedSearchAnswer(retrieved,reply.selections,owner.state,question) : retrieved;
+    event.answer = {...displayed,reply_paragraphs:reply.paragraphs};
+    owner.state = displayed.state;
   } catch (error) {
     event.plannerStatus = error.plannerStatus ?? null;
     event.plannerStage = error.plannerStage ?? null;
