@@ -60,7 +60,6 @@ PLAN_CORRECTION = (
 )
 
 ANSWER_PREFIX = '{"selections":['
-NO_SELECTION_ANSWER_PREFIX = '{"selections":[],"paragraphs":['
 
 ANSWER_GUIDANCE = (
     "Write the final shopping answer in the JSON format below. "
@@ -124,6 +123,12 @@ def prepare_answer_catalog(catalog):
     # Give Ling consecutive positions, then translate its selections back to the recall positions.
     numbered = [{**product, "position": index} for index, product in enumerate(products, start=1)]
     return {**catalog, "products": numbered}, source_positions
+
+
+def empty_search_reply(catalog):
+    if catalog["action"] == "search" and not catalog["products"]:
+        return {"paragraphs": ["这次目录检索没有找到能确认符合你要求的商品。"], "selections": []}
+    return None
 
 
 def parse_answer(raw, catalog):
@@ -305,10 +310,14 @@ def build_app(adapter, journal, token):
         start = time.monotonic()
         try:
             catalog, source_positions = prepare_answer_catalog(json.loads(payload.catalog))
+            empty_reply = empty_search_reply(catalog)
+            if empty_reply is not None:
+                append_json(journal, {"event": "answer_no_matches", "question_id": payload.questionId,
+                                      "model_and_config_version": version})
+                return {**empty_reply, "generation_ms": None, "model_and_config_version": version}
             messages = answer_messages(payload.question, catalog)
-            prefix = ANSWER_PREFIX if source_positions else NO_SELECTION_ANSWER_PREFIX
             answer_config = {**config, "max_new_tokens": 520, "prompt_token_limit": 12288}
-            raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=prefix)
+            raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=ANSWER_PREFIX)
             try:
                 reply = parse_answer(raw, catalog)
             except ValueError as err:
@@ -317,7 +326,7 @@ def build_app(adapter, journal, token):
                 append_json(journal, {"event": "answer_retry", "question_id": payload.questionId, "reason": str(err)})
                 messages[0]["content"] += ("\nThe previous response failed validation: " + str(err)
                                            + " Continue the JSON from the supplied prefix and close the object.")
-                raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=prefix)
+                raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=ANSWER_PREFIX)
                 reply = parse_answer(raw, catalog)
             for item in reply["selections"]:
                 item["position"] = source_positions[item["position"]]
