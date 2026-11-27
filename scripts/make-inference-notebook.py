@@ -16,7 +16,7 @@ ABOUT = """# WebShop Ling-3.0-tiny LoRA Inference
 [打开 GitHub 项目](https://github.com/AaronYue77/webshop-ling-rag) · [下载 Windows 问答台（ZIP）](https://github.com/AaronYue77/webshop-ling-rag/archive/refs/heads/main.zip)
 
 下载并解压后，双击 `启动问答.cmd` 打开问答台。
-此 Notebook 在 Kaggle 上运行 Ling LoRA，负责理解问题，并根据问答台检索到的目录证据生成回答。
+此 Notebook 在 Kaggle 上运行 Ling LoRA，负责理解问题、按目录证据核选商品并生成连贯的回答。请搭配同版本的 Windows 问答台。
 
 1. 点 **Copy & Edit** 打开自己的副本。
 2. 在 **Settings** 启用 **Internet**，将 **Accelerator** 设为 GPU，随后点 **Run All**。
@@ -216,7 +216,7 @@ def wait_until_ready():
                     health = json.load(response)
                 if (health.get("service") == "webshop-ling-planner" and health.get("ready") is True
                         and health.get("adapter") is True and health.get("smoke_adapter") is False
-                        and health.get("model_and_config_version", {}).get("planner_protocol") == 3
+                        and health.get("model_and_config_version", {}).get("planner_protocol") == 4
                         and health.get("model_and_config_version", {}).get("adapter_sha256")
                             == adapter_hashes["adapter_model.safetensors"]):
                     status("WebShop LoRA 已就绪。请复制 VSCode Compatible URL。")

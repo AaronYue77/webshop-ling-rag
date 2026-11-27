@@ -380,6 +380,12 @@ function renderTurn(event) {
   } else {
     for (const paragraph of out.reply_paragraphs ?? []) bubble.append(node("p",null,paragraph));
     if (!out.reply_paragraphs?.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
+    if (out.conditions?.length || out.taskLabels?.length) {
+      const chips = node("div","chips");
+      for (const item of out.conditions ?? []) chips.append(node("span","chip condition",item));
+      for (const item of out.taskLabels ?? []) chips.append(node("span","chip",item));
+      content.append(chips);
+    }
     const cards = out.cards ?? [];
     const withPictures = cards.filter(card=>card.images?.length || out.plan?.action === "search");
     if (withPictures.length) {
@@ -387,20 +393,14 @@ function renderTurn(event) {
       for (const card of withPictures) list.append(productCard(card));
       content.append(list);
     }
-    const evidence = node("div","reply-meta");
-    if (out.conditions?.length || out.taskLabels?.length) {
-      const chips = node("div","chips");
-      for (const item of out.conditions ?? []) chips.append(node("span","chip condition",item));
-      for (const item of out.taskLabels ?? []) chips.append(node("span","chip",item));
-      evidence.append(chips);
-    }
     if (cards.length) {
+      const evidence = node("div","reply-meta");
       const details = node("details","answer-evidence");
       details.append(node("summary",null,"查看目录依据 · " + cards.length + " 款"));
       for (const card of cards) details.append(productEvidence(card));
       evidence.append(details);
+      content.append(evidence);
     }
-    if (evidence.childElementCount) content.append(evidence);
   }
   response.append(mark,content);
   turn.append(response);
@@ -624,8 +624,8 @@ async function getConnection(raw) {
       if (health.service !== "webshop-ling-planner" || health.ready !== true || health.adapter !== true || health.smoke_adapter === true) {
         throw new ConnectionError("当前会话未加载正式的 WebShop LoRA 推理服务。");
       }
-      if (!(health.model_and_config_version?.planner_protocol >= 3)) {
-        throw new ConnectionError("当前是旧版 Kaggle 会话。请从连接指南打开公开的一键推理 Notebook，创建新副本并运行后重新连接。");
+      if (!(health.model_and_config_version?.planner_protocol >= 4)) {
+        throw new ConnectionError("当前 Kaggle 会话不支持证据核选。请导入项目内的 kaggle/webshop-ling-inference.ipynb，运行后重新连接。");
       }
       return {...config,kernelId:kernel.id,version:health.model_and_config_version ?? {
         model:"Ling-3.0-tiny",revision:health.revision ?? null,config_version:null
@@ -640,27 +640,54 @@ function showSettings() {
   if (!$("connection").open) $("connection").showModal();
 }
 function answerEvidence(out) {
-  const short = (text, limit) => String(text ?? "").slice(0,limit);
+  const short = (text, limit) => String(text ?? "").replace(/\s+/g," ").trim().slice(0,limit);
   const catalog = {
-    action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, matches:out.matched,
+    action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, recalled_count:out.matched,
+    result_limit:out.plan.limit,
     notes:out.notes.map(text=>short(text,300)),
-    products:out.cards.map(card=>({
-      position:card.position, asin:card.id, name:short(card.name,160),
-      snapshot_price_usd:card.price === null ? null : card.price / 100,
-      image_available:Boolean(card.images.length),
-      facts:card.facts.map(([label,value])=>[label,short(value,label === "规格" ? 200 : 150)]),
-      matched_evidence:[...new Set((card.matchedEvidence ?? []).map(item=>item.excerpt))].map(text=>short(text,210)),
-      gaps:card.gaps.map(text=>short(text,140))
-    }))
+    products:out.cards.map(card=>{
+      const product = idx.byId.get(card.id);
+      const facts = card.facts.map(([label,value])=>[label,short(value,label === "规格" ? 200 : 150)]);
+      if (product?.material.length && !facts.some(([label])=>label === "材质")) {
+        facts.push(["材质",short(product.material.map(([label,value])=>label+" · "+value).join("；"),150)]);
+      }
+      return {
+        position:card.position, asin:card.id, name:short(card.name,160), category_path:short(card.trail,165),
+        description:short(product?.description,500), highlights:(product?.bullets ?? []).slice(0,2).map(text=>short(text,150)),
+        snapshot_price_usd:card.price === null ? null : card.price / 100,
+        image_available:Boolean(card.images.length),
+        facts,
+        matched_evidence:[...new Set((card.matchedEvidence ?? []).map(item=>item.excerpt))].map(text=>short(text,210)),
+        gaps:card.gaps.map(text=>short(text,140))
+      };
+    })
   };
   const encoded = JSON.stringify(catalog);
   if (encoded.length <= 12000 && new TextEncoder().encode(encoded).length <= 22000) return encoded;
   for (const product of catalog.products) {
     product.facts = product.facts.map(([label,value])=>[label,short(value,65)]);
+    product.description = short(product.description,260);
+    product.highlights = product.highlights.map(text=>short(text,65));
     product.matched_evidence = product.matched_evidence.map(text=>short(text,80));
     product.gaps = product.gaps.map(text=>short(text,75));
   }
   return JSON.stringify(catalog);
+}
+function selectedSearchAnswer(retrieved, selections, state, question) {
+  if (!Array.isArray(selections) || selections.length > retrieved.plan.limit) {
+    throw new ConnectionError("Kaggle 未返回可核对的商品清单，请重试。");
+  }
+  const candidates = new Map(retrieved.cards.map(card=>[card.position,card]));
+  const cards = selections.map(({position,quote},i)=>{
+    const card = candidates.get(position);
+    if (!card || typeof quote !== "string" || !quote.trim()) {
+      throw new ConnectionError("Kaggle 未返回可核对的商品清单，请重试。");
+    }
+    candidates.delete(position);
+    return {...card,position:i+1,facts:[...card.facts,["推荐依据原文",quote,"目录证据"]]};
+  });
+  return {...retrieved,cards,state:cards.length ? {resultIds:cards.map(card=>card.id),active:cards.length === 1 ? 1 : null,
+    lastQuestion:question} : state};
 }
 async function ask(text) {
   const question = text.trim();
@@ -710,8 +737,9 @@ async function ask(text) {
     }
     event.answerGenerationMs = reply.generation_ms ?? null;
     if (event.answerGenerationMs !== null) event.generationMs = (event.planningMs ?? 0) + event.answerGenerationMs;
-    event.answer = {...retrieved,reply_paragraphs:reply.paragraphs};
-    owner.state = retrieved.state;
+    const displayed = retrieved.plan.action === "search" ? selectedSearchAnswer(retrieved,reply.selections,owner.state,question) : retrieved;
+    event.answer = {...displayed,reply_paragraphs:reply.paragraphs};
+    owner.state = displayed.state;
   } catch (error) {
     event.plannerStatus = error.plannerStatus ?? null;
     event.plannerStage = error.plannerStage ?? null;

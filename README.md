@@ -1,6 +1,6 @@
 # WebShop RAG · 电商商品问答工作台
 
-**购物问题常常同时涉及预算、尺码、颜色和选购理由。WebShop 在 Kaggle 上用微调后的 Ling-3.0-tiny 理解问题。问答台从 779 件商品中检索目录证据，再交给 Ling 生成回答并显示图片和依据。用户可以按上一轮的商品序号追问，目录缺少的资料会在回答中标明。**
+**购物问题常常同时涉及预算、尺码、颜色和选购理由。WebShop 在 Kaggle 上用微调后的 Ling-3.0-tiny 理解问题。问答台从 779 件商品中召回候选及其目录证据，Ling 再按原问题核选商品并生成连贯的回答。用户可以按展示的商品序号追问，目录缺少的资料会在回答中标明。**
 
 Ling-3.0-tiny QLoRA × FastAPI × BM25 与结构化筛选 · Kaggle GPU 推理与 Windows 问答台
 
@@ -28,6 +28,8 @@ Ling-3.0-tiny QLoRA × FastAPI × BM25 与结构化筛选 · Kaggle GPU 推理�
 **Kaggle Copy & Edit → Run All → 复制 VSCode Compatible URL**。
 
 打开 [Kaggle 一键推理 Notebook](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference)，创建副本，在 **Settings** 开启 GPU 和 Internet，再运行全部单元。看到 **WebShop LoRA 已就绪** 后，从 **Run → Kaggle Jupyter Server** 复制 **VSCode Compatible URL**，粘贴到问答台，保持 Kaggle 会话运行。也可以将[仓库版一键推理 Notebook](kaggle/webshop-ling-inference.ipynb) 导入 Kaggle，从 GitHub Release 读取适配器。
+
+问答台与推理 Notebook 需使用同版本。如果页面提示公开副本过旧，可导入项目内的同版本 Notebook。
 
 ### 3. 复现训练与评测
 
@@ -62,9 +64,9 @@ flowchart TD
   Q["问题与上一轮结果"] --> C{"已连接 Kaggle？"}
   C -->|是| L["Ling 识别意图和筛选条件"]
   C -->|否| P["提示连接 Kaggle"]
-  L -->|有效计划| R["查找商品并核对证据"]
-  R --> G["Ling 根据证据生成回答"]
-  G -->|生成成功| A["正文、商品卡片与目录依据"]
+  L -->|有效计划| R["召回目录候选和证据"]
+  R --> G["Ling 核选商品并撰写回答"]
+  G -->|校验通过| A["正文 → 证据 → 图片 → 目录依据"]
   L -->|计划无效| F["显示失败原因和重试入口"]
   G -->|生成失败| F
 ```
@@ -74,9 +76,9 @@ flowchart TD
 | 任务规划 | Kaggle 上的 Ling 识别检索、详情、对比和资料需求，给出材质、规格等必要条件和排除条件。浏览器校验计划并执行。[规划协议](web/policy.js) · [计划与执行](web/rag.js) |
 | 商品检索 | 在 779 条目录记录上使用 BM25、结构化筛选和预算判断。详情和对比可按上一轮商品序号定位。[检索与证据](web/rag.js) |
 | 证据核对 | 分开检查目录价格、独立尺码价、颜色、库存记录和兼容线索。遇到资料不足时，说明缺失项并继续回答其他问题。[检索与证据](web/rag.js) |
-| 网页与推理服务 | Windows 页面支持离线浏览目录和导出对话。连接 Kaggle 后，页面请求模型计划，再将目录证据交给同一个模型生成回答。[网页交互](web/app.js) · [FastAPI 服务](training/serve.py) |
+| 网页与推理服务 | 连接 Kaggle 后，页面把问题和目录证据交给 Ling。新搜索只展示模型核选的商品，详情和比较保留用户指明的商品。[网页交互](web/app.js) · [FastAPI 服务](training/serve.py) |
 
-[架构与训练流程](docs/ARCHITECTURE.md)
+[架构与训练流程](docs/ARCHITECTURE.md) · [输入与回答格式](docs/ANSWER-FORMAT.md)
 
 ## 实测结果
 

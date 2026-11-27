@@ -158,15 +158,15 @@ test("workbench only presents prose received from Kaggle and logs a failed answe
   const noop = ()=>{};
   let answerAvailable = false;
   let settingsShown = false;
-  const plan = {...rag.makePlan({category:"fashion",audience:"men",shoe:true,color:"black",tasks:["recommend"]}),
-    required_terms:["leather"],excluded_terms:["faux leather"]};
+  const plan = rag.makePlan({category:"fashion",audience:"men",shoe:true,color:"black",tasks:["recommend"]});
   const ctx = vm.createContext({thread,settings:null,processing:null,view:{kind:"chat"},threads:new Map(),idx,
     ShopRag:{runModel:rag.runModel},performance,TextEncoder,ConnectionError:Error,save:noop,updateComposer:noop,render:noop,
     scrollBottom:noop,newId:()=>"question",showSettings:()=>{ settingsShown = true; }, $:()=>({value:"",children:[]}),
     callPlanner:async (_config,_kernel,endpoint,data)=>{
       calls.push([endpoint,data]);
       if (endpoint === "/v1/plan") return {plan,adapter:true,generation_ms:30};
-      if (answerAvailable) return {paragraphs:["可以先看第一款。目录有黑色选项，商品说明也提到了皮革。"],generation_ms:20};
+      if (answerAvailable) return {paragraphs:["可以先看这双 ECCO 乐福鞋。它有黑色选项，商品说明也提到了皮革鞋面。"],
+        selections:[{position:2,quote:"full-grain ECCO leather"}],generation_ms:20};
       throw Object.assign(new Error("Generation failed"),{plannerStatus:422,plannerStage:"model_answer"});
     }});
   vm.runInContext(workflow,ctx);
@@ -179,16 +179,33 @@ test("workbench only presents prose received from Kaggle and logs a failed answe
   await ctx.ask(question);
   assert.deepEqual(calls.map(([endpoint])=>endpoint),["/v1/plan","/v1/answer"]);
   const evidence = JSON.parse(calls[1][1].catalog);
-  assert.deepEqual(evidence.products.map(item=>item.asin),["B07CN9RZ1C"]);
-  assert.match(evidence.products[0].matched_evidence[0],/full-grain ECCO leather/);
+  assert.deepEqual(evidence.products.map(item=>item.asin),["B094RBNS2K","B07CN9RZ1C"]);
+  assert.match(evidence.products[1].description,/full-grain ECCO leather/);
   assert.equal(thread.events[0].answer,undefined);
   assert.equal(thread.events[0].issue,"answer_failed");
-  assert.equal(thread.events[0].recalledPages[0].asin,"B07CN9RZ1C");
+  assert.equal(thread.events[0].recalledPages[0].asin,"B094RBNS2K");
   assert.deepEqual(thread.state,{});
   answerAvailable = true;
   await ctx.ask(question);
-  assert.match(thread.events[1].answer.reply_paragraphs[0],/可以先看第一款/);
+  assert.match(thread.events[1].answer.reply_paragraphs[0],/可以先看这双 ECCO 乐福鞋/);
+  assert.deepEqual(Array.from(thread.events[1].answer.cards,card=>[card.id,card.position]),[["B07CN9RZ1C",1]]);
+  assert.deepEqual(Array.from(thread.state.resultIds),["B07CN9RZ1C"]);
+  assert.equal(thread.events[1].answer.recalledPages.length,2);
   assert.equal(thread.events[1].generationMs,50);
+});
+
+test("answer renders prose, evidence, images, and catalog details in that order",()=>{
+  const source = fs.readFileSync(path.join(__dirname,"../web/app.js"),"utf8");
+  const workflow = source.slice(source.indexOf("function renderTurn("),source.indexOf("function renderBreadcrumbs("));
+  const element = (tag,className)=>({tag,className,children:[],dataset:{},setAttribute(){},
+    append(...items){this.children.push(...items);}});
+  const render = vm.runInNewContext(workflow+"\nrenderTurn",{node:element,productCard:()=>element("button"),
+    productEvidence:()=>element("article")});
+  const turn = render({mode:"remote",adapter:true,answer:{reply_paragraphs:["一段连贯的回答。"],conditions:["黑色"],
+    cards:[{images:["example"]}]}});
+  const body = turn.children[1].children[1];
+  assert.deepEqual(body.children.map(item=>item.className),["reply-label","reply-bubble","chips","answer-grid","reply-meta"]);
+  assert.equal(body.children[4].children[0].tag,"details");
 });
 
 test("splits have unique full inputs and isolated ASIN families and contexts",()=>{
@@ -199,14 +216,14 @@ test("splits have unique full inputs and isolated ASIN families and contexts",()
     assert.equal(groups.get(group) || split,split);
     groups.set(group,split);
   }
-  for (const [split,len] of [["train",1246],["validation",156],["test",156]]) {
+  for (const [split,len] of [["train",1246],["validation",156],["test",156],["challenge",24]]) {
     const rows = fs.readFileSync(path.join(dir,split+".jsonl"),"utf8").trim().split("\n").map(JSON.parse);
     assert.equal(rows.length,len);
     assert(rows.some(row=>row.expected.shoe));
     for (const row of rows) {
       assert(!inputs.has(row.messages[1].content));
       inputs.add(row.messages[1].content);
-      for (const id of row.products) assert.equal(assigned[id].split,split);
+      for (const id of row.products) assert.equal(assigned[id].split,split==="challenge"?"test":split);
     }
   }
 });
