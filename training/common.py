@@ -166,9 +166,10 @@ def parse_plan(text, schema, *, allow_numeric_size=False, normalize_live=False):
     return plan
 
 
-def generate(model, tokenizer, messages, config, *, choices=()):
+def generate(model, tokenizer, messages, config, *, choices=(), assistant_prefix=""):
     import torch
-    prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    prompt = (tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True, enable_thinking=False)
+              + assistant_prefix)
     batch = tokenizer(prompt, return_tensors="pt", add_special_tokens=False, return_token_type_ids=False)
     prompt_limit = config.get("prompt_token_limit", 2048)
     if batch["input_ids"].shape[1] > prompt_limit:
@@ -188,4 +189,4 @@ def generate(model, tokenizer, messages, config, *, choices=()):
     with torch.inference_mode():
         out = model.generate(**batch, do_sample=False, temperature=1.0, top_p=1.0, top_k=50,
                              eos_token_id=eos, use_cache=True, **generation_options)
-    return tokenizer.decode(out[0, prompt_length:], skip_special_tokens=True)
+    return assistant_prefix + tokenizer.decode(out[0, prompt_length:], skip_special_tokens=True)
