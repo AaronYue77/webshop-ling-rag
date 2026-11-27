@@ -151,9 +151,12 @@ if previous is not None and previous.poll() is None:
         previous.wait()
 
 # 进程内生成临时凭据。服务只监听 Kaggle 容器的回环地址。
+# 仅排查时开启，失败输出写入 /kaggle/temp 下的私有临时目录。
+CAPTURE_INVALID_MODEL_OUTPUT = False
 service_env = {
     **os.environ,
     "WEBSHOP_SERVICE_TOKEN": secrets.token_urlsafe(32),
+    "WEBSHOP_CAPTURE_INVALID_OUTPUT": "1" if CAPTURE_INVALID_MODEL_OUTPUT else "0",
     "CUDA_VISIBLE_DEVICES": "0",
     "TOKENIZERS_PARALLELISM": "false",
     "HF_HOME": "/kaggle/temp/webshop-hf",
