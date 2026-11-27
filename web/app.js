@@ -331,10 +331,15 @@ function renderDetail(catalog, p) {
 function openAnswerProduct(card) {
   setView({kind:"detail",id:card.id,back:{kind:"chat",scroll:$("scroll").scrollTop}});
 }
-function productCard(card) {
+function productCard(card, tasks = []) {
   const label = "第 " + card.position + " 款 · " + card.name;
   const price = card.price == null ? "目录未标价" : "快照价 " + ShopRag.money(card.price);
   const el = tile(label,price,card.images?.[0],() => openAnswerProduct(card));
+  const copy = el.querySelector(".tile-copy");
+  const facts = new Map(card.facts ?? []);
+  if (tasks.includes("color")) copy.append(node("small",null,"颜色 · " + (facts.get("颜色选项") || "目录未记录")));
+  if (tasks.includes("size")) copy.append(node("small",null,"尺码 · " + (facts.get("尺码选项") || "目录未记录可选尺码")));
+  if (card.modelReason) copy.append(node("small",null,card.modelReason));
   el.classList.add("reply-product");
   el.title = label;
   return el;
@@ -380,6 +385,8 @@ function renderTurn(event) {
   } else {
     for (const paragraph of out.reply_paragraphs ?? []) bubble.append(node("p",null,paragraph));
     if (!out.reply_paragraphs?.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
+    const tasks = out.plan?.tasks ?? [];
+    if (tasks.includes("price_history")) content.append(node("p","gaps",ShopRag.priceHistoryNote));
     if (out.conditions?.length || out.taskLabels?.length) {
       const chips = node("div","chips");
       for (const item of out.conditions ?? []) chips.append(node("span","chip condition",item));
@@ -390,7 +397,7 @@ function renderTurn(event) {
     const withPictures = cards.filter(card=>card.images?.length || out.plan?.action === "search");
     if (withPictures.length) {
       const list = node("div","answer-grid");
-      for (const card of withPictures) list.append(productCard(card));
+      for (const card of withPictures) list.append(productCard(card,tasks));
       content.append(list);
     }
     if (cards.length) {
@@ -642,7 +649,7 @@ function showSettings() {
 function answerEvidence(out) {
   const short = (text, limit) => String(text ?? "").replace(/\s+/g," ").trim().slice(0,limit);
   const catalog = {
-    action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, recalled_count:out.matched,
+    action:out.plan.action, tasks:out.plan.tasks, filters:out.conditions, recalled_count:out.matched,
     result_limit:out.plan.limit,
     required_terms:out.plan.required_terms ?? [], excluded_terms:out.plan.excluded_terms ?? [],
     notes:out.notes.map(text=>short(text,300)),
@@ -679,13 +686,14 @@ function selectedSearchAnswer(retrieved, selections, state, question) {
     throw new ConnectionError("Kaggle 未返回可核对的商品清单，请重试。");
   }
   const candidates = new Map(retrieved.cards.map(card=>[card.position,card]));
-  const cards = selections.map(({position,quote},i)=>{
+  const cards = selections.map(({position,quote,reason},i)=>{
     const card = candidates.get(position);
     if (!card || typeof quote !== "string" || !quote.trim()) {
       throw new ConnectionError("Kaggle 未返回可核对的商品清单，请重试。");
     }
     candidates.delete(position);
-    return {...card,position:i+1,facts:[...card.facts,["推荐依据原文",quote,"目录证据"]]};
+    return {...card,position:i+1,reason:null,modelReason:typeof reason === "string" ? reason.trim() : "",
+      facts:[...card.facts,["推荐依据原文",quote,"目录证据"]]};
   });
   return {...retrieved,cards,state:cards.length ? {resultIds:cards.map(card=>card.id),active:cards.length === 1 ? 1 : null,
     lastQuestion:question} : state};

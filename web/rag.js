@@ -5,6 +5,7 @@
 })(globalThis, function (policy) {
   const labels = {beauty:"美妆个护", electronics:"电子数码", fashion:"服饰鞋包", garden:"家居园艺", grocery:"食品杂货"};
   const taskLabels = {image:"展示图片",price:"核对目录价",price_history:"核对历史价格",size:"核对尺码",color:"核对颜色",material:"核对材质",specs:"查看规格",recommend:"解释选择",compare:"对比商品",variant_price:"核对选项价格",inventory:"核对库存",compatibility:"核对适用性",current_price:"核对现价"};
+  const priceHistoryNote = "目录只记录了未标注日期的价格快照，缺少按日期排列的历史价格或涨跌趋势。";
   const types = [
     [/防晒/,"sunscreen"],[/面霜|保湿霜/,"face moisturizer"],[/面膜/,"face mask"],[/洗面奶|洁面/,"facial cleanser"],
     [/洗发[水露]|洗头/,"shampoo"],[/护发素/,"conditioner"],[/口红|唇膏/,"lipstick balm"],[/香水/,"perfume"],
@@ -402,7 +403,7 @@
       asin:p.id,url:cards[index].link,rank:index+1,position,score:score ?? null
     }));
     if (foreignCurrency) notes.push("目录价格采用美元，外币预算缺少换算依据，本次没有按该金额筛选。");
-    if (plan.tasks.includes("price_history")) notes.push("每个商品记录一份未标注采集日期的价格快照，目录缺少按日期排列的历史价格或涨跌趋势。");
+    if (plan.tasks.includes("price_history")) notes.push(priceHistoryNote);
     if (plan.tasks.includes("current_price")) notes.push("实时售价需要在当前商品页核实。");
     if (plan.tasks.includes("inventory") && !cards.length) notes.push("本目录缺少实时库存来源。");
     if (plan.action === "compare" && cards.length) {
@@ -575,6 +576,6 @@
       generation_ms:generationMs ?? null, model_and_config_version:version ?? null, ...meta
     };
   }
-  return {index,rank,run,runModel,execute,questionRecord,replyParagraphs,localPlan,makePlan,mergePlan,taskLabels,labels,money,sizeEvidence,compatibility,colorOptions,sizeOptions,
+  return {index,rank,run,runModel,execute,questionRecord,replyParagraphs,localPlan,makePlan,mergePlan,taskLabels,labels,money,sizeEvidence,compatibility,colorOptions,sizeOptions,priceHistoryNote,
     localConfigVersion:"webshop-local-v2"};
 });
