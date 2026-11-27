@@ -62,6 +62,11 @@ PLAN_CORRECTION = (
 
 ANSWER_PREFIX = '{"selections":['
 ANSWER_FIELDS = {"paragraphs", "selections"}
+ANSWER_TASKS = {"核对颜色": "color", "核对尺码": "size", "核对历史价格": "price_history", "解释选择": "recommend"}
+
+
+def answer_tasks(catalog):
+    return {ANSWER_TASKS.get(task, task) for task in catalog.get("tasks", [])}
 
 ANSWER_GUIDANCE = (
     "Write the final shopping answer in the JSON format below. "
@@ -93,7 +98,25 @@ ANSWER_GUIDANCE = (
 
 
 def answer_messages(question, catalog):
-    return [{"role": "system", "content": ANSWER_GUIDANCE},
+    tasks = answer_tasks(catalog)
+    guidance = ANSWER_GUIDANCE
+    if "color" in tasks:
+        guidance += ("\nThe user requested colors. Report each selected or referenced product's recorded color options "
+                     "from its facts, or state that the catalog does not list them. Do not imply every color and size combination is available.")
+    if "size" in tasks:
+        guidance += ("\nThe user requested sizes. Distinguish recorded size options from a size chart and say when a size system is inferred.")
+    if "price_history" in tasks:
+        guidance += ("\nThe user requested price history. Explain that the catalog has undated snapshots, so no dated price history or trend "
+                     "can be established. Label any supplied snapshot prices accordingly.")
+    if "recommend" in tasks:
+        guidance += ("\nExplain why each recommended product suits the user's needs. Connect a catalog feature to a use or tradeoff, "
+                     "such as a breathable mesh upper for everyday walks. If the catalog only supports the shared requirements, say so.")
+        if catalog["action"] == "search":
+            guidance += (' For this request, every selection must include a third field, "reason", with one concise, '
+                         'evidence-based sentence in the answer language. For example: '
+                         '{"position":2,"quote":"breathable mesh upper","reason":"网面鞋面透气，适合平时步行。"}. '
+                         'Use the prose for the main recommendation and tradeoffs. The card will display the item-specific reason.')
+    return [{"role": "system", "content": guidance},
             {"role": "user", "content": json.dumps({"question": question, "catalog": catalog}, ensure_ascii=False)}]
 
 
@@ -180,13 +203,19 @@ def parse_answer(raw, catalog):
             or any(not isinstance(text, str) or not text.strip() or len(text) > 1800 for text in paragraphs)):
         raise ValueError("Expected non-empty prose paragraphs")
     is_search = catalog["action"] == "search"
+    needs_reason = is_search and "recommend" in answer_tasks(catalog)
+    selection_fields = {"position", "quote", "reason"} if needs_reason else {"position", "quote"}
     if not isinstance(selections, list) or len(selections) > (catalog.get("result_limit", 4) if is_search else 0):
         raise ValueError("Invalid selection count")
     products = {item["position"]: item for item in catalog["products"]}
     seen = set()
     verified = []
     for item in selections:
-        if (not isinstance(item, dict) or set(item) != {"position", "quote"}
+        if needs_reason and isinstance(item, dict):
+            reason = item.get("reason")
+            if not isinstance(reason, str) or not 4 <= len(reason.strip()) <= 240:
+                raise ValueError("Each recommendation requires a short catalog-based reason")
+        if (not isinstance(item, dict) or set(item) != selection_fields
                 or type(item["position"]) is not int or not isinstance(item["quote"], str)):
             raise ValueError("Invalid selection fields")
         position, quote = item["position"], item["quote"].strip()
@@ -196,7 +225,10 @@ def parse_answer(raw, catalog):
         if not any(quote in field for field in answer_evidence_fields(product)):
             raise ValueError("Selection quote must occur in the selected product's evidence")
         seen.add(position)
-        verified.append({"position": position, "quote": quote})
+        verified_item = {"position": position, "quote": quote}
+        if needs_reason:
+            verified_item["reason"] = reason.strip()
+        verified.append(verified_item)
     return {"paragraphs": [paragraph.strip() for paragraph in paragraphs], "selections": verified}
 
 
@@ -361,7 +393,11 @@ def build_app(adapter, journal, token):
                                       "model_and_config_version": version})
                 return {**empty_reply, "generation_ms": None, "model_and_config_version": version}
             messages = answer_messages(payload.question, catalog)
-            answer_config = {**config, "max_new_tokens": 520, "prompt_token_limit": 12288}
+            max_tokens = 520
+            if catalog["action"] == "search" and "recommend" in answer_tasks(catalog):
+                selection_limit = min(catalog.get("result_limit", 4), len(catalog["products"]))
+                max_tokens = max(max_tokens, 320 + 80 * selection_limit)
+            answer_config = {**config, "max_new_tokens": max_tokens, "prompt_token_limit": 12288}
             raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=ANSWER_PREFIX)
             try:
                 reply = parse_answer(raw, catalog)
