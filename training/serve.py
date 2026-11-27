@@ -60,6 +60,7 @@ PLAN_CORRECTION = (
 )
 
 ANSWER_PREFIX = '{"selections":['
+NO_SELECTION_ANSWER_PREFIX = '{"selections":[],"paragraphs":['
 
 ANSWER_GUIDANCE = (
     "Write the final shopping answer in the JSON format below. "
@@ -305,8 +306,9 @@ def build_app(adapter, journal, token):
         try:
             catalog, source_positions = prepare_answer_catalog(json.loads(payload.catalog))
             messages = answer_messages(payload.question, catalog)
+            prefix = ANSWER_PREFIX if source_positions else NO_SELECTION_ANSWER_PREFIX
             answer_config = {**config, "max_new_tokens": 520, "prompt_token_limit": 12288}
-            raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=ANSWER_PREFIX)
+            raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=prefix)
             try:
                 reply = parse_answer(raw, catalog)
             except ValueError as err:
@@ -314,8 +316,8 @@ def build_app(adapter, journal, token):
                     raise
                 append_json(journal, {"event": "answer_retry", "question_id": payload.questionId, "reason": str(err)})
                 messages[0]["content"] += ("\nThe previous response failed validation: " + str(err)
-                                           + " Complete selections, then write paragraphs and close the JSON object.")
-                raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=ANSWER_PREFIX)
+                                           + " Continue the JSON from the supplied prefix and close the object.")
+                raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=prefix)
                 reply = parse_answer(raw, catalog)
             for item in reply["selections"]:
                 item["position"] = source_positions[item["position"]]
