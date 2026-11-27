@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-uBY1nNAwQGRqP8KmZ6luChmhGokST9EusO2cA+mtbeU=' 'sha256-kZNF24a61cDNKUq3Z/IVlzItiBN6hez5+rZ/3FCaCtc='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-OopvEEyX4ZvTnEmaorcNLCrXjq3EcJibYCN8Tw9ah9o=' 'sha256-ITF03hrBFTBXBzyN3LmUMQOFgIvCUcq/6sXGXPomp4o='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
   <title>WebShop 商品档案 · 问答台</title>
   <style>:root {
   color-scheme: light;
@@ -362,6 +362,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
 })(globalThis, function (policy) {
   const labels = {beauty:"美妆个护", electronics:"电子数码", fashion:"服饰鞋包", garden:"家居园艺", grocery:"食品杂货"};
   const taskLabels = {image:"展示图片",price:"核对目录价",price_history:"核对历史价格",size:"核对尺码",color:"核对颜色",material:"核对材质",specs:"查看规格",recommend:"解释选择",compare:"对比商品",variant_price:"核对选项价格",inventory:"核对库存",compatibility:"核对适用性",current_price:"核对现价"};
+  const priceHistoryNote = "目录只记录了未标注日期的价格快照，缺少按日期排列的历史价格或涨跌趋势。";
   const types = [
     [/防晒/,"sunscreen"],[/面霜|保湿霜/,"face moisturizer"],[/面膜/,"face mask"],[/洗面奶|洁面/,"facial cleanser"],
     [/洗发[水露]|洗头/,"shampoo"],[/护发素/,"conditioner"],[/口红|唇膏/,"lipstick balm"],[/香水/,"perfume"],
@@ -759,7 +760,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
       asin:p.id,url:cards[index].link,rank:index+1,position,score:score ?? null
     }));
     if (foreignCurrency) notes.push("目录价格采用美元，外币预算缺少换算依据，本次没有按该金额筛选。");
-    if (plan.tasks.includes("price_history")) notes.push("每个商品记录一份未标注采集日期的价格快照，目录缺少按日期排列的历史价格或涨跌趋势。");
+    if (plan.tasks.includes("price_history")) notes.push(priceHistoryNote);
     if (plan.tasks.includes("current_price")) notes.push("实时售价需要在当前商品页核实。");
     if (plan.tasks.includes("inventory") && !cards.length) notes.push("本目录缺少实时库存来源。");
     if (plan.action === "compare" && cards.length) {
@@ -932,7 +933,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
       generation_ms:generationMs ?? null, model_and_config_version:version ?? null, ...meta
     };
   }
-  return {index,rank,run,runModel,execute,questionRecord,replyParagraphs,localPlan,makePlan,mergePlan,taskLabels,labels,money,sizeEvidence,compatibility,colorOptions,sizeOptions,
+  return {index,rank,run,runModel,execute,questionRecord,replyParagraphs,localPlan,makePlan,mergePlan,taskLabels,labels,money,sizeEvidence,compatibility,colorOptions,sizeOptions,priceHistoryNote,
     localConfigVersion:"webshop-local-v2"};
 });
 </script>
@@ -1269,10 +1270,15 @@ function renderDetail(catalog, p) {
 function openAnswerProduct(card) {
   setView({kind:"detail",id:card.id,back:{kind:"chat",scroll:$("scroll").scrollTop}});
 }
-function productCard(card) {
+function productCard(card, tasks = []) {
   const label = "第 " + card.position + " 款 · " + card.name;
   const price = card.price == null ? "目录未标价" : "快照价 " + ShopRag.money(card.price);
   const el = tile(label,price,card.images?.[0],() => openAnswerProduct(card));
+  const copy = el.querySelector(".tile-copy");
+  const facts = new Map(card.facts ?? []);
+  if (tasks.includes("color")) copy.append(node("small",null,"颜色 · " + (facts.get("颜色选项") || "目录未记录")));
+  if (tasks.includes("size")) copy.append(node("small",null,"尺码 · " + (facts.get("尺码选项") || "目录未记录可选尺码")));
+  if (card.modelReason) copy.append(node("small",null,card.modelReason));
   el.classList.add("reply-product");
   el.title = label;
   return el;
@@ -1318,6 +1324,8 @@ function renderTurn(event) {
   } else {
     for (const paragraph of out.reply_paragraphs ?? []) bubble.append(node("p",null,paragraph));
     if (!out.reply_paragraphs?.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
+    const tasks = out.plan?.tasks ?? [];
+    if (tasks.includes("price_history")) content.append(node("p","gaps",ShopRag.priceHistoryNote));
     if (out.conditions?.length || out.taskLabels?.length) {
       const chips = node("div","chips");
       for (const item of out.conditions ?? []) chips.append(node("span","chip condition",item));
@@ -1328,7 +1336,7 @@ function renderTurn(event) {
     const withPictures = cards.filter(card=>card.images?.length || out.plan?.action === "search");
     if (withPictures.length) {
       const list = node("div","answer-grid");
-      for (const card of withPictures) list.append(productCard(card));
+      for (const card of withPictures) list.append(productCard(card,tasks));
       content.append(list);
     }
     if (cards.length) {
@@ -1580,7 +1588,7 @@ function showSettings() {
 function answerEvidence(out) {
   const short = (text, limit) => String(text ?? "").replace(/\s+/g," ").trim().slice(0,limit);
   const catalog = {
-    action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, recalled_count:out.matched,
+    action:out.plan.action, tasks:out.plan.tasks, filters:out.conditions, recalled_count:out.matched,
     result_limit:out.plan.limit,
     required_terms:out.plan.required_terms ?? [], excluded_terms:out.plan.excluded_terms ?? [],
     notes:out.notes.map(text=>short(text,300)),
@@ -1617,13 +1625,14 @@ function selectedSearchAnswer(retrieved, selections, state, question) {
     throw new ConnectionError("Kaggle 未返回可核对的商品清单，请重试。");
   }
   const candidates = new Map(retrieved.cards.map(card=>[card.position,card]));
-  const cards = selections.map(({position,quote},i)=>{
+  const cards = selections.map(({position,quote,reason},i)=>{
     const card = candidates.get(position);
     if (!card || typeof quote !== "string" || !quote.trim()) {
       throw new ConnectionError("Kaggle 未返回可核对的商品清单，请重试。");
     }
     candidates.delete(position);
-    return {...card,position:i+1,facts:[...card.facts,["推荐依据原文",quote,"目录证据"]]};
+    return {...card,position:i+1,reason:null,modelReason:typeof reason === "string" ? reason.trim() : "",
+      facts:[...card.facts,["推荐依据原文",quote,"目录证据"]]};
   });
   return {...retrieved,cards,state:cards.length ? {resultIds:cards.map(card=>card.id),active:cards.length === 1 ? 1 : null,
     lastQuestion:question} : state};
