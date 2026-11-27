@@ -7,7 +7,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "training"))
 from common import InvalidPlannerAction, parse_plan
-from serve import ANSWER_PREFIX, action_messages, answer_messages, parse_answer, prepare_answer_catalog
+from serve import (ANSWER_PREFIX, NO_SELECTION_ANSWER_PREFIX, action_messages, answer_messages, parse_answer,
+                   prepare_answer_catalog)
 
 
 class LivePlannerTest(unittest.TestCase):
@@ -108,6 +109,10 @@ class LivePlannerTest(unittest.TestCase):
         compared, source_positions = prepare_answer_catalog(comparison)
         self.assertIs(compared, comparison)
         self.assertEqual(source_positions, {})
+        empty, source_positions = prepare_answer_catalog({**catalog, "products": catalog["products"][:1]})
+        self.assertEqual(source_positions, {})
+        reply = parse_answer(NO_SELECTION_ANSWER_PREFIX + '"目录中没有能确认是皮鞋的商品。"]}', empty)
+        self.assertEqual(reply["selections"], [])
 
     def test_live_action_repair_preserves_model_selected_fields(self):
         raw = json.dumps({**self.plan, "action": "search|detail|compare", "required_terms": ["leather"]})
