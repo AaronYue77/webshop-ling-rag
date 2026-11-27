@@ -32,6 +32,9 @@ flowchart TD
   end
 
   URL --> CONNECT
+
+  style KAGGLE fill:none,stroke:#8b949e,stroke-dasharray:4 3
+  style WINDOWS fill:none,stroke:#8b949e,stroke-dasharray:4 3
 ```
 
 Windows 启动器经本地转发器连接 Kaggle Jupyter 通道，内核再访问会话内的 FastAPI。Notebook 自检会校验协议 4 和正式权重哈希，问答台检查服务已就绪、已启用正式适配器且支持所需协议。[转发器](../web/relay.cs) · [连接校验](../web/app.js) · [公开推理 Notebook](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference)
