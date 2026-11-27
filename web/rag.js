@@ -388,7 +388,8 @@
     } else if (plan.category || plan.shoe || plan.terms.length || plan.audience || plan.size || plan.color || plan.required_terms?.length ||
       plan.max_price !== null || plan.min_price !== null || plan.compatibility_target || plan.excluded_terms?.length ||
       !modelOnly && /目录|商品|catalog/i.test(question) && !plan.tasks.includes("inventory")) {
-      const ranked = rank(idx,plan,modelOnly);
+      const candidateLimit = modelOnly && plan.budget_scope !== "total" ? Math.max(8,plan.limit) : plan.limit;
+      const ranked = rank(idx,{...plan,limit:candidateLimit},modelOnly);
       hits = ranked.hits.map((hit,i)=>({...hit,position:i+1}));
       total = ranked.total;
       basketPrice = ranked.totalPrice;
