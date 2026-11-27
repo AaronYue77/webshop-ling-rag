@@ -644,6 +644,7 @@ function answerEvidence(out) {
   const catalog = {
     action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, recalled_count:out.matched,
     result_limit:out.plan.limit,
+    required_terms:out.plan.required_terms ?? [], excluded_terms:out.plan.excluded_terms ?? [],
     notes:out.notes.map(text=>short(text,300)),
     products:out.cards.map(card=>{
       const product = idx.byId.get(card.id);

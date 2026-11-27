@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-uBY1nNAwQGRqP8KmZ6luChmhGokST9EusO2cA+mtbeU=' 'sha256-gGMfXP7LFYmPFx3beuMiHkt3TAbZxzh8BTTSiN3X63Q='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-uBY1nNAwQGRqP8KmZ6luChmhGokST9EusO2cA+mtbeU=' 'sha256-kZNF24a61cDNKUq3Z/IVlzItiBN6hez5+rZ/3FCaCtc='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
   <title>WebShop 商品档案 · 问答台</title>
   <style>:root {
   color-scheme: light;
@@ -1582,6 +1582,7 @@ function answerEvidence(out) {
   const catalog = {
     action:out.plan.action, tasks:out.taskLabels, filters:out.conditions, recalled_count:out.matched,
     result_limit:out.plan.limit,
+    required_terms:out.plan.required_terms ?? [], excluded_terms:out.plan.excluded_terms ?? [],
     notes:out.notes.map(text=>short(text,300)),
     products:out.cards.map(card=>{
       const product = idx.byId.get(card.id);
