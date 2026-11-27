@@ -141,6 +141,8 @@ flowchart TD
 
 这些指标衡量结构化计划。问答台核对证据并排序，Kaggle 上的 Ling 根据证据生成推荐和回答。数据按 ASIN 家族和近重复分组，共 1,246 条训练题、156 条验证题、156 条正式测试题。[数据清单](data/sft/manifest.json) · [测试集指标](docs/results/test/comparison.json) · [正式测试 156 题完整题目](docs/formal-test-questions.md) · [逐题结果说明](LOGS.md#逐题-txt)
 
+[查看正式测试 156 题的逐题评分和模型输出](docs/results/test/per-question.md)。每题并排给出基座与 LoRA 的四项评分，展开可查看标准计划和两种模型的输出。
+
 ## 仓库目录
 
 | 目录 | 入口 |
