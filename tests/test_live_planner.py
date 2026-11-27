@@ -76,6 +76,24 @@ class LivePlannerTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_answer('{"action":"search"}', catalog)
 
+    def test_live_search_requires_reasons_and_prompts_for_other_requested_information(self):
+        products = [{"position": 1, "description": "breathable mesh upper",
+                     "facts": [["颜色选项", "Black、Grey、Red"], ["尺码选项", "8、8.5、9"]]}]
+        question = "找一双 8.5 码的鞋，说明推荐理由、颜色、尺码和历史价格。"
+        selection = {"position": 1, "quote": "breathable mesh upper"}
+        answer = {"paragraphs": ["平时走路可以优先看这双套脚鞋。"], "selections": [selection]}
+        for tasks in (["color", "size", "price_history", "recommend"], ["核对颜色", "核对尺码", "核对历史价格", "解释选择"]):
+            with self.subTest(tasks=tasks):
+                catalog = {"action": "search", "products": products, "tasks": tasks}
+                system, _ = answer_messages(question, catalog)
+                for instruction in ("recorded color options", "recorded size options", "no dated price history", '"reason"'):
+                    self.assertIn(instruction, system["content"])
+                with self.assertRaisesRegex(ValueError, "requires a short catalog-based reason"):
+                    parse_answer(json.dumps(answer), catalog)
+                complete = {**answer, "selections": [{**selection, "reason": "网面鞋面透气，适合平时步行。"}]}
+                self.assertEqual(parse_answer(json.dumps(complete), catalog), complete)
+                self.assertEqual(parse_answer(json.dumps({**answer, "selections": []}), catalog)["selections"], [])
+
     def test_answer_normalizes_outer_json_without_bypassing_evidence_validation(self):
         catalog = {"action": "search", "products": [{"position": 1, "name": "Black leather loafer"}]}
         answer = {"paragraphs": ["可以考虑这双黑色皮革乐福鞋。"],

@@ -166,7 +166,7 @@ test("workbench only presents prose received from Kaggle and logs a failed answe
       calls.push([endpoint,data]);
       if (endpoint === "/v1/plan") return {plan,adapter:true,generation_ms:30};
       if (answerAvailable) return {paragraphs:["可以先看这双 ECCO 乐福鞋。它有黑色选项，商品说明也提到了皮革鞋面。"],
-        selections:[{position:2,quote:"full-grain ECCO leather"}],generation_ms:20};
+        selections:[{position:2,quote:"full-grain ECCO leather",reason:"皮革鞋面符合你对男士皮鞋的要求。"}],generation_ms:20};
       throw Object.assign(new Error("Generation failed"),{plannerStatus:422,plannerStage:"model_answer"});
     }});
   vm.runInContext(workflow,ctx);
@@ -179,6 +179,7 @@ test("workbench only presents prose received from Kaggle and logs a failed answe
   await ctx.ask(question);
   assert.deepEqual(calls.map(([endpoint])=>endpoint),["/v1/plan","/v1/answer"]);
   const evidence = JSON.parse(calls[1][1].catalog);
+  assert.deepEqual(evidence.tasks,["recommend"]);
   assert.deepEqual(evidence.products.map(item=>item.asin),["B094RBNS2K","B07CN9RZ1C"]);
   assert.match(evidence.products[1].description,/full-grain ECCO leather/);
   assert.equal(thread.events[0].answer,undefined);
@@ -189,6 +190,8 @@ test("workbench only presents prose received from Kaggle and logs a failed answe
   await ctx.ask(question);
   assert.match(thread.events[1].answer.reply_paragraphs[0],/可以先看这双 ECCO 乐福鞋/);
   assert.deepEqual(Array.from(thread.events[1].answer.cards,card=>[card.id,card.position]),[["B07CN9RZ1C",1]]);
+  assert.equal(thread.events[1].answer.cards[0].modelReason,"皮革鞋面符合你对男士皮鞋的要求。");
+  assert.equal(thread.events[1].answer.cards[0].reason,null);
   assert.deepEqual(Array.from(thread.state.resultIds),["B07CN9RZ1C"]);
   assert.equal(thread.events[1].answer.recalledPages.length,2);
   assert.equal(thread.events[1].generationMs,50);
@@ -208,6 +211,34 @@ test("answer renders prose, evidence, images, and catalog details in that order"
   assert.equal(body.children[4].children[0].tag,"details");
 });
 
+test("shopping cards show requested catalog options and model reasons beside the images",()=>{
+  const source = fs.readFileSync(path.join(__dirname,"../web/app.js"),"utf8");
+  const cardSource = source.slice(source.indexOf("function productCard("),source.indexOf("function productEvidence("));
+  const turnSource = source.slice(source.indexOf("function renderTurn("),source.indexOf("function renderBreadcrumbs("));
+  const node = (tag,className,text)=>({tag,className,text,children:[],dataset:{},classList:{add(){}},setAttribute(){},
+    append(...items){this.children.push(...items);},querySelector(){return this.children[0];}});
+  const tile = (_label,_price,image)=>{
+    const card = node("button",null,image);
+    card.append(node("span","tile-copy"));
+    return card;
+  };
+  const render = vm.runInNewContext(cardSource+turnSource+"\nrenderTurn",{node,tile,ShopRag:rag,
+    productEvidence:()=>node("article")});
+  const found = rag.runModel(idx,"女士鞋",{},rag.makePlan({audience:"women",shoe:true,size:"8.5",max_price:50,
+    tasks:["image","color","size","price_history","recommend"]}));
+  const sneaker = found.cards.find(card=>card.id==="B09RPRRNVP");
+  const modelReason = "网面鞋面透气，适合平时步行。";
+  const turn = render({mode:"remote",adapter:true,answer:{plan:found.plan,reply_paragraphs:["可以先看这双套脚鞋。"],
+    cards:[{...sneaker,modelReason}]}});
+  const body = turn.children[1].children[1];
+  const picture = body.children.find(item=>item.className==="answer-grid").children[0];
+  assert.equal(picture.text,sneaker.images[0]);
+  assert.deepEqual(picture.children[0].children.map(item=>item.text),[
+    "颜色 · Black、Grey、Red","尺码 · 6.5、7、7.5、8、8.5、9",modelReason
+  ]);
+  assert.match(body.children.find(item=>item.className==="gaps").text,/缺少按日期排列的历史价格/);
+});
+
 test("splits have unique full inputs and isolated ASIN families and contexts",()=>{
   const dir = path.join(__dirname,"../data/sft");
   const assigned = JSON.parse(fs.readFileSync(path.join(dir,"asin-splits.json"),"utf8"));
@@ -216,14 +247,14 @@ test("splits have unique full inputs and isolated ASIN families and contexts",()
     assert.equal(groups.get(group) || split,split);
     groups.set(group,split);
   }
-  for (const [split,len] of [["train",1246],["validation",156],["test",156],["challenge",24]]) {
+  for (const [split,len] of [["train",1246],["validation",156],["test",156]]) {
     const rows = fs.readFileSync(path.join(dir,split+".jsonl"),"utf8").trim().split("\n").map(JSON.parse);
     assert.equal(rows.length,len);
     assert(rows.some(row=>row.expected.shoe));
     for (const row of rows) {
       assert(!inputs.has(row.messages[1].content));
       inputs.add(row.messages[1].content);
-      for (const id of row.products) assert.equal(assigned[id].split,split==="challenge"?"test":split);
+      for (const id of row.products) assert.equal(assigned[id].split,split);
     }
   }
 });
