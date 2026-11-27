@@ -3,6 +3,7 @@ import json
 import os
 import re
 import secrets
+import tempfile
 import threading
 import time
 import unicodedata
@@ -60,6 +61,7 @@ PLAN_CORRECTION = (
 )
 
 ANSWER_PREFIX = '{"selections":['
+ANSWER_FIELDS = {"paragraphs", "selections"}
 
 ANSWER_GUIDANCE = (
     "Write the final shopping answer in the JSON format below. "
@@ -131,14 +133,47 @@ def empty_search_reply(catalog):
     return None
 
 
-def parse_answer(raw, catalog):
+def decode_answer_json(raw):
     clean = raw.strip()
     if clean.startswith("```"):
         clean = clean.split("\n", 1)[-1].removesuffix("```").strip()
-    answer = json.loads(clean)
+    return json.loads(clean)
+
+
+def log_answer_failure(journal, private_journal, event, question_id, attempt, error, raw):
+    record = {"event": event, "question_id": question_id, "attempt": attempt, "reason": str(error)}
+    if raw is not None:
+        shape = {"output_chars": len(raw)}
+        try:
+            value = decode_answer_json(raw)
+        except json.JSONDecodeError as err:
+            shape.update(json_valid=False, line=err.lineno, column=err.colno)
+        else:
+            shape.update(json_valid=True, top_level_type=type(value).__name__)
+            if isinstance(value, dict) and set(value) == {"answer"}:
+                value = value["answer"]
+                shape["answer_wrapper_type"] = type(value).__name__
+            if isinstance(value, dict):
+                shape["missing_fields"] = sorted(ANSWER_FIELDS - value.keys())
+                shape["extra_field_count"] = len(value.keys() - ANSWER_FIELDS)
+                shape["field_types"] = {key: type(value[key]).__name__ for key in sorted(ANSWER_FIELDS & value.keys())}
+                shape["array_lengths"] = {key: len(value[key]) for key in shape["field_types"] if isinstance(value[key], list)}
+        record["output_shape"] = shape
+    append_json(journal, record)
+    if raw is not None and private_journal is not None:
+        output = raw.removeprefix(ANSWER_PREFIX)
+        try:
+            append_json(private_journal, {**record, "assistant_prefix": raw[:len(raw) - len(output)],
+                                          "model_output": output[:4096], "truncated": len(output) > 4096})
+        except OSError as err:
+            append_json(journal, {"event": "answer_debug_write_failed", "error": type(err).__name__})
+
+
+def parse_answer(raw, catalog):
+    answer = decode_answer_json(raw)
     if isinstance(answer, dict) and set(answer) == {"answer"}:
         answer = answer["answer"]
-    if not isinstance(answer, dict) or not {"paragraphs", "selections"} <= answer.keys():
+    if not isinstance(answer, dict) or not ANSWER_FIELDS <= answer.keys():
         raise ValueError("Expected paragraphs and selections")
     paragraphs, selections = answer["paragraphs"], answer["selections"]
     if (not isinstance(paragraphs, list) or not 1 <= len(paragraphs) <= 8
@@ -179,6 +214,15 @@ def build_app(adapter, journal, token):
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.requests import Request
     from pydantic import BaseModel, Field
+
+    private_journal = None
+    if os.environ.get("WEBSHOP_CAPTURE_INVALID_OUTPUT") == "1":
+        try:
+            private_journal = Path(tempfile.mkdtemp(prefix="webshop-answer-debug-", dir="/kaggle/temp")) / "answers.jsonl"
+        except OSError as err:
+            append_json(journal, {"event": "answer_debug_unavailable", "error": type(err).__name__})
+        else:
+            append_json(journal, {"event": "answer_debug_enabled", "path": str(private_journal)})
 
     class PreviousResult(BaseModel):
         position: int = Field(ge=1, le=100)
@@ -308,6 +352,7 @@ def build_app(adapter, journal, token):
         if not lock.acquire(blocking=False):
             raise HTTPException(status_code=429, detail="GPU busy")
         start = time.monotonic()
+        attempt, raw = 1, None
         try:
             catalog, source_positions = prepare_answer_catalog(json.loads(payload.catalog))
             empty_reply = empty_search_reply(catalog)
@@ -323,9 +368,10 @@ def build_app(adapter, journal, token):
             except ValueError as err:
                 if time.monotonic() - start >= 45:
                     raise
-                append_json(journal, {"event": "answer_retry", "question_id": payload.questionId, "reason": str(err)})
+                log_answer_failure(journal, private_journal, "answer_retry", payload.questionId, attempt, err, raw)
                 messages[0]["content"] += ("\nThe previous response failed validation: " + str(err)
                                            + " Continue the JSON from the supplied prefix and close the object.")
+                attempt, raw = 2, None
                 raw = generate(model, tokenizer, messages, answer_config, assistant_prefix=ANSWER_PREFIX)
                 reply = parse_answer(raw, catalog)
             for item in reply["selections"]:
@@ -336,7 +382,7 @@ def build_app(adapter, journal, token):
                                   "model_and_config_version": version})
             return {**reply, "generation_ms": elapsed, "model_and_config_version": version}
         except (ValueError, TypeError, KeyError, AttributeError) as err:
-            append_json(journal, {"event": "invalid_answer", "question_id": payload.questionId, "reason": str(err)})
+            log_answer_failure(journal, private_journal, "invalid_answer", payload.questionId, attempt, err, raw)
             raise HTTPException(status_code=422, detail="Invalid model answer") from err
         except Exception as err:
             append_json(journal, {"event": "answer_error", "question_id": payload.questionId,
