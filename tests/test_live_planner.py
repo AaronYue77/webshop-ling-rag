@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "training"))
 from common import InvalidPlannerAction, parse_plan
-from serve import action_messages, answer_messages, answer_paragraphs
+from serve import action_messages, answer_messages, parse_answer
 
 
 class LivePlannerTest(unittest.TestCase):
@@ -53,14 +53,31 @@ class LivePlannerTest(unittest.TestCase):
 
     def test_answer_generation_uses_question_and_evidence_as_data(self):
         question = "可以推荐黑色皮鞋吗？"
-        catalog = {"products": [{"position": 1, "facts": [["材质", "leather"]]}]}
+        catalog = {"action": "search", "result_limit": 1, "products": [
+            {"position": 1, "description": "Breathable mesh running shoe"},
+            {"position": 2, "description": "Black loafer with full-grain leather uppers"},
+        ]}
         system, user = answer_messages(question, catalog)
         self.assertIn("Use only the supplied catalog evidence", system["content"])
         self.assertEqual(json.loads(user["content"]), {"question": question, "catalog": catalog})
-        self.assertEqual(answer_paragraphs("  目录注明使用皮革。\n\n  库存请另行确认。  "),
-                         ["目录注明使用皮革。", "库存请另行确认。"])
+        good = {"paragraphs": ["可以先看这双乐福鞋，目录明确写了全粒面皮革鞋面。"],
+                "selections": [{"position": 2, "quote": "full-grain leather uppers"}]}
+        self.assertEqual(parse_answer(json.dumps(good), catalog), good)
+        for selections in ([{"position": 1, "quote": "full-grain leather uppers"}],
+                           [{"position": 3, "quote": "full-grain leather uppers"}],
+                           good["selections"] * 2):
+            with self.subTest(selections=selections), self.assertRaises(ValueError):
+                parse_answer(json.dumps({**good, "selections": selections}), catalog)
+        self.assertEqual(parse_answer(json.dumps({**good, "selections": []}), catalog)["selections"], [])
         with self.assertRaises(ValueError):
-            answer_paragraphs('{"action":"search"}')
+            parse_answer('{"action":"search"}', catalog)
+
+    def test_comparison_uses_named_items_without_reselecting_them(self):
+        catalog = {"action": "compare", "products": [{"position": 1, "name": "Thermos"}]}
+        reply = {"paragraphs": ["这份目录没有足够的资料比较两款保温性能。"], "selections": []}
+        self.assertEqual(parse_answer(json.dumps(reply), catalog), reply)
+        with self.assertRaises(ValueError):
+            parse_answer(json.dumps({**reply, "selections": [{"position": 1, "quote": "Thermos"}]}), catalog)
 
     def test_live_action_repair_preserves_model_selected_fields(self):
         raw = json.dumps({**self.plan, "action": "search|detail|compare", "required_terms": ["leather"]})
