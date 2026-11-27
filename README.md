@@ -87,6 +87,10 @@ flowchart TD
   SFT --> SPLIT
   CATALOG --> SEARCH
   ADAPTER --> LING
+
+  style DATA fill:none,stroke:#8b949e,stroke-dasharray:4 3
+  style OFFLINE fill:none,stroke:#8b949e,stroke-dasharray:4 3
+  style ONLINE fill:none,stroke:#8b949e,stroke-dasharray:4 3
 ```
 
 微调用问题与上下文训练**任务规划**。正式评测比较底座与 LoRA 的计划输出。在线问答另外调用同一 Kaggle 模型核选候选并撰写正文，浏览器按模型计划在目录上检索。[详细架构、连接与回退路径](docs/ARCHITECTURE.md) · [Ling Cookbook #11 对照](docs/ARCHITECTURE.md#ling-cookbook-11-复现对照)
