@@ -1,8 +1,6 @@
 # WebShop RAG · 电商商品问答工作台
 
-**购物问题常常同时涉及预算、尺码、颜色和选购理由。WebShop 在 Kaggle 上用微调后的 Ling-3.0-tiny 理解问题。问答台从 779 件商品中召回候选及其目录证据，Ling 再按原问题核选商品并生成连贯的回答。用户可以按展示的商品序号追问，目录缺少的资料会在回答中标明。**
-
-Ling-3.0-tiny QLoRA × FastAPI × BM25 与结构化筛选 · Kaggle GPU 推理与 Windows 问答台
+WebShop 是一个 Windows 商品问答台。你可以按预算、尺码、颜色等条件选购，也可以按上一轮的商品序号追问。问答台从 779 件商品中检索目录证据，Kaggle 上的 Ling-3.0-tiny LoRA 负责理解问题、核选商品和生成回答。
 
 [![模型 · Ling-3.0-tiny](https://img.shields.io/badge/Model-Ling--3.0--tiny-3C4A78)](https://huggingface.co/inclusionAI/Ling-3.0-tiny)
 [![训练 · QLoRA](https://img.shields.io/badge/Training-QLoRA-6750A4)](RECIPE.md)
@@ -11,7 +9,7 @@ Ling-3.0-tiny QLoRA × FastAPI × BM25 与结构化筛选 · Kaggle GPU 推理�
 
 [打开 Kaggle 一键推理](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference) · [下载 Windows 问答台](https://github.com/AaronYue77/webshop-ling-rag/archive/refs/heads/main.zip)
 
-[快速开始](#快速开始) · [问答示例](#问答示例) · [系统架构](#系统架构) · [问答流程](#问答流程) · [实测结果](#实测结果) · [复现 Recipe](RECIPE.md)
+[快速开始](#快速开始) · [问答示例](#问答示例) · [系统架构](#系统架构) · [问答流程](#问答流程) · [实测结果](#实测结果) · [训练与评测](RECIPE.md)
 
 ![WebShop Windows 问答台截图，展示已连接的 Ling LoRA、商品推荐及目录依据](docs/webshop-workbench.png)
 
@@ -19,21 +17,17 @@ Ling-3.0-tiny QLoRA × FastAPI × BM25 与结构化筛选 · Kaggle GPU 推理�
 
 ### 1. 打开 Windows 问答台
 
-**Code → Download ZIP → 解压 → 双击启动问答.cmd**。[下载 main 分支源码 ZIP](https://github.com/AaronYue77/webshop-ling-rag/archive/refs/heads/main.zip)
+下载并解压源码 ZIP 后，双击 `启动问答.cmd`。
 
-问答台会在浏览器打开，可以浏览商品、继续之前的对话，也可右键导出单条对话。提问需要连接 Kaggle。直接打开 `WebShop.html` 可浏览商品目录和 Kaggle 图文说明。对话记录的位置见[公开日志说明](LOGS.md)。
+问答台会在浏览器打开，可以浏览商品、继续之前的对话，也可右键导出单条对话。提问需要连接 Kaggle。直接打开 `WebShop.html` 可浏览商品目录和 Kaggle 图文说明。对话记录的位置见[日志说明](LOGS.md)。
 
 ### 2. 连接 Kaggle 模型
 
-**Kaggle Copy & Edit → Run All → 复制 VSCode Compatible URL**。
-
-打开 [Kaggle 一键推理 Notebook](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference)，创建副本，在 **Settings** 开启 GPU 和 Internet，再运行全部单元。看到 **WebShop LoRA 已就绪** 后，从 **Run → Kaggle Jupyter Server** 复制 **VSCode Compatible URL**，粘贴到问答台，保持 Kaggle 会话运行。也可以将[仓库版一键推理 Notebook](kaggle/webshop-ling-inference.ipynb) 导入 Kaggle，从 GitHub Release 读取适配器。
-
-问答台与推理 Notebook 需使用同版本。如果页面提示公开副本过旧，可导入项目内的同版本 Notebook。
+打开 [Kaggle 一键推理 Notebook](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference)，点 **Copy & Edit**，在 **Settings** 启用 GPU 和 Internet，再点 **Run All**。看到 **WebShop LoRA 已就绪** 后，从 **Run → Kaggle Jupyter Server** 复制 **VSCode Compatible URL** 并粘贴到问答台。问答期间保持会话运行。问答台与 Notebook 需使用同版本，旧副本可从[仓库版推理 Notebook](kaggle/webshop-ling-inference.ipynb)重新导入。
 
 ### 3. 复现训练与评测
 
-将[训练 Notebook](kaggle/webshop-ling-rag.ipynb) 导入 Kaggle，开启 GPU 和 Internet。Notebook 下载 GitHub 生成的源码 ZIP 并定位项目根目录。先用 `smoke` 检查环境，再切换到 `train` 跑一轮 QLoRA 并执行正式测试。[训练配置、推理与评测命令](RECIPE.md)
+使用[训练与评测指南](RECIPE.md)复现 QLoRA 训练和基座、LoRA 的正式测试。
 
 本地回归可在项目根目录运行。
 
@@ -93,7 +87,7 @@ flowchart TD
   style ONLINE fill:none,stroke:#8b949e,stroke-dasharray:4 3
 ```
 
-微调用问题与上下文训练**任务规划**。正式评测比较底座与 LoRA 的计划输出。在线问答另外调用同一 Kaggle 模型核选候选并撰写正文，浏览器按模型计划在目录上检索。[详细架构、连接与回退路径](docs/ARCHITECTURE.md) · [Ling Cookbook #11 对照](docs/ARCHITECTURE.md#ling-cookbook-11-复现对照)
+[查看启动连接、问答执行和训练评测架构](docs/ARCHITECTURE.md)。
 
 ## 问答流程
 
@@ -130,7 +124,7 @@ flowchart TD
 
 ## 实测结果
 
-底座和 LoRA 使用相同的模型版本、评测输入与生成设置，各跑 156 道正式测试题，共 312 次生成。正式测试使用留出的问句模板。
+基座与 LoRA 使用相同的模型版本、生成设置和 156 道留出测试题，共生成 312 条结构化任务计划。
 
 | 指标 | 正式测试 156 题（底座 → LoRA） |
 |---|---:|
@@ -139,9 +133,7 @@ flowchart TD
 | 约束完全匹配 | 55.13% → 96.15% |
 | 完整计划匹配 | 0% → 76.92% |
 
-这些指标衡量结构化计划。问答台核对证据并排序，Kaggle 上的 Ling 根据证据生成推荐和回答。数据按 ASIN 家族和近重复分组，共 1,246 条训练题、156 条验证题、156 条正式测试题。[数据清单](data/sft/manifest.json) · [测试集指标](docs/results/test/comparison.json) · [正式测试 156 题完整题目](docs/formal-test-questions.md) · [逐题结果说明](LOGS.md#逐题-txt)
-
-[查看正式测试 156 题的逐题评分和模型输出](docs/results/test/per-question.md)。每题并排给出基座与 LoRA 的四项评分，展开可查看标准计划和两种模型的输出。
+[查看正式测试报告](docs/results/test/per-question.md)，可查每题的评分、标准计划和两种模型输出，以及完整题目与汇总数据。
 
 ## 仓库目录
 
@@ -154,6 +146,4 @@ flowchart TD
 | [docs/](docs/) | 架构、评测与运行说明 |
 | [tests/](tests/) · [scripts/](scripts/) | 回归测试、数据处理、Notebook 与单页生成 |
 
-价格、库存与兼容性以当前目录可查到的字段为证据。实时供货、实时售价和未记录的规格组合需向商家核对。
-
-[WebShop 数据来源](https://github.com/princeton-nlp/WebShop) · [Adaptive RAG 路由参考](https://github.com/JEen-wang/Adaptive-rag) · [Ling Cookbook #11](https://github.com/inclusionAI/ling-cookbook/issues/11)
+[WebShop 数据来源](https://github.com/princeton-nlp/WebShop)

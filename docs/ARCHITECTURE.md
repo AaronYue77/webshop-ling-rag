@@ -2,7 +2,7 @@
 
 Windows 问答台负责目录检索和展示。Kaggle 上的 Ling-3.0-tiny LoRA 负责理解问题、规划任务、核选商品与生成正文。下面按执行顺序展开连接、查询与回答，并给出正式训练和评测的复现入口。
 
-[启动与连接](#启动与连接) · [问答执行](#问答执行) · [核选与回答](#核选与回答) · [训练、评测与推理](#训练评测与推理) · [Ling Cookbook #11 复现对照](#ling-cookbook-11-复现对照)
+[启动与连接](#启动与连接) · [问答执行](#问答执行) · [核选与回答](#核选与回答) · [训练、评测与推理](#训练评测与推理)
 
 ## 启动与连接
 
@@ -126,17 +126,4 @@ flowchart TD
   DEPLOY --> WEB
 ```
 
-训练样本以问题和对话上下文为输入，以结构化任务计划为目标。正式 156 题对照衡量的是规划输出。在线的候选核选、正文和引用按实际问答用例验证。[数据清单](../data/sft/manifest.json) · [正式测试题](formal-test-questions.md) · [对照结果](results/test/comparison.json)
-
-如需重建问答样本，在项目根目录运行 `node scripts/prepare-dataset.cjs`。如需重新生成目录，将原始导出放到 `data/webshop-779.json`，再运行 `node scripts/prepare-catalog.cjs`。目录里的快照价无采集日期，242 件商品带有库存数量记录，60 件商品带有独立尺码价。
-
-## Ling Cookbook #11 复现对照
-
-| 要求 | 复现入口 |
-|---|---|
-| 场景、数据及输入输出 | 电商多条件查询与多轮追问。[样本与切分](../data/sft/) · [输入、标准计划与回答格式](ANSWER-FORMAT.md) |
-| 推理与微调 | 固定底座版本，使用 Kaggle GPU、Transformers、PEFT 和 4-bit NF4 QLoRA。[配置](../training/config.json) · [依赖](../training/requirements.txt) · [训练 Notebook](../kaggle/webshop-ling-rag.ipynb) |
-| 评测与验证 | 同设置对照底座与 LoRA，记录有效 JSON、任务宏 F1、约束完全匹配和完整计划匹配。[评测脚本](../training/evaluate.py) · [正式结果](results/test/comparison.json) |
-| Recipe、资产与 AI 辅助说明 | [复现命令、推理样例及 AI 辅助记录](../RECIPE.md) · [正式 LoRA 下载](https://github.com/AaronYue77/webshop-ling-rag/releases/tag/v1.0.0) · [Kaggle 演示](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference) |
-
-架构图的分层与路由画法参考 [Adaptive-RAG 项目架构图](https://github.com/JEen-wang/Adaptive-rag/blob/main/docs/17-architecture-flow.md)。验收项来自 [Ling Cookbook #11](https://github.com/inclusionAI/ling-cookbook/issues/11)。
+训练以问题和对话上下文为输入，以标准任务计划为目标。基座与 LoRA 共用同一套留出测试题。[训练与评测指南](../RECIPE.md)记录数据和复现命令。
