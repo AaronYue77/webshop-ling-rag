@@ -1,5 +1,6 @@
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -7,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "training"))
 from common import InvalidPlannerAction, parse_plan
-from serve import (ANSWER_PREFIX, action_messages, answer_messages, empty_search_reply, parse_answer,
+from serve import (ANSWER_PREFIX, action_messages, answer_messages, empty_search_reply, log_answer_failure, parse_answer,
                    prepare_answer_catalog)
 
 
@@ -86,6 +87,37 @@ class LivePlannerTest(unittest.TestCase):
                     {"answer": {**answer, "selections": [{"position": 1, "quote": "genuine suede"}]}}):
             with self.subTest(raw=raw), self.assertRaises(ValueError):
                 parse_answer(json.dumps(raw), catalog)
+
+    def test_failed_answer_logging_explains_shape_and_limits_private_capture(self):
+        catalog = {"action": "search", "products": []}
+        private_text = "private shopping note"
+        cases = [
+            (json.dumps({"answer": {"paragraphs": [private_text], private_text: 1}}),
+             {"top_level_type": "dict", "answer_wrapper_type": "dict", "missing_fields": ["selections"],
+              "extra_field_count": 1, "field_types": {"paragraphs": "list"}, "array_lengths": {"paragraphs": 1}}),
+            ("[]", {"json_valid": True, "top_level_type": "list"}),
+            ('{"paragraphs":', {"json_valid": False, "line": 1, "column": 15}),
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            journal = Path(directory) / "public.jsonl"
+            debug = Path(directory) / "debug.jsonl"
+            for attempt, (raw, expected) in enumerate(cases, start=1):
+                with self.subTest(attempt=attempt):
+                    with self.assertRaises(ValueError) as raised:
+                        parse_answer(raw, catalog)
+                    log_answer_failure(journal, None, "invalid_answer", "test-question", attempt, raised.exception, raw)
+                    entry = json.loads(journal.read_text(encoding="utf-8").splitlines()[-1])
+                    self.assertEqual(entry["attempt"], attempt)
+                    for key, value in expected.items():
+                        self.assertEqual(entry["output_shape"][key], value)
+            self.assertFalse(debug.exists())
+            raw = private_text * 300
+            log_answer_failure(journal, debug, "answer_retry", "test-question", 1, ValueError("Invalid answer"), ANSWER_PREFIX + raw)
+            self.assertNotIn(private_text, journal.read_text(encoding="utf-8"))
+            captured = json.loads(debug.read_text(encoding="utf-8"))
+            self.assertEqual(captured["assistant_prefix"], ANSWER_PREFIX)
+            self.assertEqual(captured["model_output"], raw[:4096])
+            self.assertTrue(captured["truncated"])
 
     def test_comparison_uses_named_items_without_reselecting_them(self):
         catalog = {"action": "compare", "products": [{"position": 1, "name": "Thermos"}]}

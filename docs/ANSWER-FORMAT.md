@@ -43,3 +43,9 @@
 | 推荐有某个接口的配件，别推荐转接器 | 按原问题核对接口、兼容型号和排除条件，无法从目录确认兼容性时说明。 |
 
 接口会校验输出结构、候选编号和引句归属。商品与问题的语义匹配由 Kaggle 上的模型判断。推理协议为 `4`，需用与网页配套的 [Kaggle 推理 Notebook](../kaggle/webshop-ling-inference.ipynb)。
+
+## 回答失败诊断
+
+Kaggle 的 `/kaggle/working/webshop-inference.jsonl` 按 `question_id` 记录 `answer_retry` 和 `invalid_answer`。`attempt` 从 `1` 开始，`output_shape` 记录 JSON 是否能解析、顶层类型、缺少的必需字段、额外字段数量，以及 `paragraphs` 和 `selections` 的类型和数组长度。解析失败时还会记录行号和列号。仅包含额外字段且其余校验通过的回答仍会正常返回。
+
+需要检查具体输出时，可在自己的推理 Notebook 副本把 `CAPTURE_INVALID_MODEL_OUTPUT` 改为 `True`，重新运行并复现问题。默认日志中的 `answer_debug_enabled` 会给出 Kaggle 临时私有文件的路径。该文件只记录未通过验证的尝试，每次最多保留 4,096 个字符的模型输出，另记录服务补入的 JSON 前缀。模型可能把对话内容复述到输出中，请仅在自己的会话中查看，诊断后将开关改回 `False`。

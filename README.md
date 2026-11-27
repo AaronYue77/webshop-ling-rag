@@ -11,7 +11,7 @@ Ling-3.0-tiny QLoRA × FastAPI × BM25 与结构化筛选 · Kaggle GPU 推理�
 
 [打开 Kaggle 一键推理](https://www.kaggle.com/code/aaronyue77/webshop-ling-inference) · [下载 Windows 问答台](https://github.com/AaronYue77/webshop-ling-rag/archive/refs/heads/main.zip)
 
-[快速开始](#快速开始) · [问答示例](#问答示例) · [问答流程](#问答流程) · [实测结果](#实测结果) · [复现 Recipe](RECIPE.md)
+[快速开始](#快速开始) · [问答示例](#问答示例) · [系统架构](#系统架构) · [问答流程](#问答流程) · [实测结果](#实测结果) · [复现 Recipe](RECIPE.md)
 
 ![WebShop Windows 问答台截图，展示已连接的 Ling LoRA、商品推荐及目录依据](docs/webshop-workbench.png)
 
@@ -57,18 +57,62 @@ python -m unittest discover -s tests -p "test_*.py"
 
 目录只保存了未标明采集日期的价格快照，因此页面会说明缺少历史价格序列。还可以追问「第一款和第三款差多少钱？」或「第二款有哪些尺码单独标价？」。
 
+## 系统架构
+
+```mermaid
+flowchart TD
+  subgraph DATA["数据准备"]
+    SOURCE["WebShop · 779 件商品"] --> CATALOG["标准化商品目录"]
+    CATALOG --> SFT["问题 + 对话上下文 → 标准任务计划"]
+  end
+
+  subgraph OFFLINE["Kaggle · 训练与评测"]
+    SPLIT["按 ASIN 家族与近重复分组切分"]
+    SPLIT -->|训练 1246 题 · 验证 156 题| TRAIN["Ling-3.0-tiny · 4-bit QLoRA"]
+    TRAIN --> ADAPTER["正式 LoRA 适配器"]
+    SPLIT -->|留出的正式测试 156 题| EVAL["同条件比较底座与 LoRA"]
+    ADAPTER --> EVAL
+    EVAL --> REPORT["聚合指标与逐题结果"]
+  end
+
+  subgraph ONLINE["Windows 问答台与 Kaggle · 在线推理"]
+    USER["用户问题与上一轮商品序号"] --> UI["Windows 浏览器问答台"]
+    UI -->|通过 Kaggle Jupyter 会话| API["协议 4 · FastAPI"]
+    API -->|规划与回答| LING["Kaggle GPU · Ling LoRA"]
+    API -->|返回结构化计划| SEARCH["浏览器目录 · 筛选与 BM25"]
+    SEARCH -->|候选和目录证据| API
+    API -->|正文与核选商品| VIEW["正文 → 证据 → 图片 → 目录依据"]
+  end
+
+  SFT --> SPLIT
+  CATALOG --> SEARCH
+  ADAPTER --> LING
+```
+
+微调用问题与上下文训练**任务规划**。正式评测比较底座与 LoRA 的计划输出。在线问答另外调用同一 Kaggle 模型核选候选并撰写正文，浏览器按模型计划在目录上检索。[详细架构、连接与回退路径](docs/ARCHITECTURE.md) · [Ling Cookbook #11 对照](docs/ARCHITECTURE.md#ling-cookbook-11-复现对照)
+
 ## 问答流程
 
 ```mermaid
 flowchart TD
-  Q["问题与上一轮结果"] --> C{"已连接 Kaggle？"}
-  C -->|是| L["Ling 识别意图和筛选条件"]
-  C -->|否| P["提示连接 Kaggle"]
-  L -->|有效计划| R["召回目录候选和证据"]
-  R --> G["Ling 核选商品并撰写回答"]
-  G -->|校验通过| A["正文 → 证据 → 图片 → 目录依据"]
-  L -->|计划无效| F["显示失败原因和重试入口"]
-  G -->|生成失败| F
+  Q["用户问题 + 已展示的商品清单"] --> C{"Kaggle 会话已连接？"}
+  C -->|否| P["保留问题，提示连接 Kaggle"]
+  C -->|是| PL["/v1/plan · Ling 生成结构化计划"]
+  PL -->|校验通过| ROUTE{"按 action 执行"}
+  PL -->|修复或重试仍失败| ERR["显示失败原因，保留重试入口"]
+  ROUTE -->|search| RECALL["结构化筛选与 BM25 排序"]
+  ROUTE -->|detail| DETAIL["按上一轮序号定位商品并取字段"]
+  ROUTE -->|compare| COMPARE["按序号取多款商品，统一价格与规格口径"]
+  RECALL --> E["打包候选、目录证据及缺失项"]
+  DETAIL --> E
+  COMPARE --> E
+  E --> A["/v1/answer · 核选与回答"]
+  A -->|新搜索无合格候选| EMPTY["说明没有可确认的商品"]
+  A -->|正文和引句校验通过| VIEW["正文 → 证据 → 图片 → 目录依据"]
+  A -->|生成或校验仍失败| ERR
+  VIEW --> LOG["保存对话、原始召回与实际引用"]
+  EMPTY --> LOG
+  ERR --> LOG
 ```
 
 | 能力 | 实现 |
@@ -78,7 +122,7 @@ flowchart TD
 | 证据核对 | 分开检查目录价格、独立尺码价、颜色、库存记录和兼容线索。遇到资料不足时，说明缺失项并继续回答其他问题。[检索与证据](web/rag.js) |
 | 网页与推理服务 | 连接 Kaggle 后，页面把问题和目录证据交给 Ling。新搜索只展示模型核选的商品，详情和比较保留用户指明的商品。[网页交互](web/app.js) · [FastAPI 服务](training/serve.py) |
 
-[架构与训练流程](docs/ARCHITECTURE.md) · [输入与回答格式](docs/ANSWER-FORMAT.md)
+[详细问答执行图](docs/ARCHITECTURE.md#问答执行) · [输入与回答格式](docs/ANSWER-FORMAT.md)
 
 ## 实测结果
 
@@ -86,6 +130,7 @@ flowchart TD
 
 | 指标 | 正式测试 156 题（底座 → LoRA） |
 |---|---:|
+| 有效 JSON | 55.77% → 98.72% |
 | 任务宏 F1 | 29.58% → 90.04% |
 | 约束完全匹配 | 55.13% → 96.15% |
 | 完整计划匹配 | 0% → 76.92% |
