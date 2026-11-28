@@ -184,7 +184,7 @@
     const compact = x=>word(x).replace(/[^a-z0-9]+/g," ").trim();
     const normalized = compact(target);
     if (!normalized) return {status:"unconfirmed",evidence:null};
-    const modelSuffix = /(?:iphone|ipad|galaxy|pixel|macbook)/.test(normalized) && !/\b(?:pro|max|plus|mini|air|ultra)\b/.test(normalized)
+    const modelSuffix = /\b(?:iphone|ipad|galaxy|pixel|macbook)\b/.test(normalized)
       ? "(?!\\s+(?:pro|max|plus|mini|air|ultra))" : "";
     const targetPattern = new RegExp("\\b"+normalized+"\\b"+modelSuffix,"i");
     const matches = p.compatibility.filter(x=>targetPattern.test(compact(x)));
@@ -243,6 +243,7 @@
           min !== null && (priceBasis === null || priceBasis < min)) continue;
       const fit = plan.compatibility_target ? compatibility(p,plan.compatibility_target) : null;
       if (fit?.status === "incompatible") continue;
+      if (modelOnly && fit?.status === "unconfirmed") continue;
       if (phoneCase && fit?.status === "unconfirmed" && /\b(?:iphone|galaxy|pixel|motorola|moto)\b[^\n]{0,25}\b\d{1,4}\b/i.test(p.name) &&
           !word(p.name).includes(word(plan.compatibility_target))) continue;
       let score = 0;
@@ -329,7 +330,7 @@
       else if (p.inventory) facts.push(["历史库存状态",p.inventory === "in_stock" ? "曾记录为有货" : "曾记录为缺货","availability_status"]);
       gaps.push("当前库存与颜色／尺码组合库存需要到当前商品页确认。");
     }
-    if (has("compatibility")) {
+    if (has("compatibility") || plan.compatibility_target) {
       const fit = compatibility(p,plan.compatibility_target);
       if (fit.status === "supported") facts.push(["兼容线索",fit.evidence,"商品说明 / product_information"]);
       if (fit.status === "incompatible") facts.push(["不兼容线索",fit.evidence,"商品说明 / product_information"]);

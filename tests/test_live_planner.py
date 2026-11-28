@@ -206,6 +206,7 @@ class LivePlannerTest(unittest.TestCase):
         reply = empty_search_reply(empty)
         self.assertEqual(reply["selections"], [])
         self.assertIn("目录检索", reply["paragraphs"][0])
+        self.assertIn("iPhone 13", empty_search_reply({**empty, "compatibility_target": "iPhone 13"})["paragraphs"][0])
         self.assertIsNone(empty_search_reply(comparison))
 
     def test_live_action_repair_preserves_model_selected_fields(self):

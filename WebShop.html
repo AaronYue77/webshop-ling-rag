@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-H7P+BrMP0u5XDbWRzq2L/qAEwDLtHNGQmxJ8iBLXw1g=' 'sha256-zz+12nLCIfnyP9jsnkimVHNwzmQgH00Fu9nkkPxTPRk='; style-src 'sha256-uRZjohsZbB8UuIy307stuA1Oyt2sJUVp47SXlo3RII0='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-iOZxkgS6ovublfDKkOq7bOoWZScqUWO7Yw1cqMEx0tc=' 'sha256-15X8Mr5+QBrXf20xM8D5O5xkvS116fMNFJme2oeEv3E='; style-src 'sha256-uRZjohsZbB8UuIy307stuA1Oyt2sJUVp47SXlo3RII0='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
   <title>WebShop 商品档案 · 问答台</title>
   <style>:root {
   color-scheme: light;
@@ -544,7 +544,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     const compact = x=>word(x).replace(/[^a-z0-9]+/g," ").trim();
     const normalized = compact(target);
     if (!normalized) return {status:"unconfirmed",evidence:null};
-    const modelSuffix = /(?:iphone|ipad|galaxy|pixel|macbook)/.test(normalized) && !/\b(?:pro|max|plus|mini|air|ultra)\b/.test(normalized)
+    const modelSuffix = /\b(?:iphone|ipad|galaxy|pixel|macbook)\b/.test(normalized)
       ? "(?!\\s+(?:pro|max|plus|mini|air|ultra))" : "";
     const targetPattern = new RegExp("\\b"+normalized+"\\b"+modelSuffix,"i");
     const matches = p.compatibility.filter(x=>targetPattern.test(compact(x)));
@@ -603,6 +603,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
           min !== null && (priceBasis === null || priceBasis < min)) continue;
       const fit = plan.compatibility_target ? compatibility(p,plan.compatibility_target) : null;
       if (fit?.status === "incompatible") continue;
+      if (modelOnly && fit?.status === "unconfirmed") continue;
       if (phoneCase && fit?.status === "unconfirmed" && /\b(?:iphone|galaxy|pixel|motorola|moto)\b[^\n]{0,25}\b\d{1,4}\b/i.test(p.name) &&
           !word(p.name).includes(word(plan.compatibility_target))) continue;
       let score = 0;
@@ -689,7 +690,7 @@ dialog .small { font-size: 12px; margin: 9px 0; }
       else if (p.inventory) facts.push(["历史库存状态",p.inventory === "in_stock" ? "曾记录为有货" : "曾记录为缺货","availability_status"]);
       gaps.push("当前库存与颜色／尺码组合库存需要到当前商品页确认。");
     }
-    if (has("compatibility")) {
+    if (has("compatibility") || plan.compatibility_target) {
       const fit = compatibility(p,plan.compatibility_target);
       if (fit.status === "supported") facts.push(["兼容线索",fit.evidence,"商品说明 / product_information"]);
       if (fit.status === "incompatible") facts.push(["不兼容线索",fit.evidence,"商品说明 / product_information"]);
@@ -1625,6 +1626,7 @@ function answerEvidence(out) {
   const short = (text, limit) => String(text ?? "").replace(/\s+/g," ").trim().slice(0,limit);
   const catalog = {
     action:out.plan.action, tasks:out.plan.tasks, recalled_count:out.matched,
+    compatibility_target:out.plan.compatibility_target,
     ...(out.plan.action === "search" ? {filters:out.conditions} : {requested_positions:out.plan.refs}),
     result_limit:out.plan.limit,
     required_terms:out.plan.required_terms ?? [], excluded_terms:out.plan.excluded_terms ?? [],

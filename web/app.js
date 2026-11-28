@@ -683,6 +683,7 @@ function answerEvidence(out) {
   const short = (text, limit) => String(text ?? "").replace(/\s+/g," ").trim().slice(0,limit);
   const catalog = {
     action:out.plan.action, tasks:out.plan.tasks, recalled_count:out.matched,
+    compatibility_target:out.plan.compatibility_target,
     ...(out.plan.action === "search" ? {filters:out.conditions} : {requested_positions:out.plan.refs}),
     result_limit:out.plan.limit,
     required_terms:out.plan.required_terms ?? [], excluded_terms:out.plan.excluded_terms ?? [],

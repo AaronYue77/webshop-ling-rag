@@ -99,6 +99,7 @@ test("compatibility and live evidence avoid unsupported claims",()=>{
   const search = ask("找 30 美元以内适配 iPhone 13 的手机壳，给我图片并说明兼容性。");
   assert(search.cards.every(c=>!/\biPhone (?:11|12)\b/i.test(c.name)));
   assert.equal(rag.compatibility({compatibility:["Compatible with iPhone 13 Pro Max"]},"iPhone 13").status,"unconfirmed");
+  assert.equal(rag.compatibility({compatibility:["Compatible with iPhone 13 Pro Max"]},"iPhone 13 Pro").status,"unconfirmed");
   assert.equal(rag.compatibility({compatibility:["Not compatible with iPhone 13"]},"iPhone 13").status,"incompatible");
   const out = ask("B09RPRRNVP 的当前价格、库存和商品图");
   assert.equal(out.cards[0].id,"B09RPRRNVP");
@@ -148,6 +149,20 @@ test("model-specified evidence phrases must all match and exclusions block match
   assert.deepEqual(rag.runModel(catalog,"找符合条件的水壶",{},plan).cards.map(c=>c.id),["B000000001"]);
   plan.required_terms = ["ceramic body"];
   assert.deepEqual(rag.runModel(catalog,"找符合条件的水壶",{},plan).cards,[]);
+});
+
+test("live compatibility searches require evidence for the model and requested product type",()=>{
+  const sample = idx.byId.get("B098SV78BW");
+  const products = [
+    {...sample,id:"B000000001",name:"Protective case for iPhone 13",description:"",compatibility:["Designed for iPhone 13"]},
+    {...sample,id:"B000000002",name:"Protective case for iPhone 13 Pro",description:"",compatibility:["Designed for iPhone 13 Pro"]},
+    {...sample,id:"B000000003",name:"Adjustable phone stand",trail:"Phone Stands",description:"",compatibility:["Compatible with iPhone 13"]},
+  ];
+  const plan = {...rag.makePlan({category:"electronics",compatibility_target:"iPhone 13",tasks:["recommend"]}),
+    required_terms:["case"]};
+  const result = rag.runModel(rag.index(products),"找适配这台手机的保护壳",{},plan);
+  assert.deepEqual(result.cards.map(card=>card.id),["B000000001"]);
+  assert.ok(result.cards[0].facts.some(([label,value])=>label==="兼容线索" && value==="Designed for iPhone 13"));
 });
 
 test("workbench only presents prose received from Kaggle and logs a failed answer",async()=>{

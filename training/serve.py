@@ -18,6 +18,9 @@ LIVE_PLAN_GUIDANCE = (
     '\nSet action to exactly one value: "search" for new products (including recommendations), '
     '"detail" for details or recommendations about a previously listed product, or "compare" to compare products. '
     "For search, translate specific requested product types, materials and features into concise English catalog phrases. "
+    "For a request to find a specific type of accessory for a device, include the accessory type as a hard requirement "
+    'in required_terms. Use the shortest discriminating noun used in catalog titles, such as "case", "charger", "cable" or "mount". '
+    "The device model belongs in compatibility_target. Include compatibility in tasks when the question asks about device fit. "
     "Put optional synonyms in terms for ranking. For an explicit must-have feature, add the optional key "
     'required_terms (all phrases must occur in the catalog). Extract materials and other hard features even when '
     'they occur inside the product name. A requested demographic belongs in audience even inside a compound noun. '
@@ -111,6 +114,7 @@ ANSWER_GUIDANCE = (
     "1-based order in selections, not the incoming candidate position. "
     "Keep compatibility, availability, current price and variant details qualified by actual evidence. Images and source controls "
     "appear separately. Do not invent links or substitute the snapshot price for a current price. "
+    "A compatible product of the wrong type is unsuitable. Recommend only the type asked for. "
     "默认用自然的简体中文。直接对提问的人给出结论，可优先推荐一款或概括实际取舍。不要以第三人称复述用户的问题或描述处理过程。"
     "只有存在影响选择的不确定性时才加一句提醒，集中说明一次。"
     "通常用一到三个完整段落，简单问题一段即可。不要用固定开场、标题、Markdown 加粗或逐条拆出‘理由’和‘注意事项’。"
@@ -231,7 +235,11 @@ def prepare_answer_catalog(catalog):
 
 def empty_search_reply(catalog):
     if catalog["action"] == "search" and not catalog["products"]:
-        return {"paragraphs": ["这次目录检索没有找到能确认符合你要求的商品。"], "selections": []}
+        target = catalog.get("compatibility_target")
+        message = (f"目录中没有找到能确认与 {target} 兼容且满足其他要求的商品。"
+                   if isinstance(target, str) and 0 < len(target) <= 120
+                   else "这次目录检索没有找到能确认符合你要求的商品。")
+        return {"paragraphs": [message], "selections": []}
     return None
 
 
