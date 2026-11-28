@@ -224,19 +224,21 @@ test("shopping cards show requested catalog options and model reasons beside the
   };
   const render = vm.runInNewContext(cardSource+turnSource+"\nrenderTurn",{node,tile,ShopRag:rag,
     productEvidence:()=>node("article")});
-  const found = rag.runModel(idx,"女士鞋",{},rag.makePlan({audience:"women",shoe:true,size:"8.5",max_price:50,
-    tasks:["image","color","size","price_history","recommend"]}));
-  const sneaker = found.cards.find(card=>card.id==="B09RPRRNVP");
   const modelReason = "网面鞋面透气，适合平时步行。";
-  const turn = render({mode:"remote",adapter:true,answer:{plan:found.plan,reply_paragraphs:["可以先看这双套脚鞋。"],
-    cards:[{...sneaker,modelReason}]}});
-  const body = turn.children[1].children[1];
-  const picture = body.children.find(item=>item.className==="answer-grid").children[0];
-  assert.equal(picture.text,sneaker.images[0]);
-  assert.deepEqual(picture.children[0].children.map(item=>item.text),[
-    "颜色 · Black、Grey、Red","尺码 · 6.5、7、7.5、8、8.5、9",modelReason
-  ]);
-  assert.match(body.children.find(item=>item.className==="gaps").text,/缺少按日期排列的历史价格/);
+  for (const optionTasks of [["color","size"],["specs"]]) {
+    const found = rag.runModel(idx,"女士鞋",{},rag.makePlan({audience:"women",shoe:true,size:"8.5",max_price:50,
+      tasks:["image","price_history","recommend",...optionTasks]}));
+    const sneaker = found.cards.find(card=>card.id==="B09RPRRNVP");
+    const turn = render({mode:"remote",adapter:true,answer:{plan:found.plan,reply_paragraphs:["可以先看这双套脚鞋。"],
+      cards:[{...sneaker,modelReason}]}});
+    const body = turn.children[1].children[1];
+    const picture = body.children.find(item=>item.className==="answer-grid").children[0];
+    assert.equal(picture.text,sneaker.images[0]);
+    assert.deepEqual(picture.children[0].children.map(item=>item.text),[
+      "颜色 · Black、Grey、Red","尺码 · 6.5、7、7.5、8、8.5、9",modelReason
+    ]);
+    assert.match(body.children.find(item=>item.className==="gaps").text,/缺少按日期排列的历史价格/);
+  }
 });
 
 test("splits have unique full inputs and isolated ASIN families and contexts",()=>{
