@@ -337,8 +337,11 @@ function productCard(card, tasks = []) {
   const el = tile(label,price,card.images?.[0],() => openAnswerProduct(card));
   const copy = el.querySelector(".tile-copy");
   const facts = new Map(card.facts ?? []);
-  if (tasks.includes("color")) copy.append(node("small",null,"颜色 · " + (facts.get("颜色选项") || "目录未记录")));
-  if (tasks.includes("size")) copy.append(node("small",null,"尺码 · " + (facts.get("尺码选项") || "目录未记录可选尺码")));
+  const colors = facts.get("颜色选项");
+  const sizes = facts.get("尺码选项");
+  const showSpecs = tasks.includes("specs");
+  if (tasks.includes("color") || (showSpecs && colors)) copy.append(node("small",null,"颜色 · " + (colors || "目录未记录")));
+  if (tasks.includes("size") || (showSpecs && sizes)) copy.append(node("small",null,"尺码 · " + (sizes || "目录未记录可选尺码")));
   if (card.modelReason) copy.append(node("small",null,card.modelReason));
   el.classList.add("reply-product");
   el.title = label;

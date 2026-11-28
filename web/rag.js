@@ -291,11 +291,11 @@
     const has = key=>plan.tasks.includes(key);
     const detailed = plan.action !== "search";
     for (const [term,source] of matchedTerms) facts.push(["筛选依据",term,source.field]);
-    if (has("color") || detailed || plan.color) {
+    if (has("color") || detailed || plan.color || (has("specs") && colorList.length)) {
       if (colorList.length) facts.push(["颜色选项",colorList.map(x=>x.value).join("、"),"customization_options / product_information"]);
       else gaps.push("目录未记录颜色选项。");
     }
-    if (has("size") || detailed || plan.size) {
+    if (has("size") || detailed || plan.size || (has("specs") && sizeList.length)) {
       if (sizeList.length) facts.push(["尺码选项",sizeList.map(x=>x.value).join("、"),"customization_options"]);
       else gaps.push("目录未记录可选尺码。");
       if (Object.values(p.sizeChart).some(x=>x.length)) facts.push(["尺码表",Object.entries(p.sizeChart).filter(([,v])=>v.length).map(([k,v])=>k+" "+v.join("、")).join("；"),"full_description"]);
