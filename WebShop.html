@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-OopvEEyX4ZvTnEmaorcNLCrXjq3EcJibYCN8Tw9ah9o=' 'sha256-ITF03hrBFTBXBzyN3LmUMQOFgIvCUcq/6sXGXPomp4o='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-RrVLuxtCq42PMKNEIANwSW5f5J76JQjAYvndu28edrw=' 'sha256-zqH46EwpLsBERYFH/3kwB99ElNuJR3Ufru7XNwW9w1U='; style-src 'sha256-guL+6if0HRVBe6R/x74Ed+5CHAFMYrP34XNN7hPe87I='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
   <title>WebShop 商品档案 · 问答台</title>
   <style>:root {
   color-scheme: light;
@@ -648,11 +648,11 @@ dialog .small { font-size: 12px; margin: 9px 0; }
     const has = key=>plan.tasks.includes(key);
     const detailed = plan.action !== "search";
     for (const [term,source] of matchedTerms) facts.push(["筛选依据",term,source.field]);
-    if (has("color") || detailed || plan.color) {
+    if (has("color") || detailed || plan.color || (has("specs") && colorList.length)) {
       if (colorList.length) facts.push(["颜色选项",colorList.map(x=>x.value).join("、"),"customization_options / product_information"]);
       else gaps.push("目录未记录颜色选项。");
     }
-    if (has("size") || detailed || plan.size) {
+    if (has("size") || detailed || plan.size || (has("specs") && sizeList.length)) {
       if (sizeList.length) facts.push(["尺码选项",sizeList.map(x=>x.value).join("、"),"customization_options"]);
       else gaps.push("目录未记录可选尺码。");
       if (Object.values(p.sizeChart).some(x=>x.length)) facts.push(["尺码表",Object.entries(p.sizeChart).filter(([,v])=>v.length).map(([k,v])=>k+" "+v.join("、")).join("；"),"full_description"]);
@@ -1276,8 +1276,11 @@ function productCard(card, tasks = []) {
   const el = tile(label,price,card.images?.[0],() => openAnswerProduct(card));
   const copy = el.querySelector(".tile-copy");
   const facts = new Map(card.facts ?? []);
-  if (tasks.includes("color")) copy.append(node("small",null,"颜色 · " + (facts.get("颜色选项") || "目录未记录")));
-  if (tasks.includes("size")) copy.append(node("small",null,"尺码 · " + (facts.get("尺码选项") || "目录未记录可选尺码")));
+  const colors = facts.get("颜色选项");
+  const sizes = facts.get("尺码选项");
+  const showSpecs = tasks.includes("specs");
+  if (tasks.includes("color") || (showSpecs && colors)) copy.append(node("small",null,"颜色 · " + (colors || "目录未记录")));
+  if (tasks.includes("size") || (showSpecs && sizes)) copy.append(node("small",null,"尺码 · " + (sizes || "目录未记录可选尺码")));
   if (card.modelReason) copy.append(node("small",null,card.modelReason));
   el.classList.add("reply-product");
   el.title = label;
