@@ -151,6 +151,7 @@ def answer_messages(question, catalog):
                          'evidence-based sentence in the answer language, using a short product name when helpful. For example: '
                          '{"position":2,"quote":"breathable mesh upper","reason":"网面鞋面透气，适合平时步行。"}. '
                          'Use an item-specific feature and its practical benefit when the catalog supports it. '
+                         'Each reason must explain the quote from that same product. Never attach a feature from another item. '
                          'For multiple items, do not repeat the shared budget or size as the only reason when features differ. '
                          'The item-specific reasons are shown in the answer body in selection order. Use paragraphs for '
                          'the main recommendation, tradeoffs and any requested information that the reasons do not cover. '
@@ -192,7 +193,7 @@ def verified_selection_quote(item, product):
     if isinstance(quote, str):
         quote = quote.strip()
         if 2 <= len(quote) <= 230 and any(quote in field for field in fields):
-            return quote
+            return quote, True
 
     # The catalog is the source of citations. A paraphrase from the model is not a quote.
     facts = dict(product.get("facts", []))
@@ -200,7 +201,7 @@ def verified_selection_quote(item, product):
     for field in [*preferred, *fields]:
         excerpt = field.strip()[:230].rstrip()
         if len(excerpt) >= 2:
-            return excerpt
+            return excerpt, False
     raise ValueError("Selected product has no quotable catalog evidence")
 
 
@@ -322,9 +323,10 @@ def parse_answer(raw, catalog):
         if not product or position in seen:
             raise ValueError("Expected distinct candidate positions")
         seen.add(position)
-        verified_item = {"position": position, "quote": verified_selection_quote(item, product)}
+        quote, model_quote_verified = verified_selection_quote(item, product)
+        verified_item = {"position": position, "quote": quote}
         if needs_reason:
-            verified_item["reason"] = reason.strip()
+            verified_item["reason"] = reason.strip() if model_quote_verified else None
         verified.append(verified_item)
     return {"paragraphs": paragraphs, "selections": verified}
 

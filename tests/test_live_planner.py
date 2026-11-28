@@ -115,7 +115,7 @@ class LivePlannerTest(unittest.TestCase):
                 raw = json.dumps({"paragraphs": ["可以考虑这款支架。"],
                                   "selections": [{"position": 1, "reason": reason, **quote}]})
                 self.assertEqual(parse_answer(raw, catalog)["selections"],
-                                 [{"position": 1, "reason": reason, "quote": "Folds flat for travel"}])
+                                 [{"position": 1, "reason": None, "quote": "Folds flat for travel"}])
         with self.assertRaisesRegex(ValueError, "no quotable catalog evidence"):
             parse_answer('{"paragraphs":["可考虑"],"selections":[{"position":3,"reason":"方便携带。"}]}', catalog)
 

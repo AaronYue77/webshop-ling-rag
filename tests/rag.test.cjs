@@ -245,6 +245,11 @@ test("model reasons appear in the reply, with catalog options on the image cards
     assert.equal(bubble.children[0].text,"可以先看这双套脚鞋。");
     assert.deepEqual(bubble.children[1].children.map(item=>item.text),["第 "+sneaker.position+" 款 ",modelReason]);
     assert.match(bubble.children[2].text,/缺少按日期排列的历史价格/);
+    const verifiedQuote = "Lightweight Breathable Mesh Knit";
+    const evidenceTurn = render({mode:"remote",adapter:true,answer:{...found,reply_paragraphs:["可以看看这款。"],
+      cards:[{...sneaker,modelReason:null,facts:[...sneaker.facts,["推荐依据原文",verifiedQuote]]}]}});
+    const evidenceBubble = evidenceTurn.children[1].children[1].children.find(item=>item.className==="reply-bubble");
+    assert.equal(evidenceBubble.children[1].children[1].text,"目录依据为「" + verifiedQuote + "」。");
   }
 });
 

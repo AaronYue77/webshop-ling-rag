@@ -406,16 +406,20 @@ function renderTurn(event) {
       ask(event.question);
     }));
   } else {
-    const reasons = cards.filter(card=>card.modelReason);
     const tasks = out.plan?.tasks ?? [];
+    const reasons = cards.flatMap(card=>{
+      if (card.modelReason) return [{position:card.position,text:card.modelReason}];
+      const quote = tasks.includes("recommend") && card.facts?.find(([label])=>label === "推荐依据原文")?.[1];
+      return quote ? [{position:card.position,text:"目录依据为「" + quote + "」。"}] : [];
+    });
     const paragraphs = out.reply_paragraphs ?? [];
     const prose = paragraphs.filter(paragraph=>!reasons.length ||
       !/^(?:用户(?:要求|想|希望|需要|询问|的问题|提到)|the user\s+(?:asks?|asked|wants?|requested|needs?|is looking))/i.test(paragraph.trim()));
     for (const paragraph of prose) bubble.append(node("p",null,paragraph));
-    for (const card of reasons) {
-      if (prose.some(paragraph=>paragraph.includes(card.modelReason))) continue;
+    for (const {position,text} of reasons) {
+      if (prose.some(paragraph=>paragraph.includes(text))) continue;
       const reason = node("p",null);
-      reason.append(node("strong",null,"第 " + card.position + " 款 "),node("span",null,card.modelReason));
+      reason.append(node("strong",null,"第 " + position + " 款 "),node("span",null,text));
       bubble.append(reason);
     }
     if (out.plan?.action === "search" && tasks.includes("price_history") &&
