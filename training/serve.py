@@ -30,6 +30,8 @@ LIVE_PLAN_GUIDANCE = (
     "Use the structured fields for color, budget, audience, size and device model. "
     "For a follow-up, fill refs with the intended positions from previous_results using the question and active_position. "
     "If the user refers to all listed items, include each of their positions. When ambiguous, leave refs empty. "
+    "A question asking whether an already listed item has a particular option or works with another device is detail. "
+    "Use search when the user asks you to find additional or replacement products. "
     "Infer tasks from the current question. Use previous context to resolve product references, not to carry over tasks "
     "that the current question does not ask for. For cheaper, more expensive, or price difference, use compare with price. "
     "Respect the requested currency and only set numeric budget filters for USD. "
@@ -329,8 +331,11 @@ def parse_answer(raw, catalog):
 
 def action_messages(question_and_context):
     return [{"role": "system", "content":
-             "Choose one action for this shopping question. Use search to discover products, including new recommendations. "
-             "Use detail to check or explain a previously shown product. Use compare to compare products. Return just the action."},
+             "Choose one action for the current shopping question. Search means finding new or replacement products. "
+             "Detail means checking attributes, a combination of options, compatibility, or availability of an already listed product. "
+             "Compare means deciding between or comparing two or more products. Adding a size, color, or model to a question "
+             "about an existing item does not make it a search. 查询已展示商品的属性或规格用 detail，"
+             "比较多款用 compare，明确要求另找商品用 search。Return just the action."},
             {"role": "user", "content": question_and_context}]
 
 
@@ -453,6 +458,11 @@ def build_app(adapter, journal, token):
                 raw = generate(model, tokenizer, [system, messages[1]], planner_config)
                 stage = "parse"
                 output = parse_plan(raw, sample["expected"], normalize_live=True)
+            if output["action"] == "search" and output["refs"] and context["previous_results"]:
+                action = generate(model, tokenizer, action_messages(content), planner_config, choices=PLAN_ACTIONS).strip()
+                append_json(journal, {"event": "plan_reference_route", "question_id": payload.questionId, "action": action})
+                attempts += 1
+                output = parse_plan(json.dumps({**output, "action": action}), sample["expected"], normalize_live=True)
             generation_ms = round((time.monotonic() - generation_start) * 1000, 3)
             append_json(journal, {"event": "plan_ok", "question_id": payload.questionId,
                                   "seconds": round(time.monotonic()-start, 3),
