@@ -135,6 +135,9 @@ kbd { font: inherit; color: #414141; background: #efefef; padding: 1px 4px; bord
 .reply-bubble { border: 1px solid #e1e1e1; border-radius: 5px 14px 14px 14px; background: var(--paper); padding: 11px 14px; overflow-wrap: anywhere; }
 .reply-bubble p { font-size: 15px; line-height: 1.75; white-space: pre-wrap; }
 .reply-bubble p + p { margin-top: 7px; }
+.answer-checks { margin: 0 0 9px; color: var(--muted); }
+.answer-checks > summary { width: fit-content; cursor: pointer; font-size: 13px; font-weight: 650; }
+.answer-checks > .gaps { margin-top: 5px; }
 .assistant-content > .button { margin-top: 8px; }
 .reply-meta { margin-top: 9px; }
 .reply-summary { font-size: 14px; line-height: 1.55; }

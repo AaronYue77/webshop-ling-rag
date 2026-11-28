@@ -86,15 +86,16 @@ flowchart TD
   ELIGIBLE -->|否| EMPTY["返回目录无可确认商品与空推荐清单"]
   ELIGIBLE -->|是| RENUMBER["为 Ling 临时连续编号，保留原始编号映射"]
   RENUMBER --> SELECT["Ling 按原问题逐件核选，写正文和原文引句"]
-  ACTION -->|详情或对比| DESCRIBE["Ling 回答已指明的商品，说明资料缺口"]
-  SELECT --> VALIDATE{"正文、候选编号和引句归属有效？"}
+  ACTION -->|详情或对比| EVIDENCE["保留清单序号，为对比提供以美分核算的价格证据"]
+  EVIDENCE --> DESCRIBE["Ling 直接生成商品详情或比较正文"]
+  SELECT --> VALIDATE{"回答与适用的核选字段有效？"}
   DESCRIBE --> VALIDATE
   VALIDATE -->|无效且还有时间| REGEN["补充格式提示后重试一次"]
   REGEN -->|通过| RETURN["返回 paragraphs 与 selections，映射回原始候选编号"]
   VALIDATE -->|通过| RETURN
   REGEN -->|仍不通过| ERROR["记录校验失败，页面提示重试"]
   VALIDATE -->|无重试时间| ERROR
-  RETURN --> SHOW["正文 → 证据 → 图片 → 目录依据"]
+  RETURN --> SHOW["可折叠核对依据 → 正文与逐款理由 → 图片 → 目录来源"]
   EMPTY --> SHOWEMPTY["展示目录缺口说明"]
   SHOW --> HISTORY["按展示清单续问，日志保留召回顺序和实际引用"]
   SHOWEMPTY --> HISTORY

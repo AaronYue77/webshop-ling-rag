@@ -197,7 +197,7 @@ test("workbench only presents prose received from Kaggle and logs a failed answe
   assert.equal(thread.events[1].generationMs,50);
 });
 
-test("answer renders prose, evidence, images, and catalog details in that order",()=>{
+test("answer renders collapsed checks before prose, images, and catalog details",()=>{
   const source = fs.readFileSync(path.join(__dirname,"../web/app.js"),"utf8");
   const workflow = source.slice(source.indexOf("function renderTurn("),source.indexOf("function renderBreadcrumbs("));
   const element = (tag,className)=>({tag,className,children:[],dataset:{},setAttribute(){},
@@ -207,11 +207,14 @@ test("answer renders prose, evidence, images, and catalog details in that order"
   const turn = render({mode:"remote",adapter:true,answer:{reply_paragraphs:["一段连贯的回答。"],conditions:["黑色"],
     cards:[{images:["example"]}]}});
   const body = turn.children[1].children[1];
-  assert.deepEqual(body.children.map(item=>item.className),["reply-label","reply-bubble","chips","answer-grid","reply-meta"]);
+  assert.deepEqual(body.children.map(item=>item.className),["reply-label","answer-checks","reply-bubble","answer-grid","reply-meta"]);
+  assert.equal(body.children[1].tag,"details");
+  assert.equal(body.children[1].open,undefined);
+  assert.equal(body.children[1].children[0].tag,"summary");
   assert.equal(body.children[4].children[0].tag,"details");
 });
 
-test("shopping cards show requested catalog options and model reasons beside the images",()=>{
+test("model reasons appear in the reply, with catalog options on the image cards",()=>{
   const source = fs.readFileSync(path.join(__dirname,"../web/app.js"),"utf8");
   const cardSource = source.slice(source.indexOf("function productCard("),source.indexOf("function productEvidence("));
   const turnSource = source.slice(source.indexOf("function renderTurn("),source.indexOf("function renderBreadcrumbs("));
@@ -229,16 +232,36 @@ test("shopping cards show requested catalog options and model reasons beside the
     const found = rag.runModel(idx,"女士鞋",{},rag.makePlan({audience:"women",shoe:true,size:"8.5",max_price:50,
       tasks:["image","price_history","recommend",...optionTasks]}));
     const sneaker = found.cards.find(card=>card.id==="B09RPRRNVP");
-    const turn = render({mode:"remote",adapter:true,answer:{plan:found.plan,reply_paragraphs:["可以先看这双套脚鞋。"],
-      cards:[{...sneaker,modelReason}]}});
+    const turn = render({mode:"remote",adapter:true,answer:{...found,
+      reply_paragraphs:["用户要求推荐 8.5 码的鞋。","可以先看这双套脚鞋。"],cards:[{...sneaker,modelReason}]}});
     const body = turn.children[1].children[1];
     const picture = body.children.find(item=>item.className==="answer-grid").children[0];
     assert.equal(picture.text,sneaker.images[0]);
     assert.deepEqual(picture.children[0].children.map(item=>item.text),[
-      "颜色 · Black、Grey、Red","尺码 · 6.5、7、7.5、8、8.5、9",modelReason
+      "颜色 · Black、Grey、Red","尺码 · 6.5、7、7.5、8、8.5、9"
     ]);
-    assert.match(body.children.find(item=>item.className==="gaps").text,/缺少按日期排列的历史价格/);
+    const bubble = body.children.find(item=>item.className==="reply-bubble");
+    assert.equal(bubble.children.length,2);
+    assert.equal(bubble.children[0].text,"可以先看这双套脚鞋。");
+    assert.deepEqual(bubble.children[1].children.map(item=>item.text),["第 "+sneaker.position+" 款 ",modelReason]);
+    const checks = body.children.find(item=>item.className==="answer-checks");
+    assert.ok(checks.children.some(item=>/缺少按日期排列的历史价格/.test(item.text ?? "")));
   }
+});
+
+test("follow-up evidence keeps the displayed positions and does not invent missing products",()=>{
+  const source = fs.readFileSync(path.join(__dirname,"../web/app.js"),"utf8");
+  const start = source.indexOf("function answerEvidence(");
+  const answerEvidence = vm.runInNewContext(source.slice(start,source.indexOf("function selectedSearchAnswer(",start))+
+    "\nanswerEvidence",{idx,TextEncoder});
+  const state = {resultIds:["B09S3TWKSC","B09RPRRNVP","B09QL82H1L","B09QKJHF4Q"]};
+  const compare = rag.runModel(idx,"第三款和第一款差多少钱？",state,
+    rag.makePlan({action:"compare",refs:[3,1,5],tasks:["price"]}));
+  const evidence = JSON.parse(answerEvidence(compare));
+  assert.deepEqual(evidence.requested_positions,[3,1,5]);
+  assert.deepEqual(evidence.products.map(item=>[item.position,item.snapshot_price_usd]),[[3,23.29],[1,6.99]]);
+  assert.ok(evidence.notes.some(note=>note.includes("没有第 5 款")));
+  assert.deepEqual(compare.state.resultIds,state.resultIds);
 });
 
 test("splits have unique full inputs and isolated ASIN families and contexts",()=>{

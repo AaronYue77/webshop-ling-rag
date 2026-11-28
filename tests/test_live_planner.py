@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "training"))
 from common import InvalidPlannerAction, parse_plan
 from serve import (ANSWER_PREFIX, action_messages, answer_messages, empty_search_reply, log_answer_failure, parse_answer,
-                   prepare_answer_catalog)
+                   parse_followup_answer, prepare_answer_catalog, snapshot_price_comparison)
 
 
 class LivePlannerTest(unittest.TestCase):
@@ -138,11 +138,37 @@ class LivePlannerTest(unittest.TestCase):
             self.assertTrue(captured["truncated"])
 
     def test_comparison_uses_named_items_without_reselecting_them(self):
-        catalog = {"action": "compare", "products": [{"position": 1, "name": "Thermos"}]}
-        reply = {"paragraphs": ["这份目录没有足够的资料比较两款保温性能。"], "selections": []}
-        self.assertEqual(parse_answer(json.dumps(reply), catalog), reply)
-        with self.assertRaises(ValueError):
-            parse_answer(json.dumps({**reply, "selections": [{"position": 1, "quote": "Thermos"}]}), catalog)
+        products = [{"position": 3, "name": "旅行杯", "snapshot_price_usd": 23.29},
+                    {"position": 1, "name": "保温杯", "snapshot_price_usd": 6.99}]
+        catalog = {"action": "compare", "products": products, "requested_positions": [3, 1]}
+        system, user = answer_messages("这两款差多少钱？", catalog)
+        self.assertIn("plain text", system["content"])
+        self.assertNotIn("selections", system["content"])
+        evidence = json.loads(user["content"])["catalog"]
+        self.assertEqual(evidence["products"], products)
+        self.assertEqual(evidence["snapshot_price_comparison"],
+                         {"prices_usd": {"3": "23.29", "1": "6.99"}, "missing_positions": [],
+                          "lowest_positions": [1], "highest_positions": [3], "difference_usd": "16.30"})
+        prose = "按目录快照价，第 1 款更便宜。第 1 款是 6.99 美元，第 3 款是 23.29 美元，相差 16.30 美元。"
+        reply = {"paragraphs": [prose], "selections": []}
+        self.assertEqual(parse_followup_answer(prose), reply)
+        self.assertEqual(parse_followup_answer(json.dumps({"paragraphs": [prose]})), reply)
+        for raw in ("", "[]", '{"action":"compare"}', "<think>internal</think>"):
+            with self.subTest(raw=raw), self.assertRaises(ValueError):
+                parse_followup_answer(raw)
+
+    def test_comparison_marks_equal_missing_and_multiple_snapshot_prices(self):
+        products = [{"position": 2, "snapshot_price_usd": 15.25}, {"position": 4, "snapshot_price_usd": 15.25}]
+        def compare(items, positions):
+            return snapshot_price_comparison({"products": items, "requested_positions": positions})
+
+        tied = compare(products, [2, 4])
+        self.assertEqual((tied["difference_usd"], tied["lowest_positions"]), ("0.00", [2, 4]))
+        multiple = compare([*products, {"position": 5, "snapshot_price_usd": 20.29}], [2, 4, 5])
+        self.assertEqual((multiple["difference_usd"], multiple["highest_positions"]), ("5.04", [5]))
+        missing = compare([*products, {"position": 5, "snapshot_price_usd": None}], [2, 4, 5, 7])
+        self.assertEqual(missing["missing_positions"], [5, 7])
+        self.assertNotIn("difference_usd", missing)
 
     def test_answer_checks_model_evidence_requirements_before_generation(self):
         catalog = {"action": "search", "required_terms": ["leather"], "excluded_terms": ["faux leather"],

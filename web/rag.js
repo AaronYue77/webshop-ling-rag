@@ -406,7 +406,7 @@
     if (plan.tasks.includes("price_history")) notes.push(priceHistoryNote);
     if (plan.tasks.includes("current_price")) notes.push("实时售价需要在当前商品页核实。");
     if (plan.tasks.includes("inventory") && !cards.length) notes.push("本目录缺少实时库存来源。");
-    if (plan.action === "compare" && cards.length) {
+    if (!modelOnly && plan.action === "compare" && cards.length) {
       notes.unshift(compare(cards));
       if (cards.length >= 2) {
         const kinds = cards.map(c=>"第 "+c.position+" 款 · "+(c.trail.split("›").at(-1)?.trim() || c.brand));

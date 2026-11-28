@@ -342,7 +342,6 @@ function productCard(card, tasks = []) {
   const showSpecs = tasks.includes("specs");
   if (tasks.includes("color") || (showSpecs && colors)) copy.append(node("small",null,"颜色 · " + (colors || "目录未记录")));
   if (tasks.includes("size") || (showSpecs && sizes)) copy.append(node("small",null,"尺码 · " + (sizes || "目录未记录可选尺码")));
-  if (card.modelReason) copy.append(node("small",null,card.modelReason));
   el.classList.add("reply-product");
   el.title = label;
   return el;
@@ -373,9 +372,27 @@ function renderTurn(event) {
   const model = event.mode === "remote" ? (event.adapter ? "Ling · LoRA 微调" : "Ling · 基座") :
     event.answer ? "历史记录" : "Kaggle GPU";
   content.append(node("p","reply-label",model));
+  const out = event.answer;
+  const cards = out?.cards ?? [];
+  if (out) {
+    const checks = node("details","answer-checks");
+    checks.append(node("summary",null,"查找与核对依据"));
+    const conditions = out.plan && out.plan.action !== "search" ? [] : out.conditions ?? [];
+    if (conditions.length || out.taskLabels?.length) {
+      const chips = node("div","chips");
+      for (const item of conditions) chips.append(node("span","chip condition",item));
+      for (const item of out.taskLabels ?? []) chips.append(node("span","chip",item));
+      checks.append(chips);
+    }
+    if (cards.length && out.plan && out.plan.action !== "search") {
+      const positions = cards.map(card=>"第 " + card.position + " 款");
+      checks.append(node("p","gaps","沿用前一份清单的序号，核对" + positions.join("、") + "。"));
+    }
+    for (const note of out.notes ?? []) checks.append(node("p","gaps",note));
+    if (checks.children.length > 1) content.append(checks);
+  }
   const bubble = node("div","reply-bubble");
   content.append(bubble);
-  const out = event.answer;
   if (!out) {
     const running = event.pending && processing === event.questionId;
     bubble.append(node("p",null,running ? (event.progress ?? "正在 Kaggle GPU 上解析需求…") :
@@ -386,17 +403,19 @@ function renderTurn(event) {
       ask(event.question);
     }));
   } else {
-    for (const paragraph of out.reply_paragraphs ?? []) bubble.append(node("p",null,paragraph));
-    if (!out.reply_paragraphs?.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
-    const tasks = out.plan?.tasks ?? [];
-    if (tasks.includes("price_history")) content.append(node("p","gaps",ShopRag.priceHistoryNote));
-    if (out.conditions?.length || out.taskLabels?.length) {
-      const chips = node("div","chips");
-      for (const item of out.conditions ?? []) chips.append(node("span","chip condition",item));
-      for (const item of out.taskLabels ?? []) chips.append(node("span","chip",item));
-      content.append(chips);
+    const reasons = cards.filter(card=>card.modelReason);
+    const paragraphs = out.reply_paragraphs ?? [];
+    const prose = paragraphs.filter(paragraph=>!reasons.length ||
+      !/^(?:用户(?:要求|想|希望|需要|询问|的问题|提到)|the user\s+(?:asks?|asked|wants?|requested|needs?|is looking))/i.test(paragraph.trim()));
+    for (const paragraph of prose) bubble.append(node("p",null,paragraph));
+    for (const card of reasons) {
+      if (prose.some(paragraph=>paragraph.includes(card.modelReason))) continue;
+      const reason = node("p",null);
+      reason.append(node("strong",null,"第 " + card.position + " 款 "),node("span",null,card.modelReason));
+      bubble.append(reason);
     }
-    const cards = out.cards ?? [];
+    if (!bubble.children.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
+    const tasks = out.plan?.tasks ?? [];
     const withPictures = cards.filter(card=>card.images?.length || out.plan?.action === "search");
     if (withPictures.length) {
       const list = node("div","answer-grid");
@@ -652,7 +671,8 @@ function showSettings() {
 function answerEvidence(out) {
   const short = (text, limit) => String(text ?? "").replace(/\s+/g," ").trim().slice(0,limit);
   const catalog = {
-    action:out.plan.action, tasks:out.plan.tasks, filters:out.conditions, recalled_count:out.matched,
+    action:out.plan.action, tasks:out.plan.tasks, recalled_count:out.matched,
+    ...(out.plan.action === "search" ? {filters:out.conditions} : {requested_positions:out.plan.refs}),
     result_limit:out.plan.limit,
     required_terms:out.plan.required_terms ?? [], excluded_terms:out.plan.excluded_terms ?? [],
     notes:out.notes.map(text=>short(text,300)),
