@@ -388,7 +388,10 @@ function renderTurn(event) {
       const positions = cards.map(card=>"第 " + card.position + " 款");
       checks.append(node("p","gaps","沿用前一份清单的序号，核对" + positions.join("、") + "。"));
     }
-    for (const note of out.notes ?? []) checks.append(node("p","gaps",note));
+    for (const note of out.notes ?? []) {
+      if (out.plan?.action === "search" && out.plan.tasks?.includes("price_history") && note === ShopRag.priceHistoryNote) continue;
+      checks.append(node("p","gaps",note));
+    }
     if (checks.children.length > 1) content.append(checks);
   }
   const bubble = node("div","reply-bubble");
@@ -404,6 +407,7 @@ function renderTurn(event) {
     }));
   } else {
     const reasons = cards.filter(card=>card.modelReason);
+    const tasks = out.plan?.tasks ?? [];
     const paragraphs = out.reply_paragraphs ?? [];
     const prose = paragraphs.filter(paragraph=>!reasons.length ||
       !/^(?:用户(?:要求|想|希望|需要|询问|的问题|提到)|the user\s+(?:asks?|asked|wants?|requested|needs?|is looking))/i.test(paragraph.trim()));
@@ -414,8 +418,11 @@ function renderTurn(event) {
       reason.append(node("strong",null,"第 " + card.position + " 款 "),node("span",null,card.modelReason));
       bubble.append(reason);
     }
+    if (out.plan?.action === "search" && tasks.includes("price_history") &&
+        !prose.some(paragraph=>/没有.{0,15}(历史价|价格历史)|缺少.{0,15}(历史价|价格走势)|无法.{0,15}(历史价|价格趋势)|(?:no|without|cannot establish).{0,26}price history/i.test(paragraph))) {
+      bubble.append(node("p","gaps",ShopRag.priceHistoryNote));
+    }
     if (!bubble.children.length) bubble.append(node("p",null,"此历史记录只保存了目录依据。"));
-    const tasks = out.plan?.tasks ?? [];
     const withPictures = cards.filter(card=>card.images?.length || out.plan?.action === "search");
     if (withPictures.length) {
       const list = node("div","answer-grid");

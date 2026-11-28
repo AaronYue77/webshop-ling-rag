@@ -155,8 +155,11 @@ class LivePlannerTest(unittest.TestCase):
                     {"position": 1, "name": "保温杯", "snapshot_price_usd": 6.99}]
         catalog = {"action": "compare", "products": products, "requested_positions": [3, 1]}
         system, user = answer_messages("这两款差多少钱？", catalog)
-        self.assertIn("plain text", system["content"])
+        self.assertIn("自然的简体中文", system["content"])
+        self.assertIn("纯文本", system["content"])
         self.assertNotIn("selections", system["content"])
+        system_en, _ = answer_messages("How much cheaper is item 3?", catalog)
+        self.assertIn("plain text", system_en["content"])
         evidence = json.loads(user["content"])["catalog"]
         self.assertEqual(evidence["products"], products)
         self.assertEqual(evidence["snapshot_price_comparison"],
