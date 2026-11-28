@@ -407,14 +407,13 @@ function renderTurn(event) {
     }));
   } else {
     const tasks = out.plan?.tasks ?? [];
+    const itemRecommendations = out.plan?.action === "search" && tasks.includes("recommend");
     const reasons = cards.flatMap(card=>{
       if (card.modelReason) return [{position:card.position,text:card.modelReason}];
       const quote = tasks.includes("recommend") && card.facts?.find(([label])=>label === "推荐依据原文")?.[1];
       return quote ? [{position:card.position,text:"目录依据为「" + quote + "」。"}] : [];
     });
-    const paragraphs = out.reply_paragraphs ?? [];
-    const prose = paragraphs.filter(paragraph=>!reasons.length ||
-      !/^(?:用户(?:要求|想|希望|需要|询问|的问题|提到)|the user\s+(?:asks?|asked|wants?|requested|needs?|is looking))/i.test(paragraph.trim()));
+    const prose = itemRecommendations && reasons.length ? [] : out.reply_paragraphs ?? [];
     for (const paragraph of prose) bubble.append(node("p",null,paragraph));
     for (const {position,text} of reasons) {
       if (prose.some(paragraph=>paragraph.includes(text))) continue;

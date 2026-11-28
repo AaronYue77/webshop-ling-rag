@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-iOZxkgS6ovublfDKkOq7bOoWZScqUWO7Yw1cqMEx0tc=' 'sha256-15X8Mr5+QBrXf20xM8D5O5xkvS116fMNFJme2oeEv3E='; style-src 'sha256-uRZjohsZbB8UuIy307stuA1Oyt2sJUVp47SXlo3RII0='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-UPpIRQyNltDE1YXfbER34n51KBZTwLjHDDpS6oKkcUw=' 'sha256-R1ISEWn2R2K1yPON/MUvyP25B1IBhsZ2u189B0hUZ2I=' 'sha256-iOZxkgS6ovublfDKkOq7bOoWZScqUWO7Yw1cqMEx0tc=' 'sha256-cffsyvzQ92+aywwqfa4w+EMhszIE4WKC5OSOgDPlHyw='; style-src 'sha256-uRZjohsZbB8UuIy307stuA1Oyt2sJUVp47SXlo3RII0='; img-src 'self' file: data: https://m.media-amazon.com https://*.ssl-images-amazon.com https://images.amazon.com; connect-src https://*.jupyter-proxy.kaggle.net wss://*.jupyter-proxy.kaggle.net; base-uri 'none'; form-action 'none'">
   <title>WebShop 商品档案 · 问答台</title>
   <style>:root {
   color-scheme: light;
@@ -1350,14 +1350,13 @@ function renderTurn(event) {
     }));
   } else {
     const tasks = out.plan?.tasks ?? [];
+    const itemRecommendations = out.plan?.action === "search" && tasks.includes("recommend");
     const reasons = cards.flatMap(card=>{
       if (card.modelReason) return [{position:card.position,text:card.modelReason}];
       const quote = tasks.includes("recommend") && card.facts?.find(([label])=>label === "推荐依据原文")?.[1];
       return quote ? [{position:card.position,text:"目录依据为「" + quote + "」。"}] : [];
     });
-    const paragraphs = out.reply_paragraphs ?? [];
-    const prose = paragraphs.filter(paragraph=>!reasons.length ||
-      !/^(?:用户(?:要求|想|希望|需要|询问|的问题|提到)|the user\s+(?:asks?|asked|wants?|requested|needs?|is looking))/i.test(paragraph.trim()));
+    const prose = itemRecommendations && reasons.length ? [] : out.reply_paragraphs ?? [];
     for (const paragraph of prose) bubble.append(node("p",null,paragraph));
     for (const {position,text} of reasons) {
       if (prose.some(paragraph=>paragraph.includes(text))) continue;
