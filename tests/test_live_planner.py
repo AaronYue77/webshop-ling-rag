@@ -103,6 +103,16 @@ class LivePlannerTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_answer(json.dumps({"paragraphs": answer["paragraphs"]}), catalog)
 
+    def test_search_recovers_only_missing_json_closers_after_a_complete_value(self):
+        catalog = {"action": "search", "products": [{"position": 1, "name": "Portable charger"}]}
+        raw = '{"selections":[{"position":1,"quote":"Portable charger"}],"paragraphs":["可以考虑这款。"]'
+        expected = {"selections": [{"position": 1, "quote": "Portable charger"}], "paragraphs": ["可以考虑这款。"]}
+        self.assertEqual(parse_answer(raw, catalog), expected)
+        self.assertEqual(parse_answer(raw[:-1], catalog), expected)
+        for invalid in (raw[:-2], raw.replace('"position":1', '"position":3')):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                parse_answer(invalid, catalog)
+
     def test_selection_cites_its_own_catalog_when_ling_paraphrases_or_omits_the_quote(self):
         catalog = {"action": "search", "tasks": ["recommend"], "products": [
             {"position": 1, "name": "Wireless stand", "matched_evidence": ["Folds flat for travel"]},
