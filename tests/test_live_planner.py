@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "training"))
 from common import InvalidPlannerAction, parse_plan
 from serve import (ANSWER_PREFIX, action_messages, answer_messages, empty_search_reply, log_answer_failure, parse_answer,
-                   parse_followup_answer, prepare_answer_catalog, snapshot_price_comparison)
+                   parse_followup_answer, parse_followup_plan, prepare_answer_catalog, snapshot_price_comparison)
 
 
 class LivePlannerTest(unittest.TestCase):
@@ -216,6 +216,19 @@ class LivePlannerTest(unittest.TestCase):
         repaired = {**caught.exception.plan, "action": "compare"}
         self.assertEqual(parse_plan(json.dumps(repaired), self.plan, normalize_live=True), repaired)
         self.assertEqual(action_messages("original model input")[1]["content"], "original model input")
+
+    def test_compact_followup_keeps_model_refs_tasks_and_requested_filters(self):
+        partial = json.dumps({"refs": ["2"], "tasks": ["color", "size"], "size": 8.5,
+                              "color": "black", "unused_extra_key": "value"})
+        with self.assertRaises(ValueError):
+            parse_plan(partial, self.plan, normalize_live=True)
+        repaired = parse_followup_plan(partial, self.plan, "detail")
+        self.assertEqual((repaired["action"], repaired["refs"], repaired["tasks"]), ("detail", [2], ["color", "size"]))
+        self.assertEqual((repaired["size"], repaired["color"], repaired["max_price"]), ("8.5", "black", None))
+        with self.assertRaises(ValueError):
+            parse_followup_plan(partial, self.plan, "search")
+        with self.assertRaises(ValueError):
+            parse_followup_plan('{"refs":["second"],"tasks":["color"]}', self.plan, "detail")
 
 
 if __name__ == "__main__":

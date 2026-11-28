@@ -49,15 +49,16 @@ PLAN_EXAMPLES = (
      {"tasks": ["recommend"], "category": "garden", "terms": ["electric kettle"],
       "required_terms": ["stainless steel", "removable filter"], "excluded_terms": ["plastic lid"]}),
 )
+PLAN_DEFAULTS = {"action": "search", "tasks": [], "category": None, "shoe": False, "audience": None,
+                 "max_price": None, "min_price": None, "price_exclusive": False, "size": None, "size_system": None,
+                 "color": None, "terms": [], "refs": [], "limit": 4, "compatibility_target": None,
+                 "sort": "relevance", "budget_scope": "item"}
+FOLLOWUP_PLAN_FIELDS = ("refs", "tasks", "size", "size_system", "color", "compatibility_target")
 
 
 def planner_examples():
-    empty = {"action": "search", "tasks": [], "category": None, "shoe": False, "audience": None,
-             "max_price": None, "min_price": None, "price_exclusive": False, "size": None, "size_system": None,
-             "color": None, "terms": [], "refs": [], "limit": 4, "compatibility_target": None,
-             "sort": "relevance", "budget_scope": "item"}
     return "\nExamples of keeping explicit catalog filters while using valid actions:\n" + "\n".join(
-        question + "\n" + json.dumps({**empty, **plan}, separators=(",", ":")) for question, plan in PLAN_EXAMPLES
+        question + "\n" + json.dumps({**PLAN_DEFAULTS, **plan}, separators=(",", ":")) for question, plan in PLAN_EXAMPLES
     )
 
 PLAN_CORRECTION = (
@@ -349,6 +350,29 @@ def action_messages(question_and_context):
             {"role": "user", "content": question_and_context}]
 
 
+def followup_plan_messages(question_and_context):
+    example = json.dumps({key: PLAN_DEFAULTS[key] for key in FOLLOWUP_PLAN_FIELDS}, separators=(",", ":"))
+    return [{"role": "system", "content":
+             "Extract details for a follow-up about previously listed products. Output JSON only with this schema: "
+             + example + ". Use original positions from previous_results. If the reference is ambiguous, leave refs empty. "
+             "Tasks can be image, price, price_history, size, color, material, specs, recommend, compare, "
+             "variant_price, inventory, compatibility, current_price. Include only what is asked in the current question. "
+             "Use a string for size and the exact device model for compatibility_target. Set unspecified fields to null."},
+            {"role": "user", "content": question_and_context}]
+
+
+def parse_followup_plan(raw, schema, action):
+    if action not in ("detail", "compare"):
+        raise ValueError("A compact plan requires a follow-up action")
+    value = decode_answer_json(raw)
+    if isinstance(value, dict) and isinstance(value.get("plan"), dict):
+        value = value["plan"]
+    if not isinstance(value, dict) or not {"refs", "tasks"} <= value.keys():
+        raise ValueError("Expected a follow-up plan with tasks and product positions")
+    plan = {**PLAN_DEFAULTS, **{key: value[key] for key in FOLLOWUP_PLAN_FIELDS if key in value}, "action": action}
+    return parse_plan(json.dumps(plan), schema, normalize_live=True)
+
+
 def build_app(adapter, journal, token):
     from fastapi import FastAPI, Header, HTTPException
     from fastapi.exception_handlers import request_validation_exception_handler
@@ -461,13 +485,26 @@ def build_app(adapter, journal, token):
                     raise
                 append_json(journal, {"event": "plan_retry", "question_id": payload.questionId,
                                       "reason": str(first_error), "model_and_config_version": version})
-                system = {**messages[0], "content": messages[0]["content"] + PLAN_CORRECTION
-                          + "\nValidation issue: " + str(first_error)}
-                stage = "generation"
-                attempts += 1
-                raw = generate(model, tokenizer, [system, messages[1]], planner_config)
-                stage = "parse"
-                output = parse_plan(raw, sample["expected"], normalize_live=True)
+                action = None
+                if context["previous_results"]:
+                    action = generate(model, tokenizer, action_messages(content), planner_config, choices=PLAN_ACTIONS).strip()
+                    attempts += 1
+                if action in ("detail", "compare"):
+                    try:
+                        output = parse_followup_plan(raw, sample["expected"], action)
+                    except ValueError:
+                        attempts += 1
+                        compact = generate(model, tokenizer, followup_plan_messages(content),
+                                           {**planner_config, "max_new_tokens": 160}, assistant_prefix='{"refs":[')
+                        output = parse_followup_plan(compact, sample["expected"], action)
+                else:
+                    system = {**messages[0], "content": messages[0]["content"] + PLAN_CORRECTION
+                              + "\nValidation issue: " + str(first_error)}
+                    stage = "generation"
+                    attempts += 1
+                    raw = generate(model, tokenizer, [system, messages[1]], planner_config)
+                    stage = "parse"
+                    output = parse_plan(raw, sample["expected"], normalize_live=True)
             if output["action"] == "search" and output["refs"] and context["previous_results"]:
                 action = generate(model, tokenizer, action_messages(content), planner_config, choices=PLAN_ACTIONS).strip()
                 append_json(journal, {"event": "plan_reference_route", "question_id": payload.questionId, "action": action})
