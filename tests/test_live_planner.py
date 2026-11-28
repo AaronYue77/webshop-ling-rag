@@ -67,8 +67,7 @@ class LivePlannerTest(unittest.TestCase):
         self.assertEqual(parse_answer(json.dumps(good), catalog), good)
         continuation = '{"position":2,"quote":"full-grain leather uppers"}],"paragraphs":["可考虑这双皮鞋。"]}'
         self.assertEqual(parse_answer(ANSWER_PREFIX + continuation, catalog)["selections"], good["selections"])
-        for selections in ([{"position": 1, "quote": "full-grain leather uppers"}],
-                           [{"position": 3, "quote": "full-grain leather uppers"}],
+        for selections in ([{"position": 3, "quote": "full-grain leather uppers"}],
                            good["selections"] * 2):
             with self.subTest(selections=selections), self.assertRaises(ValueError):
                 parse_answer(json.dumps({**good, "selections": selections}), catalog)
@@ -101,10 +100,24 @@ class LivePlannerTest(unittest.TestCase):
         for raw in ({"answer": answer}, {**answer, "action": "search"}):
             with self.subTest(raw=raw):
                 self.assertEqual(parse_answer(json.dumps(raw), catalog), answer)
-        for raw in ({"paragraphs": answer["paragraphs"]},
-                    {"answer": {**answer, "selections": [{"position": 1, "quote": "genuine suede"}]}}):
-            with self.subTest(raw=raw), self.assertRaises(ValueError):
-                parse_answer(json.dumps(raw), catalog)
+        with self.assertRaises(ValueError):
+            parse_answer(json.dumps({"paragraphs": answer["paragraphs"]}), catalog)
+
+    def test_selection_cites_its_own_catalog_when_ling_paraphrases_or_omits_the_quote(self):
+        catalog = {"action": "search", "tasks": ["recommend"], "products": [
+            {"position": 1, "name": "Wireless stand", "matched_evidence": ["Folds flat for travel"]},
+            {"position": 2, "name": "Protective phone case"},
+            {"position": 3},
+        ]}
+        reason = "可以折叠，出门时好收纳。"
+        for quote in ({"quote": "Protective phone case"}, {"quote": "折叠便携"}, {}, {"quote": None}):
+            with self.subTest(quote=quote):
+                raw = json.dumps({"paragraphs": ["可以考虑这款支架。"],
+                                  "selections": [{"position": 1, "reason": reason, **quote}]})
+                self.assertEqual(parse_answer(raw, catalog)["selections"],
+                                 [{"position": 1, "reason": reason, "quote": "Folds flat for travel"}])
+        with self.assertRaisesRegex(ValueError, "no quotable catalog evidence"):
+            parse_answer('{"paragraphs":["可考虑"],"selections":[{"position":3,"reason":"方便携带。"}]}', catalog)
 
     def test_failed_answer_logging_explains_shape_and_limits_private_capture(self):
         catalog = {"action": "search", "products": []}
@@ -179,8 +192,8 @@ class LivePlannerTest(unittest.TestCase):
         self.assertEqual(checked["products"], [{"position": 1, "description": "Upper: Full-grain Leather"}])
         self.assertEqual(source_positions, {1: 2})
         self.assertEqual(len(catalog["products"]), 3)
-        with self.assertRaises(ValueError):
-            parse_answer('{"paragraphs":["推荐这款。"],"selections":[{"position":1,"quote":"Black"}]}', checked)
+        checked_reply = parse_answer('{"paragraphs":["推荐这款。"],"selections":[{"position":1,"quote":"Black"}]}', checked)
+        self.assertEqual(checked_reply["selections"], [{"position": 1, "quote": "Upper: Full-grain Leather"}])
         comparison = {**catalog, "action": "compare"}
         compared, source_positions = prepare_answer_catalog(comparison)
         self.assertIs(compared, comparison)

@@ -88,7 +88,8 @@ flowchart TD
   RENUMBER --> SELECT["Ling 按原问题逐件核选，写正文和原文引句"]
   ACTION -->|详情或对比| EVIDENCE["保留清单序号，为对比提供以美分核算的价格证据"]
   EVIDENCE --> DESCRIBE["Ling 直接生成商品详情或比较正文"]
-  SELECT --> VALIDATE{"回答与适用的核选字段有效？"}
+  SELECT --> CITE["逐款校验引句，必要时从同款目录字段提取原文"]
+  CITE --> VALIDATE{"回答与适用的核选字段有效？"}
   DESCRIBE --> VALIDATE
   VALIDATE -->|无效且还有时间| REGEN["补充格式提示后重试一次"]
   REGEN -->|通过| RETURN["返回 paragraphs 与 selections，映射回原始候选编号"]
